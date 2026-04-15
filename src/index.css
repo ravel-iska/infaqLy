@@ -1,0 +1,254 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════
+   DESIGN SYSTEM — infaqLy
+   Dual Theme: User (Light) + Admin (Dark)
+   ═══════════════════════════════════════════════════ */
+
+/* ── Base Reset ────────────────────────────────── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  color: #1E293B;
+  background-color: #F8FAF5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* ── User Theme Utilities ─────────────────────── */
+.user-bg {
+  background-color: #F8FAF5;
+}
+
+.user-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+  transition: all 0.2s ease;
+}
+
+.user-card:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* ── Admin Theme Utilities ────────────────────── */
+.admin-bg {
+  background-color: #0F172A;
+  color: #F1F5F9;
+}
+
+.admin-card {
+  background-color: #1E293B;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.admin-card:hover {
+  border-color: #6366F1;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+/* ── Button Variants ──────────────────────────── */
+@layer components {
+  /* User Primary Button */
+  .btn-user-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 
+           bg-user-accent text-white font-semibold rounded-lg
+           hover:bg-user-accent-hover active:scale-[0.97]
+           transition-all duration-200 cursor-pointer
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* User Ghost Button */
+  .btn-user-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 
+           bg-transparent text-user-accent font-semibold rounded-lg
+           border-2 border-user-accent
+           hover:bg-user-accent hover:text-white active:scale-[0.97]
+           transition-all duration-200 cursor-pointer;
+  }
+
+  /* Admin Primary Button */
+  .btn-admin-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 
+           bg-admin-accent text-white font-semibold rounded-admin
+           hover:bg-admin-accent-hover active:scale-[0.97]
+           transition-all duration-200 cursor-pointer
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Admin Ghost Button */
+  .btn-admin-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 
+           bg-transparent text-admin-text-secondary font-medium rounded-admin
+           border border-admin-border
+           hover:bg-admin-bg-hover hover:text-admin-text active:scale-[0.97]
+           transition-all duration-200 cursor-pointer;
+  }
+
+  /* Status Badges */
+  .badge-success {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold
+           rounded-full bg-emerald-100 text-emerald-700;
+  }
+
+  .badge-warning {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold
+           rounded-full bg-amber-100 text-amber-700;
+  }
+
+  .badge-danger {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold
+           rounded-full bg-red-100 text-red-700;
+  }
+
+  /* Admin Status Badges */
+  .badge-admin-success {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold
+           rounded-full bg-emerald-500/20 text-emerald-400;
+  }
+
+  .badge-admin-warning {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold
+           rounded-full bg-amber-500/20 text-amber-400;
+  }
+
+  .badge-admin-danger {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold
+           rounded-full bg-red-500/20 text-red-400;
+  }
+
+  /* Input Styles */
+  .input-user {
+    @apply w-full px-4 py-3 rounded-lg border border-user-border
+           bg-white text-user-text placeholder-user-text-muted
+           focus:outline-none focus:ring-2 focus:ring-user-accent/30 focus:border-user-accent
+           transition-all duration-200;
+  }
+
+  .input-admin {
+    @apply w-full px-4 py-3 rounded-admin border border-admin-border
+           bg-admin-bg text-admin-text placeholder-admin-text-muted font-mono text-sm
+           focus:outline-none focus:ring-2 focus:ring-admin-accent/30 focus:border-admin-accent
+           transition-all duration-200;
+  }
+}
+
+/* ── Progress Bar ─────────────────────────────── */
+.progress-bar {
+  @apply relative h-3 rounded-full overflow-hidden;
+  background-color: #E2E8F0;
+}
+
+.progress-bar-fill {
+  @apply absolute top-0 left-0 h-full rounded-full;
+  background: linear-gradient(90deg, #10B981, #059669);
+  width: var(--progress-width, 0%);
+  transition: width 1.5s ease-out;
+}
+
+.progress-bar-fill.animate {
+  animation: progress 1.5s ease-out forwards;
+}
+
+/* ── Admin Grid Pattern Background ────────────── */
+.admin-grid-bg {
+  background-image: 
+    linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ── Scrollbar Styling ────────────────────────── */
+.scrollbar-admin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-admin::-webkit-scrollbar-track {
+  background: #0F172A;
+}
+
+.scrollbar-admin::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+
+.scrollbar-admin::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* ── Hero Gradient ────────────────────────────── */
+.hero-gradient {
+  background: linear-gradient(135deg, #F8FAF5 0%, #D1FAE5 50%, #F0FDF4 100%);
+}
+
+/* ── CTA Gradient ─────────────────────────────── */
+.cta-gradient {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+}
+
+/* ── Glass effect ─────────────────────────────── */
+.glass-user {
+  backdrop-filter: blur(12px);
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+.glass-admin {
+  backdrop-filter: blur(12px);
+  background-color: rgba(15, 23, 42, 0.85);
+}
+
+/* ── Navbar scroll state ──────────────────────── */
+.navbar-scrolled {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Skeleton loading shimmer ─────────────────── */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #E2E8F0 25%,
+    #F1F5F9 50%,
+    #E2E8F0 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.skeleton-shimmer-dark {
+  background: linear-gradient(
+    90deg,
+    #1E293B 25%,
+    #334155 50%,
+    #1E293B 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

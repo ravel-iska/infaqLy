@@ -1,0 +1,162 @@
+import { env } from '../config/env.js';
+import { db } from '../config/database.js';
+import { donations, campaigns, settings } from '../db/schema.js';
+import { eq } from 'drizzle-orm';
+
+/**
+ * Get Midtrans config from database settings → env fallback.
+ * Admin saves keys via /api/settings (persisted in DB).
+ * This ensures keys survive browser cookie/localStorage clears.
+ */
+async function getMidtransConfig() {
+  let serverKey = '';
+  let clientKey = '';
+  let merchantId = '';
+  let midtransEnv: 'sandbox' | 'production' = 'sandbox';
+
+  try {
+    const rows = await db.select().from(settings).where(
+      eq(settings.key, 'midtrans_server_key')
+    ).limit(1);
+    serverKey = rows[0]?.value || '';
+
+    const rows2 = await db.select().from(settings).where(
+      eq(settings.key, 'midtrans_client_key')
+    ).limit(1);
+    clientKey = rows2[0]?.value || '';
+
+    const rows3 = await db.select().from(settings).where(
+      eq(settings.key, 'midtrans_merchant_id')
+    ).limit(1);
+    merchantId = rows3[0]?.value || '';
+
+    const rows4 = await db.select().from(settings).where(
+      eq(settings.key, 'midtrans_env')
+    ).limit(1);
+    const dbEnv = rows4[0]?.value;
+    if (dbEnv === 'production' || dbEnv === 'sandbox') midtransEnv = dbEnv;
+  } catch (err) {
+    console.warn('[Midtrans] Failed to read settings from DB, using env fallback');
+  }
+
+  // Fallback to env vars if DB didn't have them
+  if (!serverKey) serverKey = env.MIDTRANS_SERVER_KEY;
+  if (!clientKey) clientKey = env.MIDTRANS_CLIENT_KEY;
+  if (!merchantId) merchantId = env.MIDTRANS_MERCHANT_ID;
+  if (!serverKey && !clientKey) midtransEnv = env.MIDTRANS_ENV;
+
+  return { serverKey, clientKey, merchantId, env: midtransEnv };
+}
+
+/**
+ * Generate Order ID
+ */
+export function generateOrderId(): string {
+  const date = new Date().toISOString().slice(2, 10).replace(/-/g, '');
+  const rand = Math.random().toString(36).slice(2, 7).toUpperCase();
+  return `INF-${date}-${rand}`;
+}
+
+/**
+ * Create Snap Token via Midtrans API.
+ * Reads server key from DB settings (set by admin via Settings page).
+ */
+export async function createSnapToken(data: {
+  orderId: string; amount: number; donorName: string; donorEmail: string; donorPhone: string; programName: string;
+}) {
+  const config = await getMidtransConfig();
+
+  if (!config.serverKey) {
+    throw new Error('Midtrans Server Key belum dikonfigurasi. Buka Admin → Pengaturan → Midtrans.');
+  }
+
+  const SNAP_BASE_URL = config.env === 'production'
+    ? 'https://app.midtrans.com/snap/v1'
+    : 'https://app.sandbox.midtrans.com/snap/v1';
+
+  const transactionData = {
+    transaction_details: { order_id: data.orderId, gross_amount: data.amount },
+    item_details: [{
+      id: 'donation', price: data.amount, quantity: 1,
+      name: data.programName.length > 50 ? data.programName.slice(0, 47) + '...' : data.programName,
+    }],
+    customer_details: {
+      first_name: data.donorName,
+      email: data.donorEmail || 'donor@infaqly.com',
+      phone: data.donorPhone || '',
+    },
+  };
+
+  const auth = Buffer.from(config.serverKey + ':').toString('base64');
+
+  const response = await fetch(`${SNAP_BASE_URL}/transactions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': `Basic ${auth}`,
+    },
+    body: JSON.stringify(transactionData),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error_messages?.[0] || `Midtrans error (${response.status})`);
+  }
+
+  const result = await response.json();
+  return { token: result.token, redirectUrl: result.redirect_url };
+}
+
+/**
+ * Get client key (for frontend Snap.js script) from DB settings.
+ * This is called via a public API so the frontend can load the correct Snap script.
+ */
+export async function getClientConfig() {
+  const config = await getMidtransConfig();
+  return {
+    clientKey: config.clientKey,
+    env: config.env,
+  };
+}
+
+/**
+ * Handle Midtrans Webhook Notification
+ */
+export async function handleNotification(body: any) {
+  const orderId = body.order_id;
+  const transactionStatus = body.transaction_status;
+  const fraudStatus = body.fraud_status;
+
+  // Map Midtrans status to our status
+  let status: 'success' | 'pending' | 'expired' | 'failed' = 'pending';
+  if (transactionStatus === 'capture' || transactionStatus === 'settlement') {
+    status = fraudStatus === 'accept' || !fraudStatus ? 'success' : 'failed';
+  } else if (transactionStatus === 'deny' || transactionStatus === 'cancel') {
+    status = 'failed';
+  } else if (transactionStatus === 'expire') {
+    status = 'expired';
+  }
+
+  // Update donation record
+  const [donation] = await db.update(donations)
+    .set({
+      paymentStatus: status,
+      paymentMethod: body.payment_type || null,
+      midtransResponse: body,
+      paidAt: status === 'success' ? new Date() : null,
+      updatedAt: new Date(),
+    })
+    .where(eq(donations.orderId, orderId))
+    .returning();
+
+  // If success, update campaign collected + donors count
+  if (status === 'success' && donation) {
+    await db.execute(
+      `UPDATE campaigns SET collected = collected + ${donation.amount}, donors = donors + 1, updated_at = NOW() WHERE id = ${donation.campaignId}`
+    );
+  }
+
+  return { orderId, status, donation };
+}
+

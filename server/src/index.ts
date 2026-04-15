@@ -1,0 +1,97 @@
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { env } from './config/env.js';
+import { errorHandler } from './middleware/error.middleware.js';
+import { expirePendingDonations } from './services/donation.service.js';
+
+// Routes
+import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
+import campaignRoutes from './routes/campaign.routes.js';
+import donationRoutes from './routes/donation.routes.js';
+import paymentRoutes from './routes/payment.routes.js';
+import withdrawalRoutes from './routes/withdrawal.routes.js';
+import whatsappRoutes from './routes/whatsapp.routes.js';
+import uploadRoutes from './routes/upload.routes.js';
+import settingsRoutes from './routes/settings.routes.js';
+import wabotRoutes from './routes/wabot.routes.js';
+import { startBot } from './services/wabot.service.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const app = express();
+
+// ═══ Global Middleware ═══
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+app.use(cors({
+  origin: env.FRONTEND_URL,
+  credentials: true,
+}));
+app.use(morgan('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// Serve uploaded files
+app.use('/uploads', express.static(path.resolve(env.UPLOAD_DIR)));
+
+// ═══ API Routes ═══
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/campaigns', campaignRoutes);
+app.use('/api/donations', donationRoutes);
+app.use('/api/payment', paymentRoutes);
+app.use('/api/withdrawals', withdrawalRoutes);
+app.use('/api/whatsapp', whatsappRoutes);
+app.use('/api/upload', uploadRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/wabot', wabotRoutes);
+
+// Health check
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok', time: new Date().toISOString() });
+});
+
+// ═══ Error Handler ═══
+app.use(errorHandler);
+
+// ═══ Start Server ═══
+app.listen(env.PORT, () => {
+  console.log(`\n🕌 infaqLy API Server`);
+  console.log(`   Port:     ${env.PORT}`);
+  console.log(`   Frontend: ${env.FRONTEND_URL}`);
+  console.log(`   Midtrans: ${env.MIDTRANS_ENV}`);
+  console.log(`   Fonnte:   ${env.FONNTE_TOKEN ? '✅ configured' : '❌ not set'}`);
+  console.log(`   DB:       ${env.DATABASE_URL.replace(/:[^:@]+@/, ':***@')}`);
+  console.log(`\n   Ready! 🚀\n`);
+
+  // ═══ Cron: Auto-expire pending donations older than 23 hours ═══
+  const EXPIRE_INTERVAL_MS = 15 * 60 * 1000; // Every 15 minutes
+
+  async function runExpiry() {
+    try {
+      const count = await expirePendingDonations();
+      if (count > 0) {
+        console.log(`[Cron] ⏰ ${count} donasi pending kedaluwarsa (>23 jam)`);
+      }
+    } catch (err) {
+      console.error('[Cron] Error expiring donations:', err);
+    }
+  }
+
+  // Run immediately on startup, then every 15 minutes
+  runExpiry();
+  setInterval(runExpiry, EXPIRE_INTERVAL_MS);
+  console.log('   ⏰ Cron: Auto-expire donations setiap 15 menit');
+
+  // ═══ WhatsApp Bot: Auto-start ═══
+  startBot().catch((err) => console.error('[WABot] Auto-start error:', err));
+  console.log('   📱 WABot: Baileys self-hosted (untuk OTP)\n');
+});
+
+export default app;
+
