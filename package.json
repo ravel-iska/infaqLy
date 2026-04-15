@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "dev": "concurrently -k -n BE,FE,DB -c blue,green,yellow \"npm --prefix server run dev\" \"vite\" \"npm --prefix server run db:studio\"",
     "dev:fe": "vite",
