@@ -123,7 +123,7 @@ export default function CampaignFormPage() {
         await updateCampaign(id, formData);
         toast.success('Kampanye berhasil diperbarui! ✅');
       } else {
-        await createCampaign(data);
+        await createCampaign(formData);
         toast.success('Kampanye baru berhasil dibuat! 🎉');
       }
       navigate('/admin-panel/campaigns');
