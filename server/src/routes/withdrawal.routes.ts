@@ -32,7 +32,11 @@ router.post('/', requireAdmin, upload.single('evidence'), async (req: Request, r
     const { amount, bankInfo, note } = req.body;
     if (!amount || !bankInfo) return res.status(400).json({ error: 'Nominal dan info rekening wajib diisi' });
 
-    const evidenceUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
+    let evidenceUrl: string | undefined = undefined;
+    if (req.file) {
+      const b64 = req.file.buffer.toString('base64');
+      evidenceUrl = `data:${req.file.mimetype};base64,${b64}`;
+    }
 
     const withdrawal = await withdrawalService.createWithdrawal({
       amount: Number(amount),

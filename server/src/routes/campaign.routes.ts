@@ -77,7 +77,11 @@ router.post('/', requireAdmin, upload.single('image'), async (req: Request, res:
     const { title, category, target, status, description, endDate } = req.body;
     if (!title || !target) return res.status(400).json({ error: 'Judul dan target wajib diisi' });
 
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : req.body.imageUrl || null;
+    let imageUrl = req.body.imageUrl || null;
+    if (req.file) {
+      const b64 = req.file.buffer.toString('base64');
+      imageUrl = `data:${req.file.mimetype};base64,${b64}`;
+    }
 
     const campaign = await campaignService.createCampaign({
       title, category, target: Number(target), status, imageUrl, description, endDate,
@@ -93,7 +97,10 @@ router.patch('/:id', requireAdmin, upload.single('image'), async (req: Request, 
   try {
     const data: any = { ...req.body };
     if (data.target) data.target = Number(data.target);
-    if (req.file) data.imageUrl = `/uploads/${req.file.filename}`;
+    if (req.file) {
+      const b64 = req.file.buffer.toString('base64');
+      data.imageUrl = `data:${req.file.mimetype};base64,${b64}`;
+    }
 
     const campaign = await campaignService.updateCampaign(Number(req.params.id), data);
     return res.json({ campaign });

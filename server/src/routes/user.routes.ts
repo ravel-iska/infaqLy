@@ -28,7 +28,8 @@ router.patch('/me', requireAuth, async (req: Request, res: Response) => {
 router.patch('/me/avatar', requireAuth, upload.single('avatar'), async (req: Request, res: Response) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'File avatar diperlukan' });
-    const avatarUrl = `/uploads/${req.file.filename}`;
+    const b64 = req.file.buffer.toString('base64');
+    const avatarUrl = `data:${req.file.mimetype};base64,${b64}`;
     const user = await userService.updateProfile(req.user!.id, { avatarUrl });
     return res.json({ user });
   } catch (err: any) {
