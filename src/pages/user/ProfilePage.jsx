@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { formatDateShort } from '@/utils/formatDate';
 import { generateCertificate } from '@/utils/generateCertificate';
-import { updateProfile, changePassword } from '@/services/authService';
+import { updateProfile, changePassword, uploadAvatar, deleteAvatar } from '@/services/authService';
 import api from '@/services/api';
 import { Edit, Download, Mail, Phone, X, Save, Eye, EyeOff, Camera, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -235,18 +235,27 @@ function EditProfileModal({ user, onClose, onSave }) {
 
     setLoading(true);
     try {
-      // Siapkan data update
+      // 1. Simpan perubahan text (username, email, WA)
       const updatedFields = { ...form };
-      if (avatarPreview) {
-        updatedFields.avatarUrl = avatarPreview;
-      } else {
+      let result = await updateProfile(updatedFields);
+
+      // 2. Handle Ganti/Hapus Foto
+      if (avatarFile) {
+        // Upload foto sungguhan
+        const uploadResult = await uploadAvatar(avatarFile);
+        updatedFields.avatarUrl = uploadResult.user.avatarUrl;
+        result.user.avatarUrl = uploadResult.user.avatarUrl;
+      } else if (avatarPreview === null && user.avatarUrl) {
+        // User menghapus fotonya
+        await deleteAvatar();
         updatedFields.avatarUrl = null;
+        result.user.avatarUrl = null;
+      } else {
+        // Tetap pakai avatar yang lama
+        updatedFields.avatarUrl = user.avatarUrl;
       }
 
-      // Simpan profil ke database
-      const result = await updateProfile(updatedFields);
-
-      // Ubah password jika diminta
+      // 3. Ubah password jika diminta
       if (passwordSection) {
         await changePassword({
           currentPassword: passwords.current,
@@ -255,7 +264,7 @@ function EditProfileModal({ user, onClose, onSave }) {
         toast.success('Password berhasil diubah');
       }
 
-      onSave(updatedFields);
+      onSave(result.user);
     } catch (err) {
       toast.error(err.message || 'Gagal memperbarui profil');
     } finally {

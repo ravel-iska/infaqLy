@@ -57,7 +57,7 @@ export async function updateProfile(updates) {
 export async function uploadAvatar(file) {
   const formData = new FormData();
   formData.append('avatar', file);
-  const data = await api.upload('/users/me/avatar', formData);
+  const data = await api.upload('/users/me/avatar', formData, { method: 'PATCH' });
   return { success: true, user: data.user };
 }
 
