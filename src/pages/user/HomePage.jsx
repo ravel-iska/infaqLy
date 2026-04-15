@@ -48,23 +48,23 @@ export default function HomePage() {
   return (
     <div className="animate-fade-in">
       {/* ══════ HERO ══════ */}
-      <section className="hero-gradient py-20 lg:py-28">
+      <section className="hero-gradient py-12 sm:py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-user-text leading-tight">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-user-text leading-tight">
               Berbagi Kebaikan Lewat{' '}
               <span className="text-user-accent">Infaq & Wakaf</span>{' '}
               Digital
             </h1>
-            <p className="mt-6 text-lg text-user-text-secondary max-w-2xl mx-auto">
+            <p className="mt-4 sm:mt-6 text-base sm:text-lg text-user-text-secondary max-w-2xl mx-auto">
               Salurkan infaq Anda dengan mudah dan transparan melalui platform digital yang terpercaya. Setiap rupiah tercatat, setiap donasi bermakna.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/explore" className="btn-user-primary text-base px-8 py-4">
+              <Link to="/explore" className="btn-user-primary w-full sm:w-auto text-base px-6 py-3.5 sm:px-8 sm:py-4">
                 🤲 Mulai Berdonasi
               </Link>
-              <a href="#cara-donasi" className="inline-flex items-center gap-2 text-user-accent font-semibold hover:gap-3 transition-all">
-                Pelajari Lebih <ArrowRight size={18} />
+              <a href="#cara-donasi" className="inline-flex items-center justify-center w-full sm:w-auto p-3 text-user-accent font-semibold hover:gap-3 transition-all">
+                Pelajari Lebih <ArrowRight size={18} className="ml-1" />
               </a>
             </div>
           </div>
@@ -72,20 +72,22 @@ export default function HomePage() {
       </section>
 
       {/* ══════ STATISTIK ══════ */}
-      <section className="py-16 -mt-12 relative z-10">
+      <section className="py-8 sm:py-16 -mt-8 sm:-mt-12 relative z-10">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
             {STATS.map((stat) => {
               const Icon = stat.icon;
               return (
-                <div key={stat.label} className="user-card p-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-user-accent-light flex items-center justify-center">
+                <div key={stat.label} className="user-card p-4 sm:p-6 text-center flex flex-row sm:flex-col items-center justify-start sm:justify-center gap-4 sm:gap-0">
+                  <div className="w-12 h-12 sm:mx-auto mb-0 sm:mb-3 rounded-full bg-user-accent-light flex-shrink-0 flex items-center justify-center">
                     <Icon size={24} className="text-user-accent" />
                   </div>
-                  <p className="text-sm text-user-text-secondary">{stat.label}</p>
-                  <p className="text-2xl font-bold text-user-text mt-1">
-                    {stat.format === 'currency' ? formatCurrencyShort(stat.value) : stat.value.toLocaleString('id-ID')}
-                  </p>
+                  <div className="text-left sm:text-center w-full">
+                    <p className="text-xs sm:text-sm text-user-text-secondary">{stat.label}</p>
+                    <p className="text-lg sm:text-2xl font-bold text-user-text mt-0.5 sm:mt-1">
+                      {stat.format === 'currency' ? formatCurrencyShort(stat.value) : stat.value.toLocaleString('id-ID')}
+                    </p>
+                  </div>
                 </div>
               );
             })}
@@ -94,14 +96,14 @@ export default function HomePage() {
       </section>
 
       {/* ══════ PROGRAM UNGGULAN ══════ */}
-      <section className="py-16 bg-white">
+      <section className="py-10 sm:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-user-text">Program Unggulan</h2>
-            <p className="mt-2 text-user-text-secondary">Kampanye donasi yang sedang berjalan dan membutuhkan dukungan Anda</p>
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold text-user-text">Program Unggulan</h2>
+            <p className="mt-2 text-sm sm:text-base text-user-text-secondary">Kampanye donasi yang sedang berjalan dan membutuhkan dukungan Anda</p>
           </div>
           {featured.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {featured.map((campaign) => (
                 <CampaignCardHome key={campaign.id} campaign={campaign} />
               ))}
@@ -112,8 +114,8 @@ export default function HomePage() {
             </div>
           )}
           <div className="text-center mt-10">
-            <Link to="/explore" className="btn-user-ghost">
-              Lihat Semua Program <ArrowRight size={18} />
+            <Link to="/explore" className="btn-user-ghost w-full sm:w-auto">
+              Lihat Semua Program <ArrowRight size={18} className="ml-1" />
             </Link>
           </div>
         </div>

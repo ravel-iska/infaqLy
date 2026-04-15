@@ -50,7 +50,7 @@ export default function ExplorePage() {
         </div>
 
         {/* Search & Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="relative flex-1">
             <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-user-text-muted" />
             <input
@@ -61,13 +61,13 @@ export default function ExplorePage() {
               className="input-user pl-11"
             />
           </div>
-          <div className="flex gap-3">
-            <select value={category} onChange={(e) => setCategory(e.target.value)} className="input-user !w-auto min-w-[160px]">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <select value={category} onChange={(e) => setCategory(e.target.value)} className="input-user sm:!w-auto sm:min-w-[160px]">
               <option value="all">Semua Kategori</option>
               <option value="infaq">Infaq</option>
               <option value="wakaf">Wakaf</option>
             </select>
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="input-user !w-auto min-w-[160px]">
+            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="input-user sm:!w-auto sm:min-w-[160px]">
               <option value="newest">Terbaru</option>
               <option value="most-donors">Paling Banyak Donasi</option>
               <option value="ending-soon">Segera Berakhir</option>
@@ -108,30 +108,30 @@ function CampaignListCard({ campaign }) {
           className="w-full h-48 md:h-full object-cover hover:scale-105 transition-transform duration-500"
         />
       </div>
-      <div className="flex-1 p-6 flex flex-col justify-between">
+      <div className="flex-1 p-4 sm:p-6 flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className={`px-3 py-1 text-xs font-semibold rounded-full ${campaign.category === 'infaq' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
               {categoryLabel}
             </span>
           </div>
-          <h3 className="text-xl font-bold text-user-text">{campaign.title}</h3>
-          <div className="mt-4">
+          <h3 className="text-lg sm:text-xl font-bold text-user-text leading-tight">{campaign.title}</h3>
+          <div className="mt-3 sm:mt-4">
             <div className="progress-bar">
               <div className="progress-bar-fill" style={{ '--progress-width': `${Math.min(progress, 100)}%` }}></div>
             </div>
             <div className="flex justify-between mt-2">
-              <span className="text-sm font-semibold text-user-accent">{formatCurrency(campaign.collected)}</span>
-              <span className="text-sm text-user-text-muted">dari {formatCurrency(campaign.target)}</span>
+              <span className="text-xs sm:text-sm font-semibold text-user-accent">{formatCurrency(campaign.collected)}</span>
+              <span className="text-xs sm:text-sm text-user-text-muted">dari {formatCurrency(campaign.target)}</span>
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-user-border">
-          <div className="flex gap-4 text-sm text-user-text-muted">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-4 pt-4 border-t border-user-border gap-4 sm:gap-0">
+          <div className="flex gap-4 text-xs sm:text-sm text-user-text-muted">
             <span>👥 {campaign.donors} donatur</span>
             <span>⏳ {days} hari lagi</span>
           </div>
-          <Link to={`/explore/${campaign.id}`} className="btn-user-primary !py-2 !px-4 text-sm">
+          <Link to={`/explore/${campaign.id}`} className="btn-user-primary w-full sm:w-auto justify-center !py-2 !px-4 text-sm mt-1 sm:mt-0">
             Donasi Sekarang <ArrowRight size={16} />
           </Link>
         </div>
