@@ -27,7 +27,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 // ═══ Global Middleware ═══
-app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  contentSecurityPolicy: false, // Let frontend handle its own CSP or allow external images
+}));
 app.use(cors({
   origin: env.FRONTEND_URL,
   credentials: true,
