@@ -77,14 +77,14 @@ export default function TransactionsPage() {
 
   return (
     <div className="animate-fade-in space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h1 className="text-2xl font-bold text-admin-text">💳 Log Transaksi</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
 
-          <button onClick={loadTransactions} className="btn-admin-ghost text-sm" disabled={loading}>
+          <button onClick={loadTransactions} className="btn-admin-ghost text-sm flex-1 sm:flex-none justify-center" disabled={loading}>
             <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh
           </button>
-          <button onClick={exportCSV} className="btn-admin-ghost text-sm">
+          <button onClick={exportCSV} className="btn-admin-ghost text-sm flex-1 sm:flex-none justify-center">
             <Download size={16} /> Export CSV
           </button>
         </div>

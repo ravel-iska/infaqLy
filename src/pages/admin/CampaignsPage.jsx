@@ -48,9 +48,9 @@ export default function CampaignsPage() {
 
   return (
     <div className="animate-fade-in space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h1 className="text-2xl font-bold text-admin-text">📋 Manajemen Kampanye</h1>
-        <Link to="/admin-panel/campaigns/new" className="btn-admin-primary text-sm">
+        <Link to="/admin-panel/campaigns/new" className="btn-admin-primary text-sm w-full sm:w-auto justify-center">
           <Plus size={18} /> Buat Baru
         </Link>
       </div>

@@ -12,7 +12,7 @@ const iconMap = {
 
 export default function Sidebar({ collapsed, onToggle }) {
   return (
-    <aside className={`fixed top-0 left-0 h-screen bg-admin-bg-sidebar border-r border-admin-border flex flex-col transition-all duration-300 z-40 ${collapsed ? 'w-[72px]' : 'w-[240px]'}`}>
+    <aside className={`fixed top-0 left-0 h-screen bg-admin-bg-sidebar border-r border-admin-border flex flex-col transition-all duration-300 z-40 ${collapsed ? '-translate-x-full md:translate-x-0 md:w-[72px]' : 'translate-x-0 w-[240px]'}`}>
       {/* Logo */}
       <div className="h-16 flex items-center px-4 border-b border-admin-border">
         <Link to="/admin-panel/dashboard" className="flex items-center gap-2 overflow-hidden">
