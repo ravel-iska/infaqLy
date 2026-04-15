@@ -110,7 +110,7 @@ export default function Topbar({ onToggleSidebar }) {
 
           {/* Notification Dropdown */}
           {notifOpen && (
-            <div className="absolute right-0 mt-2 w-80 bg-admin-bg-card rounded-xl border border-admin-border shadow-admin-lg animate-slide-down overflow-hidden">
+            <div className="absolute -right-12 sm:right-0 mt-2 w-[280px] sm:w-80 bg-admin-bg-card rounded-xl border border-admin-border shadow-admin-lg animate-slide-down overflow-hidden z-50">
               <div className="flex items-center justify-between px-4 py-3 border-b border-admin-border">
                 <h3 className="text-sm font-semibold text-admin-text">🔔 Notifikasi</h3>
                 <div className="flex items-center gap-2">
