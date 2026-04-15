@@ -10,6 +10,7 @@ import makeWASocket, {
   fetchLatestBaileysVersion,
 } from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
+// @ts-ignore — no types for qrcode
 import * as QRCode from 'qrcode';
 import path from 'path';
 import { fileURLToPath } from 'url';

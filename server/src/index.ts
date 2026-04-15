@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { env } from './config/env.js';
 import { errorHandler } from './middleware/error.middleware.js';
@@ -55,6 +56,18 @@ app.use('/api/wabot', wabotRoutes);
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
+
+// ═══ Serve Frontend (Production) ═══
+// In production, serve the Vite-built frontend
+const frontendDist = path.resolve(__dirname, '../../dist');
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+  // SPA fallback — all non-API routes serve index.html
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+  console.log(`   📦 Serving frontend from ${frontendDist}`);
+}
 
 // ═══ Error Handler ═══
 app.use(errorHandler);

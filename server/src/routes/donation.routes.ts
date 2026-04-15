@@ -81,7 +81,7 @@ router.patch('/:orderId/status', requireAuth, async (req: Request, res: Response
     const { orderId } = req.params;
     const { status } = req.body;
     if (!status) return res.status(400).json({ error: 'Status wajib diisi' });
-    const donation = await donationService.updateDonationStatus(orderId, status);
+    const donation = await donationService.updateDonationStatus(orderId as string, status);
     return res.json({ donation });
   } catch (err: any) {
     return res.status(400).json({ error: err.message });
