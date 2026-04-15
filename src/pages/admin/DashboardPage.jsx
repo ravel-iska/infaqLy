@@ -5,6 +5,7 @@ import { formatTimeAgo } from '@/utils/formatDate';
 import { Link } from 'react-router-dom';
 import { getAllCampaigns } from '@/services/campaignService';
 import api from '@/services/api';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function DashboardPage() {
   const [campaigns, setCampaigns] = useState([]);
@@ -77,36 +78,54 @@ export default function DashboardPage() {
             <div className="h-64 flex items-center justify-center text-admin-text-muted text-sm">
               Belum ada data donasi
             </div>
-          ) : (() => {
-            const maxVal = Math.max(...monthlyStats.map(m => m.total), 1);
-            return (
-              <div className="h-64 flex items-end gap-3 px-2">
-                {monthlyStats.map((m, i) => {
-                  const height = maxVal > 0 ? Math.max((m.total / maxVal) * 100, 4) : 4;
-                  return (
-                    <div key={i} className="flex-1 flex flex-col items-center gap-1 group">
-                      <div className="relative w-full flex justify-center">
-                        <span className="absolute -top-6 text-[10px] text-admin-text-muted font-mono opacity-0 group-hover:opacity-100 transition-opacity bg-admin-bg-card px-1 rounded shadow-sm whitespace-nowrap">
-                          {m.total > 0 ? formatCurrencyShort(m.total) : 'Rp 0'}
-                        </span>
-                      </div>
-                      <div
-                        className="w-full rounded-t-md transition-all duration-500 ease-out cursor-pointer"
-                        style={{
-                          height: `${height}%`,
-                          background: m.total > 0 ? 'linear-gradient(to top, #6366F1, #10B981)' : '#334155',
-                          opacity: m.total > 0 ? 1 : 0.3,
-                          minHeight: '4px',
-                        }}
-                      />
-                      <span className="text-[10px] text-admin-text-muted font-medium mt-1">{m.month}</span>
-                      <span className="text-[9px] text-admin-text-muted">{m.count} txn</span>
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })()}
+          ) : (
+            <div className="h-72 w-full mt-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={monthlyStats} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#818CF8" stopOpacity={0.5} />
+                      <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" strokeOpacity={0.5} />
+                  <XAxis 
+                    dataKey="month" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#94A3B8', fontSize: 12 }} 
+                    dy={10}
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#94A3B8', fontSize: 11 }}
+                    tickFormatter={(value) => formatCurrencyShort(value)}
+                    width={50}
+                  />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#1E293B', borderColor: '#334155', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)' }}
+                    itemStyle={{ color: '#818CF8', fontWeight: 'bold' }}
+                    labelStyle={{ color: '#94A3B8', marginBottom: '4px' }}
+                    formatter={(value, name, props) => [
+                      formatCurrency(value), 
+                      `Total (${props.payload.count} txn)`
+                    ]}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="total" 
+                    stroke="#818CF8" 
+                    strokeWidth={3}
+                    fillOpacity={1} 
+                    fill="url(#colorTotal)" 
+                    activeDot={{ r: 6, fill: '#6366F1', stroke: '#1E293B', strokeWidth: 2 }}
+                    animationDuration={1500}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
 
         <div className="lg:col-span-2 admin-card p-5">
