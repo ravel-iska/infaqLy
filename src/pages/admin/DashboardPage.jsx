@@ -94,7 +94,7 @@ export default function DashboardPage() {
                         className="w-full rounded-t-md transition-all duration-500 ease-out cursor-pointer"
                         style={{
                           height: `${height}%`,
-                          background: m.total > 0 ? 'linear-gradient(to top, var(--color-admin-accent), var(--color-admin-accent-secondary, #10b981))' : 'var(--color-admin-border)',
+                          background: m.total > 0 ? 'linear-gradient(to top, #6366F1, #10B981)' : '#334155',
                           opacity: m.total > 0 ? 1 : 0.3,
                           minHeight: '4px',
                         }}
