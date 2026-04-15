@@ -70,10 +70,10 @@ const api = {
   delete: (endpoint, opts) => request(endpoint, { method: 'DELETE', ...opts }),
   
   // For file uploads (FormData) — NO cross-token fallback
-  upload: (endpoint, formData) => {
+  upload: (endpoint, formData, overrides = {}) => {
     const token = getTokenForContext();
     return request(endpoint, {
-      method: 'POST',
+      method: overrides.method || 'POST',
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       body: formData,
     });

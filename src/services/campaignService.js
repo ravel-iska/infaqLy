@@ -29,13 +29,13 @@ export async function getCampaignById(id) {
 
 /** Buat kampanye baru */
 export async function createCampaign(campaignData) {
-  const data = await api.post('/campaigns', campaignData);
+  const data = await api.upload('/campaigns', campaignData);
   return { success: true, campaign: data.campaign };
 }
 
 /** Update kampanye */
 export async function updateCampaign(id, campaignData) {
-  const data = await api.patch(`/campaigns/${id}`, campaignData);
+  const data = await api.upload(`/campaigns/${id}`, campaignData, { method: 'PATCH' });
   return { success: true, campaign: data.campaign };
 }
 

@@ -19,6 +19,7 @@ export default function CampaignFormPage() {
     description: '',
   });
   const [imagePreview, setImagePreview] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -61,6 +62,7 @@ export default function CampaignFormPage() {
       toast.error('Ukuran gambar maksimal 5MB');
       return;
     }
+    setImageFile(file); // Save the actual file
     const reader = new FileReader();
     reader.onload = (ev) => setImagePreview(ev.target.result);
     reader.readAsDataURL(file);
@@ -77,6 +79,7 @@ export default function CampaignFormPage() {
 
   const removeImage = () => {
     setImagePreview(null);
+    setImageFile(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -100,14 +103,24 @@ export default function CampaignFormPage() {
 
     setLoading(true);
     try {
-      const data = {
-        ...form,
-        target: Number(form.target),
-        imageUrl: imagePreview,
-      };
+      const formData = new FormData();
+      formData.append('title', form.title);
+      formData.append('category', form.category);
+      formData.append('target', form.target);
+      formData.append('status', form.status);
+      formData.append('description', form.description);
+      if (form.endDate) formData.append('endDate', form.endDate);
+      
+      // If a new file was chosen, append it
+      if (imageFile) {
+        formData.append('image', imageFile);
+      } else if (imagePreview && !imagePreview.startsWith('data:')) {
+        // Keeping the old imageUrl if it has not changed
+        formData.append('imageUrl', imagePreview);
+      }
 
       if (isEdit) {
-        await updateCampaign(id, data);
+        await updateCampaign(id, formData);
         toast.success('Kampanye berhasil diperbarui! ✅');
       } else {
         await createCampaign(data);
