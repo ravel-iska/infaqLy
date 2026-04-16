@@ -117,7 +117,7 @@ export default function Footer() {
         </div>
         
         <div className="space-y-6">
-          <h5 className="font-bold text-on-surface dark:text-slate-100">Program</h5>
+          <h5 className="font-bold text-on-surface dark:text-slate-100 pt-1">Program</h5>
           <ul className="space-y-3 text-slate-500 dark:text-slate-400">
             <li><Link to="/explore" className="hover:text-emerald-500 transition-colors">Zakat Profesi</Link></li>
             <li><Link to="/explore" className="hover:text-emerald-500 transition-colors">Infaq Pendidikan</Link></li>
@@ -127,7 +127,7 @@ export default function Footer() {
         </div>
         
         <div className="space-y-6">
-          <h5 className="font-bold text-on-surface dark:text-slate-100">Bantuan</h5>
+          <h5 className="font-bold text-on-surface dark:text-slate-100 pt-1">Bantuan</h5>
           <ul className="space-y-3 text-slate-500 dark:text-slate-400">
             <li>
               <a 
@@ -150,7 +150,7 @@ export default function Footer() {
         </div>
         
         <div className="space-y-6">
-          <h5 className="font-bold text-on-surface dark:text-slate-100">Kontak</h5>
+          <h5 className="font-bold text-on-surface dark:text-slate-100 pt-1">Kontak</h5>
           <ul className="space-y-3 text-slate-500 dark:text-slate-400">
             <li className="flex items-center gap-2 group">
               <span className="material-symbols-outlined text-sm">mail</span>

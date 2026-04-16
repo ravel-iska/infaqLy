@@ -53,14 +53,14 @@ export default function Navbar() {
   return (
     <nav className={`fixed top-0 w-full z-50 transition-colors duration-300 ease-in-out ${scrolled ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-sm dark:border-b dark:border-slate-800' : 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md'}`}>
       <div className="flex justify-between items-center px-4 md:px-8 py-3 md:py-4 max-w-7xl mx-auto w-full">
-        <div className="flex items-center gap-8 lg:gap-12">
+        <div className="flex items-baseline gap-8 lg:gap-12">
           {/* Logo */}
           <Link to="/" className="text-2xl font-headline font-bold text-emerald-800 dark:text-emerald-400">
             Infaqly
           </Link>
           
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8 font-body text-sm tracking-tight text-slate-600 dark:text-slate-300">
+          <div className="hidden md:flex items-baseline gap-8 font-body text-sm tracking-tight text-slate-600 dark:text-slate-300">
           {USER_NAV_ITEMS.map((item) => (
             <NavLink
               key={item.path}
