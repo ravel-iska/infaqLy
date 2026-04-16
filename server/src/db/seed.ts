@@ -40,7 +40,58 @@ async function seed() {
     console.log('✅ Default Admin Phone setting seeded');
   }
 
-  // 3. Mock Campaigns Seed has been removed for production.
+  // 3. Seed test donations for certificate download testing
+  const existingDonations = await db.select().from(schema.donations);
+  if (existingDonations.length === 0) {
+    // Find the admin user and any active campaign
+    const [adminUser] = await db.select().from(schema.users).where(eq(schema.users.role, 'admin'));
+    const [activeCampaign] = await db.select().from(schema.campaigns);
+
+    if (adminUser && activeCampaign) {
+      await db.insert(schema.donations).values([
+        {
+          orderId: 'INF-TEST-001',
+          userId: adminUser.id,
+          campaignId: activeCampaign.id,
+          donorName: activeCampaign.title,
+          donorEmail: adminUser.email,
+          donorPhone: adminUser.whatsapp,
+          amount: 250000,
+          paymentMethod: 'bank_transfer',
+          paymentStatus: 'success',
+          paidAt: new Date(),
+        },
+        {
+          orderId: 'INF-TEST-002',
+          userId: adminUser.id,
+          campaignId: activeCampaign.id,
+          donorName: activeCampaign.title,
+          donorEmail: adminUser.email,
+          donorPhone: adminUser.whatsapp,
+          amount: 100000,
+          paymentMethod: 'ewallet',
+          paymentStatus: 'success',
+          paidAt: new Date(Date.now() - 86400000), // yesterday
+        },
+        {
+          orderId: 'INF-TEST-003',
+          userId: adminUser.id,
+          campaignId: activeCampaign.id,
+          donorName: activeCampaign.title,
+          donorEmail: adminUser.email,
+          donorPhone: adminUser.whatsapp,
+          amount: 50000,
+          paymentMethod: 'qris',
+          paymentStatus: 'pending',
+        },
+      ]).onConflictDoNothing();
+      console.log('✅ Test donations seeded (2 success, 1 pending)');
+    } else {
+      console.log('⚠️  Skipped donation seeding — no admin user or campaign found');
+    }
+  } else {
+    console.log('ℹ️  Donations already exist, skipping seed');
+  }
 
   console.log('🎉 Seed complete!');
   await pool.end();

@@ -3,247 +3,307 @@ import { formatDate } from './formatDate';
 
 /**
  * Generate sertifikat donasi sebagai HTML dan buka di tab baru untuk di-print/save as PDF
- * @param {Object} params
- * @param {string} params.donorName - Nama donatur
- * @param {string} params.program - Nama program donasi
- * @param {number} params.amount - Nominal donasi
- * @param {string} params.date - Tanggal donasi
- * @param {string|number} params.transactionId - ID transaksi
+ * Desain: Clean, modern, minimalis — mudah dibaca & enak dipandang
  */
 export function generateCertificate({ donorName, program, amount, date, transactionId }) {
   const formattedDate = formatDate(date);
   const formattedAmount = formatCurrency(amount);
   const certNumber = `CERT-${transactionId}-${new Date(date).getFullYear()}`;
+  const printDate = formatDate(new Date());
 
   const html = `
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Sertifikat Donasi - ${certNumber}</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>Kuitansi Donasi - ${certNumber}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
+
     @page {
-      size: A4 landscape;
+      size: A4 portrait;
       margin: 0;
     }
 
     body {
-      font-family: 'Inter', sans-serif;
-      background: #f8faf5;
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #f1f5f9;
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      padding: 20px;
+      padding: 24px;
+      color: #1e293b;
     }
 
-    .certificate {
-      width: 297mm;
-      max-width: 1100px;
-      aspect-ratio: 297 / 210;
-      background: #fff;
-      border-radius: 16px;
-      border: 3px solid #10B981;
-      position: relative;
+    .receipt {
+      width: 100%;
+      max-width: 520px;
+      background: #ffffff;
+      border-radius: 24px;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 80px;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
     }
 
-    /* Corner ornaments */
-    .certificate::before {
+    /* Green Header Strip */
+    .header {
+      background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+      padding: 36px 32px 28px;
+      text-align: center;
+      position: relative;
+    }
+    .header::after {
       content: '';
       position: absolute;
-      top: 0; left: 0;
-      width: 120px; height: 120px;
-      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-      clip-path: polygon(0 0, 100% 0, 0 100%);
-      opacity: 0.15;
-    }
-    .certificate::after {
-      content: '';
-      position: absolute;
-      bottom: 0; right: 0;
-      width: 120px; height: 120px;
-      background: linear-gradient(315deg, #10B981 0%, #059669 100%);
-      clip-path: polygon(100% 100%, 0 100%, 100% 0);
-      opacity: 0.15;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 20px;
+      background: #fff;
+      border-radius: 20px 20px 0 0;
     }
 
-    .inner-border {
-      position: absolute;
-      top: 12px; left: 12px; right: 12px; bottom: 12px;
-      border: 1px solid #D1FAE5;
-      border-radius: 10px;
-      pointer-events: none;
-    }
-
-    .logo {
+    .brand {
       font-family: 'Outfit', sans-serif;
-      font-size: 28px;
+      font-size: 22px;
       font-weight: 800;
-      color: #1E293B;
-      margin-bottom: 8px;
+      color: rgba(255,255,255,0.95);
+      letter-spacing: -0.5px;
     }
-    .logo span { font-size: 32px; }
+    .brand-icon { font-size: 26px; vertical-align: middle; margin-right: 4px; }
 
-    .subtitle {
-      font-size: 12px;
-      color: #64748B;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      margin-bottom: 36px;
-    }
-
-    .title {
+    .header-title {
       font-family: 'Outfit', sans-serif;
-      font-size: 32px;
+      font-size: 15px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.75);
+      margin-top: 6px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* Body */
+    .body {
+      padding: 28px 32px 32px;
+    }
+
+    /* Success Badge */
+    .success-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #059669;
+      font-size: 12px;
       font-weight: 700;
-      color: #10B981;
+      padding: 6px 14px;
+      border-radius: 100px;
       margin-bottom: 24px;
     }
 
-    .message {
-      font-size: 14px;
-      color: #64748B;
+    /* Donor Section */
+    .donor-section {
       text-align: center;
-      max-width: 500px;
-      line-height: 1.6;
-      margin-bottom: 20px;
+      margin-bottom: 28px;
     }
-
+    .donor-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
     .donor-name {
       font-family: 'Outfit', sans-serif;
-      font-size: 36px;
-      font-weight: 700;
-      color: #1E293B;
-      margin-bottom: 8px;
-      border-bottom: 3px solid #10B981;
-      padding-bottom: 6px;
+      font-size: 28px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.5px;
     }
 
-    .details-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 24px;
-      margin-top: 28px;
-      margin-bottom: 36px;
-      width: 100%;
-      max-width: 600px;
-    }
-
-    .detail-item {
+    /* Amount Highlight */
+    .amount-box {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border: 1px solid #bbf7d0;
+      border-radius: 16px;
+      padding: 20px;
       text-align: center;
+      margin-bottom: 24px;
     }
-    .detail-label {
+    .amount-label {
       font-size: 11px;
-      color: #94A3B8;
+      font-weight: 600;
+      color: #64748b;
       text-transform: uppercase;
       letter-spacing: 1px;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
-    .detail-value {
-      font-size: 15px;
-      font-weight: 600;
-      color: #1E293B;
-    }
-    .detail-value.accent {
-      color: #10B981;
+    .amount-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: #059669;
+      letter-spacing: -1px;
     }
 
-    .footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      max-width: 600px;
-      margin-top: auto;
+    /* Detail Rows */
+    .details {
+      border-top: 1px dashed #e2e8f0;
       padding-top: 20px;
-      border-top: 1px solid #E2E8F0;
+      margin-bottom: 24px;
     }
-    .cert-id {
-      font-size: 11px;
-      color: #94A3B8;
-      font-family: monospace;
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
     }
-    .print-info {
-      font-size: 11px;
-      color: #94A3B8;
+    .detail-row + .detail-row {
+      border-top: 1px solid #f8fafc;
+    }
+    .detail-key {
+      font-size: 13px;
+      font-weight: 500;
+      color: #94a3b8;
+    }
+    .detail-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      text-align: right;
     }
 
+    /* Footer */
+    .footer {
+      background: #f8fafc;
+      border-top: 1px solid #f1f5f9;
+      padding: 20px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-text {
+      font-size: 10px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+    .footer-text strong {
+      color: #64748b;
+    }
+
+    /* Thank You Message */
+    .thankyou {
+      text-align: center;
+      padding: 16px 0 0;
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 500;
+      line-height: 1.6;
+    }
+    .thankyou em {
+      display: block;
+      font-style: normal;
+      font-size: 18px;
+      margin-top: 4px;
+    }
+
+    /* Print Button */
     .btn-print {
       position: fixed;
       bottom: 24px;
       right: 24px;
-      padding: 12px 28px;
-      background: #10B981;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: #059669;
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 14px;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       font-family: 'Inter', sans-serif;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+      box-shadow: 0 8px 24px rgba(5, 150, 105, 0.35);
       transition: all 0.2s;
       z-index: 100;
     }
     .btn-print:hover {
-      background: #059669;
-      transform: translateY(-1px);
+      background: #047857;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(5, 150, 105, 0.4);
     }
 
     @media print {
       body { background: none; padding: 0; }
-      .certificate { box-shadow: none; border-radius: 0; }
-      .btn-print { display: none; }
+      .receipt { box-shadow: none; max-width: 100%; }
+      .btn-print { display: none !important; }
     }
   </style>
 </head>
 <body>
-  <div class="certificate">
-    <div class="inner-border"></div>
-    
-    <div class="logo"><span>🕌</span> infaqLy</div>
-    <div class="subtitle">Platform Donasi Infaq & Wakaf Digital</div>
-    
-    <div class="title">Sertifikat Donasi</div>
-    
-    <div class="message">
-      Dengan ini kami menyatakan bahwa yang bersangkutan telah menyalurkan donasi melalui platform infaqLy:
+  <div class="receipt">
+    <!-- Header -->
+    <div class="header">
+      <div class="brand"><span class="brand-icon">🕌</span> infaqLy</div>
+      <div class="header-title">Kuitansi Donasi</div>
     </div>
-    
-    <div class="donor-name">${donorName}</div>
-    
-    <div class="details-grid">
-      <div class="detail-item">
-        <div class="detail-label">Program</div>
-        <div class="detail-value">${program}</div>
+
+    <!-- Body -->
+    <div class="body">
+      <div style="text-align:center">
+        <span class="success-badge">✓ Pembayaran Berhasil</span>
       </div>
-      <div class="detail-item">
-        <div class="detail-label">Nominal</div>
-        <div class="detail-value accent">${formattedAmount}</div>
+
+      <!-- Donor -->
+      <div class="donor-section">
+        <div class="donor-label">Donatur</div>
+        <div class="donor-name">${donorName}</div>
       </div>
-      <div class="detail-item">
-        <div class="detail-label">Tanggal</div>
-        <div class="detail-value">${formattedDate}</div>
+
+      <!-- Amount -->
+      <div class="amount-box">
+        <div class="amount-label">Total Donasi</div>
+        <div class="amount-value">${formattedAmount}</div>
+      </div>
+
+      <!-- Details -->
+      <div class="details">
+        <div class="detail-row">
+          <span class="detail-key">Program</span>
+          <span class="detail-val">${program}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">Tanggal Donasi</span>
+          <span class="detail-val">${formattedDate}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">No. Referensi</span>
+          <span class="detail-val" style="font-family:monospace;font-size:11px;color:#94a3b8">${certNumber}</span>
+        </div>
+      </div>
+
+      <!-- Thank You -->
+      <div class="thankyou">
+        Jazakallahu khairan atas kebaikan Anda.<br>
+        Semoga Allah memberikan balasan berlipat ganda.
+        <em>🤲</em>
       </div>
     </div>
 
+    <!-- Footer -->
     <div class="footer">
-      <div class="cert-id">${certNumber}</div>
-      <div class="print-info">Dicetak pada ${formatDate(new Date())}</div>
+      <span class="footer-text">Dicetak pada <strong>${printDate}</strong></span>
+      <span class="footer-text"><strong>infaqLy</strong> — Platform Donasi Digital</span>
     </div>
   </div>
 
-  <button class="btn-print" onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
+  <button class="btn-print" onclick="window.print()">
+    🖨️ Cetak / Simpan PDF
+  </button>
 </body>
 </html>
   `.trim();
@@ -259,7 +319,7 @@ export function generateCertificate({ donorName, program, amount, date, transact
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `sertifikat-${certNumber}.html`;
+    a.download = `kuitansi-${certNumber}.html`;
     a.click();
     URL.revokeObjectURL(url);
   }

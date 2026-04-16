@@ -182,42 +182,6 @@ export default function CampaignDetailPage() {
               </div>
             </div>
 
-            {/* Latest Donors Section */}
-            <section className="space-y-6">
-              <div className="flex justify-between items-end">
-                <h2 className="text-2xl font-extrabold tracking-tight font-headline">Donatur Terbaru</h2>
-                <span className="text-sm font-bold text-primary px-3 py-1 bg-primary/10 rounded-lg">{recentDonors.length} Orang</span>
-              </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {recentDonors.length === 0 ? (
-                  <div className="col-span-1 sm:col-span-2 text-center text-on-surface-variant text-sm py-12 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 border-dashed">
-                    <span className="material-symbols-outlined text-4xl text-slate-300 block mb-2">volunteer_activism</span>
-                    Belum ada donatur, mari menjadi pionir kebaikan!
-                  </div>
-                ) : recentDonors.map((donor, i) => {
-                  const initials = donor.isAnonymous ? 'HA' : (donor.donorName?.[0] || '?');
-                  const isLarge = donor.amount >= 250000;
-                  
-                  return (
-                    <div key={i} className="flex items-center space-x-4 p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/10 shadow-sm hover:shadow-md transition-shadow">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${isLarge ? 'bg-primary-container/20 text-primary' : 'bg-surface-container-high text-primary-container'}`}>
-                        {initials}
-                      </div>
-                      <div className="overflow-hidden flex-1">
-                        <h4 className="font-bold text-sm text-on-surface truncate">
-                          {donor.isAnonymous ? 'Hamba Allah' : donor.donorName}
-                        </h4>
-                        <p className="text-xs text-on-surface-variant">Donasi <span className="font-semibold text-primary">{formatCurrency(donor.amount)}</span></p>
-                      </div>
-                      <div className="text-[10px] text-on-surface-variant/60 font-medium whitespace-nowrap">
-                        {formatTimeAgo(donor.createdAt)}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
           </div>
 
           {/* Right Sidebar: Donation Panel */}
@@ -368,6 +332,43 @@ export default function CampaignDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* Latest Donors Section — outside grid so it always appears after payment panel on mobile */}
+        <section className="space-y-6 mt-10 max-w-7xl">
+          <div className="flex justify-between items-end">
+            <h2 className="text-2xl font-extrabold tracking-tight font-headline">Donatur Terbaru</h2>
+            <span className="text-sm font-bold text-primary px-3 py-1 bg-primary/10 rounded-lg">{recentDonors.length} Orang</span>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {recentDonors.length === 0 ? (
+              <div className="col-span-full text-center text-on-surface-variant text-sm py-12 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 border-dashed">
+                <span className="material-symbols-outlined text-4xl text-slate-300 block mb-2">volunteer_activism</span>
+                Belum ada donatur, mari menjadi pionir kebaikan!
+              </div>
+            ) : recentDonors.map((donor, i) => {
+              const initials = donor.isAnonymous ? 'HA' : (donor.donorName?.[0] || '?');
+              const isLarge = donor.amount >= 250000;
+              
+              return (
+                <div key={i} className="flex items-center space-x-4 p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/10 shadow-sm hover:shadow-md transition-shadow">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${isLarge ? 'bg-primary-container/20 text-primary' : 'bg-surface-container-high text-primary-container'}`}>
+                    {initials}
+                  </div>
+                  <div className="overflow-hidden flex-1">
+                    <h4 className="font-bold text-sm text-on-surface truncate">
+                      {donor.isAnonymous ? 'Hamba Allah' : donor.donorName}
+                    </h4>
+                    <p className="text-xs text-on-surface-variant">Donasi <span className="font-semibold text-primary">{formatCurrency(donor.amount)}</span></p>
+                  </div>
+                  <div className="text-[10px] text-on-surface-variant/60 font-medium whitespace-nowrap">
+                    {formatTimeAgo(donor.createdAt)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
       </main>
     </div>
   );
