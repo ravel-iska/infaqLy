@@ -1,3 +1,7 @@
+/* ── Google Fonts / Material Symbols ──────────── */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -31,6 +35,15 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'Outfit', sans-serif;
   font-weight: 700;
   line-height: 1.2;
+}
+
+/* ── Material Symbols ─────────────────────────── */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.ambient-shadow {
+  box-shadow: 0 20px 40px rgba(17, 28, 45, 0.06);
 }
 
 /* ── User Theme Utilities ─────────────────────── */
@@ -201,7 +214,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── Hero Gradient ────────────────────────────── */
 .hero-gradient {
-  background: linear-gradient(135deg, #F8FAF5 0%, #D1FAE5 50%, #F0FDF4 100%);
+  background: linear-gradient(135deg, #006c49 0%, #10b981 100%);
 }
 
 /* ── CTA Gradient ─────────────────────────────── */

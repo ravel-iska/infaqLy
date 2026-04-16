@@ -1,52 +1,57 @@
 import { Link } from 'react-router-dom';
-import { Heart } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-white border-t border-user-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Brand */}
-          <div>
-            <Link to="/" className="inline-flex items-center gap-2 text-xl font-bold font-heading text-user-text">
-              <span className="text-2xl">🕌</span>
-              <span>infaqLy</span>
-            </Link>
-            <p className="mt-3 text-sm text-user-text-secondary leading-relaxed">
-              Platform donasi infaq & wakaf digital yang terpercaya. 
-              Salurkan kebaikan Anda dengan mudah dan transparan.
-            </p>
-          </div>
-
-          {/* Links */}
-          <div>
-            <h4 className="font-semibold text-user-text mb-4">Navigasi</h4>
-            <ul className="space-y-2">
-              <li><Link to="/" className="text-sm text-user-text-secondary hover:text-user-accent transition-colors">Beranda</Link></li>
-              <li><Link to="/explore" className="text-sm text-user-text-secondary hover:text-user-accent transition-colors">Jelajahi Program</Link></li>
-              <li><Link to="/login" className="text-sm text-user-text-secondary hover:text-user-accent transition-colors">Masuk</Link></li>
-              <li><Link to="/register" className="text-sm text-user-text-secondary hover:text-user-accent transition-colors">Daftar</Link></li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h4 className="font-semibold text-user-text mb-4">Kontak</h4>
-            <ul className="space-y-2 text-sm text-user-text-secondary">
-              <li>📧 info@infaqly.id</li>
-              <li>📱 +62 812-3456-7890</li>
-              <li>📍 Indonesia</li>
-            </ul>
+    <footer className="bg-slate-50 w-full rounded-t-3xl mt-auto">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-12 px-8 lg:px-12 py-16 max-w-7xl mx-auto font-body text-sm leading-relaxed">
+        <div className="space-y-6">
+          <div className="text-xl font-headline font-bold text-emerald-800">Infaqly</div>
+          <p className="text-slate-500">Membangun ekosistem filantropi digital yang amanah, transparan, dan berdampak luas bagi umat.</p>
+          <div className="flex gap-4">
+            <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary cursor-pointer hover:bg-primary hover:text-on-primary transition-all">
+              <span className="material-symbols-outlined text-sm">share</span>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary cursor-pointer hover:bg-primary hover:text-on-primary transition-all">
+              <span className="material-symbols-outlined text-sm">language</span>
+            </div>
           </div>
         </div>
-
-        <div className="mt-10 pt-6 border-t border-user-border flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-user-text-muted">
-            © {new Date().getFullYear()} infaqLy. Seluruh hak cipta dilindungi.
-          </p>
-          <p className="text-xs text-user-text-muted flex items-center gap-1">
-            Dibuat dengan <Heart size={12} className="text-danger fill-danger" /> oleh Bagus Priambudi di Indonesia
-          </p>
+        
+        <div className="space-y-6">
+          <h5 className="font-bold text-on-surface">Program</h5>
+          <ul className="space-y-3 text-slate-500">
+            <li><Link to="/explore" className="hover:text-emerald-500 transition-colors">Zakat Profesi</Link></li>
+            <li><Link to="/explore" className="hover:text-emerald-500 transition-colors">Infaq Pendidikan</Link></li>
+            <li><Link to="/explore" className="hover:text-emerald-500 transition-colors">Wakaf Produktif</Link></li>
+            <li><Link to="/explore" className="hover:text-emerald-500 transition-colors">Sedekah Pangan</Link></li>
+          </ul>
+        </div>
+        
+        <div className="space-y-6">
+          <h5 className="font-bold text-on-surface">Bantuan</h5>
+          <ul className="space-y-3 text-slate-500">
+            <li><a href="#" className="hover:text-emerald-500 transition-colors">Pusat Bantuan</a></li>
+            <li><a href="#" className="hover:text-emerald-500 transition-colors">Cara Donasi</a></li>
+            <li><a href="#" className="hover:text-emerald-500 transition-colors">Verifikasi Akun</a></li>
+            <li><a href="#" className="hover:text-emerald-500 transition-colors">Syarat & Ketentuan</a></li>
+          </ul>
+        </div>
+        
+        <div className="space-y-6">
+          <h5 className="font-bold text-on-surface">Kontak</h5>
+          <ul className="space-y-3 text-slate-500">
+            <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">mail</span> info@infaqly.org</li>
+            <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">call</span> +62 21 555 1234</li>
+            <li className="flex items-start gap-2"><span className="material-symbols-outlined text-sm">location_on</span> Jakarta South Quarter, Tower A, Lantai 12</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div className="max-w-7xl mx-auto px-8 lg:px-12 pb-8 border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-xs">
+        <p>© {new Date().getFullYear()} Infaqly Philanthropy. All rights reserved.</p>
+        <div className="flex gap-6">
+          <a href="#" className="hover:text-emerald-500 transition-colors">Kebijakan Privasi</a>
+          <a href="#" className="hover:text-emerald-500 transition-colors">Syarat & Ketentuan</a>
         </div>
       </div>
     </footer>
