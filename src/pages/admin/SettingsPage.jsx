@@ -483,21 +483,37 @@ export default function SettingsPage() {
                 <span className="material-symbols-outlined text-[18px]">link_off</span> Putus Server
               </button>
             ) : (
-              <button
-                onClick={async () => {
-                  setBotLoading(true);
-                  try {
-                    const result = await api.post('/wabot/connect');
-                    setBotStatus(result.status); setBotQr(result.qr);
-                  } catch { toast.error('Gagal menghubungkan daemon'); }
-                  finally { setBotLoading(false); }
-                }}
-                disabled={botLoading || botStatus === 'connecting'}
-                className="btn-admin-primary px-6 flex items-center gap-2"
-              >
-                {botLoading ? <span className="material-symbols-outlined animate-spin text-[18px]">sync</span> : <span className="material-symbols-outlined text-[18px]">wifi</span>}
-                Jalankan Server
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={async () => {
+                    if (!confirm('Bersihkan semua cache memori sesi WhatsApp Daemon? Anda harus melakukan scan QR ulang setelah ini.')) return;
+                    try {
+                      await api.post('/wabot/disconnect');
+                      setBotStatus('disconnected'); setBotQr(null); setBotPhone(null);
+                      toast.success('Memori Sesi WhatsApp berhasil dibersihkan');
+                    } catch { toast.error('Gagal membersihkan memori'); }
+                  }}
+                  className="btn-admin-ghost text-danger hover:bg-danger/10 px-4 flex items-center gap-2"
+                  title="Gunakan ini jika WhatsApp nyangkut / logout di HP"
+                >
+                  <span className="material-symbols-outlined text-[18px]">delete_sweep</span> Bersihkan Sesi Masalah
+                </button>
+                <button
+                  onClick={async () => {
+                    setBotLoading(true);
+                    try {
+                      const result = await api.post('/wabot/connect');
+                      setBotStatus(result.status); setBotQr(result.qr);
+                    } catch { toast.error('Gagal menghubungkan daemon'); }
+                    finally { setBotLoading(false); }
+                  }}
+                  disabled={botLoading || botStatus === 'connecting'}
+                  className="btn-admin-primary px-6 flex items-center gap-2"
+                >
+                  {botLoading ? <span className="material-symbols-outlined animate-spin text-[18px]">sync</span> : <span className="material-symbols-outlined text-[18px]">wifi</span>}
+                  Jalankan Server
+                </button>
+              </div>
             )}
           </div>
         </div>
