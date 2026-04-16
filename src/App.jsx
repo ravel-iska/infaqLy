@@ -122,7 +122,7 @@ function AppRoutes() {
       <Route element={<UserLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/explore" element={<ExplorePage />} />
-        <Route path="/explore/:campaignId" element={<RequireAuth><CampaignDetailPage /></RequireAuth>} />
+        <Route path="/explore/:campaignId" element={<CampaignDetailPage />} />
         <Route path="/cara-donasi" element={<HowToDonatePage />} />
         <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
       </Route>

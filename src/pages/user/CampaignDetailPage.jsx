@@ -273,27 +273,38 @@ export default function CampaignDetailPage() {
                   </div>
                 </div>
 
-                {/* Donation Options Auth Barrier */}
-                {!user ? (
-                  <div className="mt-8 pt-6 border-t border-outline-variant/10 dark:border-slate-700">
-                    <div className="bg-surface-container-high dark:bg-slate-900 rounded-[1.5rem] p-6 text-center border border-outline-variant/20 dark:border-slate-700">
-                      <span className="material-symbols-outlined text-[40px] text-primary dark:text-emerald-400 mb-3">volunteer_activism</span>
-                      <h4 className="font-bold text-on-surface dark:text-slate-200 mb-2 font-headline text-lg">Mari Bersama Menebar Kebaikan</h4>
-                      <p className="text-sm text-on-surface-variant dark:text-slate-400 font-medium mb-6">
-                        Silakan buat akun atau masuk terlebih dahulu agar kami dapat mengirimkan kuitansi dan progres penyaluran donasi Anda.
-                      </p>
-                      <div className="flex flex-col gap-3">
-                        <Link to="/register" className="w-full py-3.5 rounded-xl bg-primary dark:bg-emerald-600 hover:bg-primary/90 dark:hover:bg-emerald-500 text-white font-bold shadow-lg hover:-translate-y-0.5 transition-all">
-                          Daftar Sekarang
-                        </Link>
-                        <Link to="/login" className="text-sm font-bold text-primary dark:text-emerald-400 hover:underline">
-                          Sudah punya akun? Masuk
-                        </Link>
+                {/* Donation Options Panel */}
+                <div className="mt-8 pt-6 border-t border-outline-variant/10 dark:border-slate-700 relative">
+                  
+                  {/* AUTH BARRIER OVERLAY (GLASSMORPHISM) */}
+                  {!user && (
+                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center pt-8">
+                      {/* Blurred backdrop hiding the bottom area */}
+                      <div className="absolute inset-0 bg-white/40 dark:bg-slate-900/60 backdrop-blur-[4px] rounded-b-[2rem] -mx-8 -mb-8 pointer-events-auto"></div>
+                      
+                      {/* Floating Card */}
+                      <div className="relative z-30 bg-white/95 dark:bg-slate-800/95 p-6 rounded-[1.5rem] shadow-2xl shadow-primary/20 dark:shadow-black/50 border border-white/50 dark:border-slate-600 text-center mx-1 backdrop-blur-md transform transition-all hover:scale-[1.02] border-t-emerald-500 dark:border-t-emerald-400 border-t-4">
+                        <div className="mx-auto w-16 h-16 bg-emerald-100 dark:bg-emerald-900/40 rounded-full flex items-center justify-center mb-3">
+                          <span className="material-symbols-outlined text-[32px] text-emerald-600 dark:text-emerald-400">volunteer_activism</span>
+                        </div>
+                        <h4 className="font-extrabold text-on-surface dark:text-slate-100 mb-2 font-headline text-lg">Hampir Sampai!</h4>
+                        <p className="text-sm text-on-surface-variant dark:text-slate-300 font-medium mb-5 leading-relaxed">
+                          Satu langkah kecil lagi. Silakan <strong className="text-emerald-600 dark:text-emerald-400">Daftar</strong> atau <strong className="text-emerald-600 dark:text-emerald-400">Masuk</strong> sejenak untuk melanjutkan niat baik ini dengan aman dan transparan.
+                        </p>
+                        <div className="flex flex-col gap-2.5">
+                          <Link to="/login" className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white font-bold shadow-lg hover:shadow-xl transition-all block text-[15px]">
+                            Masuk & Lanjut Bayar
+                          </Link>
+                          <Link to="/register" className="text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors mt-2">
+                            Belum punya akun? Daftar gratis
+                          </Link>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="space-y-4 pt-2">
+                  )}
+
+                  {/* ACTUAL PAYMENT FIELD (Always rendered, but looks disabled/blurred if not logged in) */}
+                  <div className={`space-y-4 pt-2 transition-all duration-500 ease-out ${!user ? 'opacity-30 select-none pointer-events-none blur-[2px] grayscale-[30%]' : ''}`}>
                     <h4 className="text-sm font-bold text-on-surface dark:text-slate-200 tracking-tight">Pilih Nominal Infaq Anda</h4>
                     <div className="grid grid-cols-2 gap-3">
                       {QUICK_AMOUNTS.map((q) => (
@@ -346,7 +357,7 @@ export default function CampaignDetailPage() {
                       </>}
                     </button>
                   </div>
-                )}
+                </div>
 
                 {/* Trust Badge */}
                 <div className="mt-8 pt-6 border-t border-outline-variant/10 dark:border-slate-700 flex items-start space-x-3 bg-slate-50/50 dark:bg-slate-900/50 p-3 rounded-xl border border-transparent dark:border-slate-700/50">
