@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Filter, ArrowRight } from 'lucide-react';
-import { formatCurrency } from '@/utils/formatCurrency';
+import { formatCurrency, formatCurrencyShort } from '@/utils/formatCurrency';
 import { getActiveCampaigns, daysRemaining } from '@/services/campaignService';
 
 export default function ExplorePage() {
@@ -41,101 +40,161 @@ export default function ExplorePage() {
     });
 
   return (
-    <div className="animate-fade-in py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="animate-fade-in py-12 bg-surface min-h-screen font-body text-on-surface pb-24">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-user-text">Jelajahi Program</h1>
-          <p className="mt-2 text-user-text-secondary">Temukan program donasi yang sesuai dengan hati Anda</p>
+        <div className="mb-10 text-center md:text-left">
+          <h1 className="font-headline text-4xl md:text-5xl font-bold mb-4">Jelajahi Program</h1>
+          <p className="text-on-surface-variant text-lg">Temukan program donasi yang sesuai dengan hati dan kepedulian Anda.</p>
         </div>
 
         {/* Search & Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="bg-surface-container-low p-4 md:p-6 rounded-[2rem] ambient-shadow border border-white/40 flex flex-col md:flex-row gap-4 mb-12">
+          {/* Search Input */}
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-user-text-muted" />
+            <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-70">
+              search
+            </span>
             <input
               type="text"
               placeholder="Cari nama program..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="input-user pl-11"
+              className="w-full pl-14 pr-6 py-4 rounded-full border border-outline-variant/30 bg-surface-container-lowest text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-sm md:text-base"
             />
           </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <select value={category} onChange={(e) => setCategory(e.target.value)} className="input-user sm:!w-auto sm:min-w-[160px]">
-              <option value="all">Semua Kategori</option>
-              <option value="infaq">Infaq</option>
-              <option value="wakaf">Wakaf</option>
-            </select>
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="input-user sm:!w-auto sm:min-w-[160px]">
-              <option value="newest">Terbaru</option>
-              <option value="most-donors">Paling Banyak Donasi</option>
-              <option value="ending-soon">Segera Berakhir</option>
-            </select>
+
+          {/* Select dropdowns */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative w-full sm:w-auto">
+              <select 
+                value={category} 
+                onChange={(e) => setCategory(e.target.value)} 
+                className="w-full sm:min-w-[180px] appearance-none pl-6 pr-12 py-4 rounded-full border border-outline-variant/30 bg-surface-container-lowest text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-sm md:text-base cursor-pointer"
+              >
+                <option value="all">Semua Kategori</option>
+                <option value="infaq">Kategori Infaq</option>
+                <option value="wakaf">Kategori Wakaf</option>
+              </select>
+              <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
+                expand_more
+              </span>
+            </div>
+
+            <div className="relative w-full sm:w-auto">
+              <select 
+                value={sortBy} 
+                onChange={(e) => setSortBy(e.target.value)} 
+                className="w-full sm:min-w-[220px] appearance-none pl-6 pr-12 py-4 rounded-full border border-outline-variant/30 bg-surface-container-lowest text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-sm md:text-base cursor-pointer"
+              >
+                <option value="newest">Urut: Terbaru</option>
+                <option value="most-donors">Urut: Paling Banyak Donasi</option>
+                <option value="ending-soon">Urut: Segera Berakhir</option>
+              </select>
+              <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
+                sort
+              </span>
+            </div>
           </div>
         </div>
 
         {/* Results */}
         {filtered.length === 0 ? (
-          <div className="text-center py-20">
-            <Filter size={48} className="mx-auto text-user-text-muted mb-4" />
-            <h3 className="text-lg font-semibold text-user-text">Tidak ada program ditemukan</h3>
-            <p className="text-sm text-user-text-secondary mt-1">Coba ubah kata kunci atau filter pencarian Anda</p>
+          <div className="text-center py-32 bg-surface-container-lowest rounded-[3rem] border border-white/20 ambient-shadow">
+            <div className="w-24 h-24 mx-auto bg-surface-container rounded-full flex items-center justify-center mb-6">
+              <span className="material-symbols-outlined text-5xl text-on-surface-variant/50">
+                search_off
+              </span>
+            </div>
+            <h3 className="font-headline text-2xl font-bold text-on-surface mb-2">Tidak ada program ditemukan</h3>
+            <p className="text-on-surface-variant">Coba ubah kata kunci atau filter kategori pencarian Anda.</p>
           </div>
         ) : (
-          <div className="space-y-6">
-            {filtered.map((campaign) => (
-              <CampaignListCard key={campaign.id} campaign={campaign} />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {filtered.map((campaign, idx) => (
+              <CampaignListCard key={campaign.id} campaign={campaign} idx={idx} />
             ))}
           </div>
         )}
+
       </div>
     </div>
   );
 }
 
-function CampaignListCard({ campaign }) {
+function CampaignListCard({ campaign, idx }) {
   const progress = campaign.target > 0 ? Math.round((campaign.collected / campaign.target) * 100) : 0;
   const days = daysRemaining(campaign.endDate);
   const categoryLabel = campaign.category === 'infaq' ? 'Infaq' : 'Wakaf';
 
+  // Rotating colors for tabs to match the aesthetic from HomePage
+  const tagColorClass = idx % 2 === 0 
+    ? 'bg-primary-container text-on-primary-container' 
+    : 'bg-tertiary-container text-on-tertiary-container';
+
   return (
-    <div className="user-card overflow-hidden flex flex-col md:flex-row">
-      <div className="md:w-72 md:flex-shrink-0 overflow-hidden">
+    <Link to={`/explore/${campaign.id}`} className="group bg-surface-container-lowest rounded-[2rem] overflow-hidden ambient-shadow border border-white/20 transition-all hover:-translate-y-2 flex flex-col sm:flex-row h-full">
+      
+      {/* Image Block */}
+      <div className="relative h-56 sm:h-auto sm:w-5/12 overflow-hidden flex-shrink-0">
         <img
-          src={campaign.imageUrl || campaign.image || 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=400&h=250&fit=crop'}
+          src={campaign.imageUrl || campaign.image || 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=600&auto=format&fit=crop&q=60'}
           alt={campaign.title}
-          className="w-full h-48 md:h-full object-cover hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
+        <div className={`absolute top-4 left-4 ${tagColorClass} text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest`}>
+          {categoryLabel}
+        </div>
       </div>
-      <div className="flex-1 p-4 sm:p-6 flex flex-col justify-between">
+
+      {/* Content Block */}
+      <div className="flex-1 p-6 lg:p-8 flex flex-col justify-between">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className={`px-3 py-1 text-xs font-semibold rounded-full ${campaign.category === 'infaq' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-              {categoryLabel}
-            </span>
-          </div>
-          <h3 className="text-lg sm:text-xl font-bold text-user-text leading-tight">{campaign.title}</h3>
-          <div className="mt-3 sm:mt-4">
-            <div className="progress-bar">
-              <div className="progress-bar-fill" style={{ '--progress-width': `${Math.min(progress, 100)}%` }}></div>
+          <h3 className="font-headline text-xl font-bold mb-4 line-clamp-2 text-on-surface">{campaign.title}</h3>
+          
+          <div className="mb-6">
+            <div className="flex justify-between text-xs font-bold mb-2">
+              <span className="text-primary">{formatCurrency(campaign.collected)}</span>
+              <span className="text-on-surface-variant text-[10px] sm:text-xs">dari {formatCurrencyShort(campaign.target)}</span>
             </div>
-            <div className="flex justify-between mt-2">
-              <span className="text-xs sm:text-sm font-semibold text-user-accent">{formatCurrency(campaign.collected)}</span>
-              <span className="text-xs sm:text-sm text-user-text-muted">dari {formatCurrency(campaign.target)}</span>
+            <div className="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+              <div 
+                className="bg-primary-container h-full rounded-full transition-all duration-1000" 
+                style={{ width: `${Math.min(progress, 100)}%` }}
+              ></div>
             </div>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-4 pt-4 border-t border-user-border gap-4 sm:gap-0">
-          <div className="flex gap-4 text-xs sm:text-sm text-user-text-muted">
-            <span>👥 {campaign.donors} donatur</span>
-            <span>⏳ {days} hari lagi</span>
+
+        <div>
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-2 text-xs font-medium text-on-surface-variant">
+              <span className="material-symbols-outlined text-[16px]">group</span>
+              {campaign.donors} Donatur
+            </div>
+            
+            {progress >= 100 ? (
+              <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
+                <span className="material-symbols-outlined text-[14px]">check_circle</span> Tercapai
+              </div>
+            ) : days <= 0 ? (
+              <div className="flex items-center gap-1 text-xs font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-full">
+                <span className="material-symbols-outlined text-[14px]">cancel</span> Ditutup
+              </div>
+            ) : (
+              <div className="flex items-center gap-1 text-xs font-medium text-on-surface-variant bg-surface-container px-2.5 py-1 rounded-full">
+                <span className="material-symbols-outlined text-[14px]">schedule</span> {days} Hari
+              </div>
+            )}
           </div>
-          <Link to={`/explore/${campaign.id}`} className="btn-user-primary w-full sm:w-auto justify-center !py-2 !px-4 text-sm mt-1 sm:mt-0">
-            Donasi Sekarang <ArrowRight size={16} />
-          </Link>
+          
+          <button className="w-full py-3 bg-surface-container text-primary font-bold rounded-xl flex items-center justify-center gap-2 transition-colors group-hover:bg-primary group-hover:text-on-primary">
+            Donasi Sekarang <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </button>
         </div>
       </div>
-    </div>
+      
+    </Link>
   );
 }
