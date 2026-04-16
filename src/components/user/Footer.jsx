@@ -131,7 +131,7 @@ export default function Footer() {
           <ul className="space-y-3 text-slate-500">
             <li>
               <a 
-                href={hasWa ? `${api.defaults.baseURL}/settings/whatsapp-redirect` : "#"} 
+                href={hasWa ? "/api/settings/whatsapp-redirect" : "#"} 
                 target={hasWa ? "_blank" : undefined}
                 rel="noopener noreferrer" 
                 onClick={(e) => {
@@ -159,7 +159,7 @@ export default function Footer() {
             {hasWa && (
               <li className="flex items-center gap-2 group">
                 <span className="material-symbols-outlined text-sm">support_agent</span>
-                <a href={`${api.defaults.baseURL}/settings/whatsapp-redirect`} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">Tanya via WhatsApp</a>
+                <a href="/api/settings/whatsapp-redirect" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">Tanya via WhatsApp</a>
               </li>
             )}
             <li className="flex items-start gap-2 group">

@@ -28,7 +28,7 @@ function FloatingWA() {
 
   return (
     <a 
-      href={`${api.defaults.baseURL}/settings/whatsapp-redirect`}
+      href="/api/settings/whatsapp-redirect"
       target="_blank"
       rel="noopener noreferrer"
       onClick={handleClick}
