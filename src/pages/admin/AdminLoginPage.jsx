@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, Lock, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, Lock, ShieldCheck, ArrowLeft, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { adminLogin } from '@/services/authService';
 import api from '@/services/api';
@@ -118,7 +118,7 @@ export default function AdminLoginPage() {
                 </p>
               </div>
               <button type="submit" disabled={loading || pinInput.length < 4} className="btn-admin-primary w-full py-3.5">
-                {loading ? <span className="animate-pulse">Memverifikasi...</span> : <><ShieldCheck size={18} /> Masuk dengan PIN</>}
+                {loading ? <><Loader2 size={18} className="animate-spin" /> Memverifikasi...</> : <><ShieldCheck size={18} /> Masuk dengan PIN</>}
               </button>
             </form>
 
@@ -180,7 +180,7 @@ export default function AdminLoginPage() {
               </div>
             </div>
             <button type="submit" disabled={loading} className="btn-admin-primary w-full py-3.5">
-              {loading ? <span className="animate-pulse">Memuat...</span> : <><Lock size={18} /> Sign In</>}
+              {loading ? <><Loader2 size={18} className="animate-spin" /> Sedang Masuk...</> : <><Lock size={18} /> Sign In</>}
             </button>
           </form>
 

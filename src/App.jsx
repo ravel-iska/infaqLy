@@ -55,11 +55,29 @@ function AdminGuestOnly({ children }) {
 
 function LoadingScreen() {
   return (
-    <div className="min-h-screen flex items-center justify-center user-bg">
-      <div className="text-center">
-        <span className="text-4xl animate-pulse">🕌</span>
-        <p className="mt-2 text-sm text-user-text-muted">Memuat...</p>
+    <div className="min-h-screen flex flex-col items-center justify-center user-bg relative overflow-hidden">
+      {/* Subtle Glow Background */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-user-accent/5 rounded-full blur-[100px] pointer-events-none" />
+
+      {/* Spinner Container */}
+      <div className="relative flex justify-center items-center mb-8 z-10">
+        {/* Outer Static Track */}
+        <div className="absolute inset-0 w-16 h-16 rounded-full border-[3px] border-user-border/30" />
+        
+        {/* Fast Inner Ring */}
+        <div className="absolute w-10 h-10 rounded-full border-[3px] border-transparent border-t-user-accent animate-spin" style={{ animationDuration: '0.8s' }} />
+        
+        {/* Slow Outer Ring */}
+        <div className="w-16 h-16 rounded-full border-[3px] border-transparent border-b-user-accent animate-[spin_1.5s_linear_infinite_reverse]" />
       </div>
+
+      {/* Brand Text */}
+      <h2 className="text-xl font-extrabold text-user-text tracking-tight mb-2 z-10">
+        infaq<span className="text-user-accent">Ly</span>
+      </h2>
+      <p className="text-sm font-medium text-user-text-muted animate-pulse z-10">
+        Mempersiapkan data...
+      </p>
     </div>
   );
 }
