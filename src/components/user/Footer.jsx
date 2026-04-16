@@ -41,10 +41,45 @@ function TermsModal({ isOpen, onClose }) {
   );
 }
 
+function PrivacyModal({ isOpen, onClose }) {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+      <div className="bg-surface-container-lowest w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-slide-up relative">
+        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-white sticky top-0 z-10">
+          <h3 className="font-headline text-xl font-bold text-on-surface">Kebijakan Privasi</h3>
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div className="p-6 overflow-y-auto font-body text-slate-600 text-sm space-y-4 shadow-inner">
+          <p>Di InfaqLy, privasi Anda adalah prioritas utama kami. Kebijakan ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi data pribadi Anda.</p>
+          
+          <h4 className="font-bold text-slate-800 text-base mt-6">1. Pengumpulan Data</h4>
+          <p>Kami hanya mengumpulkan data yang diperlukan untuk transaksi donasi dan notifikasi, meliputi: Nama Lengkap, Alamat Email, Nomor WhatsApp/Telepon, dan histori donasi.</p>
+          
+          <h4 className="font-bold text-slate-800 text-base mt-6">2. Penggunaan Data</h4>
+          <p>Data Anda hanya digunakan secara internal untuk memverifikasi transaksi, memberikan laporan perkembangan program, mengirimkan bukti donasi (kuitansi), dan menghubungi Anda terkait keamanan akun (OTP).</p>
+          
+          <h4 className="font-bold text-slate-800 text-base mt-6">3. Keamanan & Kerahasiaan Data</h4>
+          <p>Seluruh transaksi Anda dienkripsi (SSL) dan disalurkan melalui mitra Payment Gateway resmi yang mengantongi izin dari Bank Indonesia (Midtrans). Kami berkomitmen untuk <strong>tidak pernah menjual, menukar, atau menyebarluaskan data Anda</strong> ke pihak luar untuk tujuan komersil apapun tanpa izin eksplisit Anda.</p>
+          
+          <h4 className="font-bold text-slate-800 text-base mt-6">4. Pilihan Anonimitas</h4>
+          <p>Jika Anda memilih untuk berdonasi secara anonim, sistem InfaqLy akan mentopeng nama Anda (menjadi Hamba Allah) di seluruh daftar donatur publik, sehingga privasi Anda lebih terjaga secara sosial.</p>
+        </div>
+        <div className="p-4 border-t border-slate-100 bg-white sticky bottom-0">
+          <button onClick={onClose} className="w-full py-3 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-sm">Saya Mengerti</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Footer() {
   const [waUrl, setWaUrl] = useState('');
   const [phone, setPhone] = useState('+62 21 555 1234');
   const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -96,11 +131,23 @@ export default function Footer() {
         <div className="space-y-6">
           <h5 className="font-bold text-on-surface">Bantuan</h5>
           <ul className="space-y-3 text-slate-500">
-            {waUrl ? (
-              <li><a href={waUrl} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">Pusat Bantuan</a></li>
-            ) : null}
+            <li>
+              <a 
+                href={waUrl || "#"} 
+                target={waUrl ? "_blank" : undefined}
+                rel="noopener noreferrer" 
+                onClick={(e) => {
+                  if (!waUrl) {
+                    e.preventDefault();
+                    toast('Nomor Bantuan/WhatsApp admin belum dikonfigurasi.', { icon: '⚠️' });
+                  }
+                }}
+                className="hover:text-emerald-500 transition-colors"
+              >
+                Pusat Bantuan
+              </a>
+            </li>
             <li><Link to="/cara-donasi" className="hover:text-emerald-500 transition-colors">Cara Donasi</Link></li>
-            <li><button onClick={() => setIsTermsOpen(true)} className="hover:text-emerald-500 transition-colors text-left">Syarat & Ketentuan</button></li>
           </ul>
         </div>
         
@@ -117,12 +164,13 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-8 lg:px-12 pb-8 border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-xs">
         <p>© {new Date().getFullYear()} Infaqly Philanthropy. All rights reserved.</p>
         <div className="flex gap-6">
-          <button onClick={() => setIsTermsOpen(true)} className="hover:text-emerald-500 transition-colors">Kebijakan Privasi</button>
+          <button onClick={() => setIsPrivacyOpen(true)} className="hover:text-emerald-500 transition-colors">Kebijakan Privasi</button>
           <button onClick={() => setIsTermsOpen(true)} className="hover:text-emerald-500 transition-colors">Syarat & Ketentuan</button>
         </div>
       </div>
 
       <TermsModal isOpen={isTermsOpen} onClose={() => setIsTermsOpen(false)} />
+      <PrivacyModal isOpen={isPrivacyOpen} onClose={() => setIsPrivacyOpen(false)} />
     </footer>
   );
 }
