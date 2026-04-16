@@ -133,12 +133,16 @@ export default function CampaignsPage() {
                         </td>
                         <td className="px-5 py-4">
                           <span className={`px-2.5 py-1 text-[11px] font-bold rounded flex items-center w-max gap-1.5 uppercase tracking-wider ${
-                            c.category === 'infaq' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                            c.category === 'infaq' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' 
+                            : c.category === 'wakaf' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                            : 'bg-admin-accent/10 text-admin-accent border border-admin-accent/20'
                           }`}>
                             <span className="material-symbols-outlined text-[14px]">
-                              {c.category === 'infaq' ? 'volunteer_activism' : 'real_estate_agent'}
+                              {c.category === 'infaq' ? 'volunteer_activism' 
+                               : c.category === 'wakaf' ? 'real_estate_agent' 
+                               : 'loyalty'}
                             </span>
-                            {c.category === 'infaq' ? 'Infaq' : 'Wakaf'}
+                            {c.category === 'infaq' ? 'Infaq' : c.category === 'wakaf' ? 'Wakaf' : c.category}
                           </span>
                         </td>
                         <td className="px-5 py-4">

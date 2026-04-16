@@ -63,7 +63,7 @@ export default function CampaignDetailPage() {
 
   const progress = campaign.target > 0 ? Math.round((campaign.collected / campaign.target) * 100) : 0;
   const days = daysRemaining(campaign.endDate);
-  const categoryLabel = campaign.category === 'infaq' ? 'Infaq' : 'Wakaf';
+  const categoryLabel = campaign.category === 'infaq' ? 'Infaq' : campaign.category === 'wakaf' ? 'Wakaf' : campaign.category;
 
   const handleQuickAmount = (val) => {
     setSelectedQuick(val);

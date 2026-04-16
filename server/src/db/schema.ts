@@ -1,6 +1,6 @@
 // Re-export all schemas
 export { users, sessions, roleEnum } from './schema/users.js';
-export { campaigns, campaignCategoryEnum, campaignStatusEnum } from './schema/campaigns.js';
+export { campaigns, campaignStatusEnum } from './schema/campaigns.js';
 export { donations, paymentStatusEnum } from './schema/donations.js';
 export { withdrawals, withdrawalStatusEnum } from './schema/withdrawals.js';
 export { otpCodes, otpTypeEnum } from './schema/otp.js';
