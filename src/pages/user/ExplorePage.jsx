@@ -39,6 +39,8 @@ export default function ExplorePage() {
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
+  const uniqueCategories = ['all', ...new Set(campaigns.map(c => c.category))];
+
   return (
     <div className="animate-fade-in pt-24 pb-12 bg-surface font-body text-on-surface">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
@@ -71,11 +73,13 @@ export default function ExplorePage() {
               <select 
                 value={category} 
                 onChange={(e) => setCategory(e.target.value)} 
-                className="w-full sm:min-w-[180px] appearance-none pl-6 pr-12 py-4 rounded-full border border-outline-variant/30 bg-surface-container-lowest text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-sm md:text-base cursor-pointer"
+                className="w-full sm:min-w-[180px] appearance-none pl-6 pr-12 py-4 rounded-full border border-outline-variant/30 bg-surface-container-lowest text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-sm md:text-base cursor-pointer capitalize"
               >
-                <option value="all">Semua Kategori</option>
-                <option value="infaq">Infaq</option>
-                <option value="wakaf">Wakaf</option>
+                {uniqueCategories.map(cat => (
+                  <option key={cat} value={cat}>
+                    {cat === 'all' ? 'Semua Kategori' : cat}
+                  </option>
+                ))}
               </select>
               <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
                 expand_more

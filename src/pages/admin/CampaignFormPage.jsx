@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { getCampaignById, createCampaign, updateCampaign } from '@/services/campaignService';
+import { getCampaignById, createCampaign, updateCampaign, getAllCampaigns } from '@/services/campaignService';
 import toast from 'react-hot-toast';
 
 export default function CampaignFormPage() {
@@ -21,6 +21,18 @@ export default function CampaignFormPage() {
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [existingCategories, setExistingCategories] = useState(['infaq', 'wakaf']);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const campaigns = await getAllCampaigns();
+        const cats = new Set(['infaq', 'wakaf']);
+        campaigns.forEach(c => cats.add(c.category));
+        setExistingCategories([...cats]);
+      } catch {}
+    })();
+  }, []);
 
   useEffect(() => {
     if (isEdit) {
@@ -212,9 +224,10 @@ export default function CampaignFormPage() {
                 ) : (
                   <div className="relative">
                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-admin-text-muted text-[20px]">category</span>
-                    <select value={form.category} onChange={(e) => update('category', e.target.value)} className="input-admin pl-12 sm:w-full font-medium appearance-none">
-                      <option value="infaq">Kategori Infaq</option>
-                      <option value="wakaf">Kategori Wakaf</option>
+                    <select value={form.category} onChange={(e) => update('category', e.target.value)} className="input-admin pl-12 sm:w-full font-medium appearance-none capitalize">
+                      {existingCategories.map(cat => (
+                        <option key={cat} value={cat}>Kategori {cat}</option>
+                      ))}
                     </select>
                     <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-admin-text-muted pointer-events-none text-[20px]">expand_more</span>
                   </div>
