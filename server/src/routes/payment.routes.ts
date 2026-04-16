@@ -70,8 +70,8 @@ router.post('/notification', async (req: Request, res: Response) => {
   try {
     const result = await paymentService.handleNotification(req.body);
 
-    // Send WA notification on success
-    if (result.status === 'success' && result.donation) {
+    // Send WA notification on newly completed successful transaction
+    if (result.status === 'success' && result.isNewSuccess && result.donation) {
       const d = result.donation;
       const campaign = await campaignService.getCampaignById(d.campaignId);
       sendDonationNotification(
@@ -97,8 +97,8 @@ router.get('/check-status/:orderId', requireAuth, async (req: Request, res: Resp
     if (statusResult) {
       const result = await paymentService.handleNotification(statusResult);
       
-      // Send WA notification on success
-      if (result.status === 'success' && result.donation) {
+      // Send WA notification on relatively new success
+      if (result.status === 'success' && result.isNewSuccess && result.donation) {
         const d = result.donation;
         const campaign = await campaignService.getCampaignById(d.campaignId);
         sendDonationNotification(

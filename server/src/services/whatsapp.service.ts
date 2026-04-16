@@ -3,6 +3,8 @@ import { db } from '../config/database.js';
 import { settings } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 import * as wabot from './wabot.service.js';
+import { generateCertificatePDF } from './pdf.service.js';
+import fs from 'fs';
 
 const FONNTE_API_URL = 'https://api.fonnte.com/send';
 
@@ -92,7 +94,43 @@ export async function sendDonationNotification(donorName: string, donorPhone: st
   const fmt = new Intl.NumberFormat('id-ID').format(amount);
   const msg = `🕌 *infaqLy — Konfirmasi Donasi*\n\nAssalamu'alaikum ${donorName},\n\nTerima kasih atas donasi Anda! ❤️\n\n📋 *Detail:*\n• Program: ${program}\n• Nominal: Rp ${fmt}\n• Order ID: ${orderId}\n• Status: ✅ Berhasil\n\nSemoga Allah membalas kebaikan Anda. Aamiin. 🤲\n\n_Pesan otomatis dari infaqLy_`;
   console.log(`[WA] 📤 Sending donation receipt to ${donorName} (${donorPhone})...`);
-  return sendWhatsApp(donorPhone, msg);
+  
+  // Kirim struk teks utama terlebih dahulu
+  const result = await sendWhatsApp(donorPhone, msg);
+
+  // Jika WA bot native (Baileys) tersambung, kita buat & kirim Certificate PDF
+  const botStatus = wabot.getStatus();
+  if (botStatus.connected) {
+    let pdfPath = '';
+    try {
+      console.log(`[WA] 📄 Generating PDF certificate for ${orderId}...`);
+      pdfPath = await generateCertificatePDF({
+        orderId,
+        donorName,
+        amount,
+        programName: program,
+        date: new Date(),
+      });
+
+      console.log(`[WA] 📤 Sending PDF certificate to ${donorPhone}...`);
+      await wabot.sendDocument(
+        donorPhone, 
+        pdfPath, 
+        `Kuitansi-Donasi-${orderId}.pdf`, 
+        `Berikut adalah kuitansi digital untuk donasi Anda.`
+      );
+    } catch (err: any) {
+      console.error(`[WA] ❌ Failed to generate/send PDF:`, err);
+    } finally {
+      // Hapus file sementara agar tidak menumpuk memenuhi memori/storage server
+      if (pdfPath && fs.existsSync(pdfPath)) {
+        fs.unlinkSync(pdfPath);
+        console.log(`[WA] 🗑️ Temporary PDF file deleted: ${pdfPath}`);
+      }
+    }
+  }
+
+  return result;
 }
 
 /** OTP notification */

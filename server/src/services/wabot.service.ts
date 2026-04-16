@@ -147,6 +147,34 @@ export async function sendMessage(phone: string, message: string): Promise<{ suc
 }
 
 /**
+ * Send a document/file via the bot
+ */
+export async function sendDocument(phone: string, filePath: string, fileName: string, caption: string): Promise<{ success: boolean; message: string }> {
+  if (!sock || connectionStatus !== 'connected') {
+    return { success: false, message: 'WhatsApp bot belum terhubung. Scan QR di Pengaturan Admin.' };
+  }
+
+  try {
+    const fs = await import('fs');
+    if (!fs.existsSync(filePath)) {
+       return { success: false, message: 'File tidak ditemukan' };
+    }
+
+    const jid = toJid(phone);
+    await sock.sendMessage(jid, { 
+      document: fs.readFileSync(filePath), 
+      mimetype: 'application/pdf', 
+      fileName: fileName,
+      caption: caption 
+    });
+    return { success: true, message: 'Dokumen terkirim via WA Bot' };
+  } catch (err: any) {
+    console.error('[WABot] Send Document error:', err);
+    return { success: false, message: 'Gagal kirim dokumen: ' + (err.message || 'unknown error') };
+  }
+}
+
+/**
  * Send OTP message
  */
 export async function sendOtp(phone: string, otp: string): Promise<{ success: boolean; message: string }> {

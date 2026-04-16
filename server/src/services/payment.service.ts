@@ -167,13 +167,15 @@ export async function handleNotification(body: any) {
     .returning();
 
   // If transitioning TO success (and wasn't already success), update campaign
+  let isNewSuccess = false;
   if (status === 'success' && donation && !wasAlreadySuccess) {
+    isNewSuccess = true;
     await db.execute(
       `UPDATE campaigns SET collected = collected + ${donation.amount}, donors = donors + 1, updated_at = NOW() WHERE id = ${donation.campaignId}`
     );
   }
 
-  return { orderId, status, donation };
+  return { orderId, status, donation, isNewSuccess };
 }
 
 /**
