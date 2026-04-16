@@ -134,22 +134,30 @@ export default function SettingsPage() {
     }
   };
 
-  // ═══ Save Fonnte ═══
-  const saveFonnte = async () => {
-    if (!waToken.trim()) {
-      toast.error('Token Fonnte wajib diisi');
-      return;
-    }
+  // ═══ Save Fonnte / WhatsApp Token ═══
+  const saveFonnteToken = async () => {
     try {
       await api.put('/settings', {
         fonnte_token: waToken.trim(),
-        fonnte_admin_phone: adminPhone.trim(),
       });
-      toast.success('Pengaturan WhatsApp berhasil disimpan! ✅');
+      toast.success('Token WhatsApp berhasil disimpan! ✅');
     } catch (err) {
-      toast.error(err.message || 'Gagal menyimpan');
+      toast.error(err.message || 'Gagal menyimpan token');
     }
   };
+
+  // ═══ Save Admin Contact / Pusat Bantuan ═══
+  const saveAdminContact = async () => {
+    try {
+      await api.put('/settings', {
+        fonnte_admin_phone: adminPhone.trim(),
+      });
+      toast.success('Nomor Pusat Bantuan berhasil disimpan! ✅');
+    } catch (err) {
+      toast.error(err.message || 'Gagal menyimpan nomor kontak');
+    }
+  };
+  // ═══ Save functions omitted for brevity in replacement preview ═══
 
   // ═══ Test Fonnte Connection ═══
   const handleTestConnection = async () => {
@@ -164,7 +172,7 @@ export default function SettingsPage() {
     }
 
     // Save first so backend can use the token
-    await saveFonnte();
+    await saveFonnteToken();
 
     setTestLoading(true);
     setTestResult(null);
@@ -497,11 +505,11 @@ export default function SettingsPage() {
       <div className="admin-card p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-semibold text-admin-text">📱 Fonnte WhatsApp API</h2>
-            <p className="text-sm text-admin-text-muted mt-1">Konfigurasi untuk notifikasi otomatis via WhatsApp</p>
+            <h2 className="text-lg font-semibold text-admin-text">📱 Fonnte WhatsApp API (Gateway OTP Cadangan)</h2>
+            <p className="text-sm text-admin-text-muted mt-1">Konfigurasi Gateway Alternatif Jika Baileys Bot Mati</p>
           </div>
-          <button onClick={saveFonnte} className="btn-admin-primary text-sm">
-            <Save size={16} /> Simpan
+          <button onClick={saveFonnteToken} className="btn-admin-primary text-sm">
+            <Save size={16} /> Simpan Token
           </button>
         </div>
 
@@ -528,19 +536,46 @@ export default function SettingsPage() {
             </p>
           </div>
 
+          {/* Admin Phone MOVED HIGHER OR SEPARATED */}
+        </div>
+      </div>
+
+      {/* ════════════════════════════════════════ */}
+      {/* PUSAT BANTUAN & INFO KONTAK ADMIN      */}
+      {/* ════════════════════════════════════════ */}
+      <div className="admin-card p-6 border border-emerald-500/20 bg-emerald-50">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-lg font-semibold text-emerald-800">📞 Pusat Bantuan & Kontak Dukungan</h2>
+            <p className="text-sm text-emerald-600/80 mt-1">Nomor telepon ini yang akan ditampilkan di web & gelembung WhatsApp utama user</p>
+          </div>
+          <button onClick={saveAdminContact} className="btn-admin-primary text-sm bg-emerald-600 hover:bg-emerald-700">
+            <Save size={16} /> Simpan Nomor
+          </button>
+        </div>
+
+        <div className="space-y-4">
           {/* Admin Phone */}
           <div>
-            <label className="block text-sm font-medium text-admin-text-secondary mb-1.5">Nomor Admin (untuk notifikasi)</label>
+            <label className="block text-sm font-bold text-emerald-900 mb-1.5">Nomor Telepon/WhatsApp Admin</label>
             <input
               type="text"
               value={adminPhone}
               onChange={(e) => setAdminPhone(e.target.value)}
-              placeholder="081234567890"
-              className="input-admin"
+              placeholder="Contoh: 081234567890"
+              className="input-admin border-emerald-200 focus:border-emerald-500 bg-white"
             />
-            <p className="text-xs text-admin-text-muted mt-1">Nomor ini akan menerima notifikasi penarikan dan laporan</p>
+            <p className="text-xs text-emerald-700/70 mt-2 font-medium">Jika ini kosong, tombol WA Pusat Bantuan tidak akan berfungsi/hilang. Format wajib menggunakan awalan 08xxx atau 62xxx tanpa spasi/simbol.</p>
           </div>
-
+        </div>
+      </div>
+      
+      {/* Fonnte Test Connection (Moved into a new Section to not clutter) */}
+      <div className="admin-card p-6">
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-admin-text">🧪 Test Kirim Notifikasi via Fonnte</h2>
+        </div>
+        <div className="space-y-4">
           {/* Test Connection */}
           <div className="pt-3 border-t border-admin-border">
             <label className="block text-sm font-medium text-admin-text-secondary mb-1.5">🧪 Test Kirim Pesan</label>
