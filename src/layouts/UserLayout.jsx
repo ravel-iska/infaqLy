@@ -5,29 +5,31 @@ import Footer from '@/components/user/Footer';
 import api from '@/services/api';
 
 function FloatingWA() {
-  const [waUrl, setWaUrl] = useState('');
+  const [hasWa, setHasWa] = useState(false);
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
         const data = await api.get('/settings/public');
-        if (data.waUrl) setWaUrl(data.waUrl);
+        if (data.hasWa) setHasWa(data.hasWa);
       } catch (err) {}
     };
     fetchSettings();
   }, []);
 
   const handleClick = (e) => {
-    if (!waUrl) {
+    if (!hasWa) {
       e.preventDefault();
       alert('Maaf, nomor Bantuan/WhatsApp admin belum dikonfigurasi di Pengaturan.');
     }
   };
 
+  if (!hasWa) return null; // Hide totally if the admin wiped out the Help Center number
+
   return (
     <a 
-      href={waUrl || "#"} 
-      target={waUrl ? "_blank" : undefined}
+      href={`${api.defaults.baseURL}/settings/whatsapp-redirect`}
+      target="_blank"
       rel="noopener noreferrer"
       onClick={handleClick}
       title="Hubungi Pusat Bantuan"

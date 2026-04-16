@@ -76,8 +76,7 @@ function PrivacyModal({ isOpen, onClose }) {
 }
 
 export default function Footer() {
-  const [waUrl, setWaUrl] = useState('');
-  const [phone, setPhone] = useState('+62 21 555 1234');
+  const [hasWa, setHasWa] = useState(false);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
@@ -85,8 +84,7 @@ export default function Footer() {
     const fetchSettings = async () => {
       try {
         const data = await api.get('/settings/public');
-        if (data.waUrl) setWaUrl(data.waUrl);
-        if (data.phone) setPhone(data.phone);
+        if (data.hasWa) setHasWa(data.hasWa);
       } catch (err) {}
     };
     fetchSettings();
@@ -133,11 +131,11 @@ export default function Footer() {
           <ul className="space-y-3 text-slate-500">
             <li>
               <a 
-                href={waUrl || "#"} 
-                target={waUrl ? "_blank" : undefined}
+                href={hasWa ? `${api.defaults.baseURL}/settings/whatsapp-redirect` : "#"} 
+                target={hasWa ? "_blank" : undefined}
                 rel="noopener noreferrer" 
                 onClick={(e) => {
-                  if (!waUrl) {
+                  if (!hasWa) {
                     e.preventDefault();
                     toast('Nomor Bantuan/WhatsApp admin belum dikonfigurasi.', { icon: '⚠️' });
                   }
@@ -158,10 +156,12 @@ export default function Footer() {
               <span className="material-symbols-outlined text-sm">mail</span>
               <a href="mailto:info@infaqly.org" className="hover:text-emerald-500 transition-colors">info@infaqly.org</a>
             </li>
-            <li className="flex items-center gap-2 group">
-              <span className="material-symbols-outlined text-sm">call</span>
-              <a href={`tel:${phone.replace(/\D/g, '')}`} className="hover:text-emerald-500 transition-colors">{phone}</a>
-            </li>
+            {hasWa && (
+              <li className="flex items-center gap-2 group">
+                <span className="material-symbols-outlined text-sm">support_agent</span>
+                <a href={`${api.defaults.baseURL}/settings/whatsapp-redirect`} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">Tanya via WhatsApp</a>
+              </li>
+            )}
             <li className="flex items-start gap-2 group">
               <span className="material-symbols-outlined text-sm mt-0.5">location_on</span>
               <a href="https://www.google.com/maps/search/?api=1&query=South+Quarter+Tower+A+Jakarta" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">

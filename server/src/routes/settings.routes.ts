@@ -16,17 +16,10 @@ router.get('/public', async (req: Request, res: Response) => {
     }
 
     const phone = settingsMap['fonnte_admin_phone'] || '';
-    let waUrl = '';
-    let displayPhone = '+62 21 555 1234';
-    if (phone) {
-      let cleanPhone = phone.replace(/^0/, '62').replace(/\D/g, '');
-      waUrl = `https://wa.me/${cleanPhone}`;
-      displayPhone = phone;
-    }
+    const hasWa = !!phone;
 
     return res.json({ 
-      waUrl, 
-      phone: displayPhone,
+      hasWa,
       settings: {
         maintenance_mode: settingsMap['maintenance_mode'] || 'false'
       }
@@ -67,6 +60,21 @@ router.put('/', requireAdmin, async (req: Request, res: Response) => {
     return res.json({ message: 'Settings berhasil disimpan' });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/settings/whatsapp-redirect - Obfuscated WhatsApp link redirect to hide phone number
+router.get('/whatsapp-redirect', async (req: Request, res: Response) => {
+  try {
+    const [row] = await db.select().from(settings).where(eq(settings.key, 'fonnte_admin_phone')).limit(1);
+    const phone = row?.value || '';
+    if (!phone) {
+      return res.status(404).send('WhatsApp Help Center is not configured');
+    }
+    const cleanPhone = phone.replace(/^0/, '62').replace(/\D/g, '');
+    return res.redirect(`https://wa.me/${cleanPhone}?text=Halo%20Admin%20Pusat%20Bantuan`);
+  } catch (err: any) {
+    return res.status(500).send('Internal Error');
   }
 });
 
