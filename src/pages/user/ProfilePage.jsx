@@ -22,10 +22,134 @@ function Avatar({ user, size = 'md' }) {
   );
 }
 
+/** Status filter tabs */
+const FILTER_TABS = [
+  { key: 'all', label: 'Semua', icon: 'list' },
+  { key: 'success', label: 'Berhasil', icon: 'check_circle' },
+  { key: 'pending', label: 'Menunggu', icon: 'schedule' },
+  { key: 'failed', label: 'Gagal', icon: 'cancel' },
+];
+
+/** Single donation card */
+function DonationCard({ tx, user }) {
+  const [downloading, setDownloading] = useState(false);
+
+  const statusConfig = {
+    success: {
+      label: 'Berhasil',
+      icon: 'check_circle',
+      bg: 'bg-emerald-50',
+      text: 'text-emerald-700',
+      border: 'border-emerald-200',
+      dot: 'bg-emerald-500',
+    },
+    pending: {
+      label: 'Menunggu',
+      icon: 'schedule',
+      bg: 'bg-amber-50',
+      text: 'text-amber-700',
+      border: 'border-amber-200',
+      dot: 'bg-amber-500',
+    },
+    failed: {
+      label: 'Gagal',
+      icon: 'cancel',
+      bg: 'bg-red-50',
+      text: 'text-red-700',
+      border: 'border-red-200',
+      dot: 'bg-red-500',
+    },
+  };
+
+  const status = statusConfig[tx.paymentStatus] || statusConfig.failed;
+
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      generateCertificate({
+        donorName: user?.username || 'Donatur',
+        program: tx.donorName || 'Program',
+        amount: tx.amount,
+        date: tx.createdAt,
+        transactionId: tx.orderId,
+      });
+      toast.success('Sertifikat berhasil dibuka!');
+    } finally {
+      setTimeout(() => setDownloading(false), 1200);
+    }
+  };
+
+  return (
+    <div className="group bg-white rounded-2xl border border-slate-100 hover:border-primary/20 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
+      {/* Top row: Date + Status badge */}
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
+          <span className="material-symbols-outlined text-[14px]">calendar_today</span>
+          {formatDateShort(tx.createdAt)}
+        </span>
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full ${status.bg} ${status.text} border ${status.border}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`}></span>
+          {status.label}
+        </span>
+      </div>
+
+      {/* Program name */}
+      <h3 className="text-base font-bold text-on-surface leading-snug mb-1 line-clamp-1">
+        {tx.donorName || 'Program Donasi'}
+      </h3>
+
+      {/* Amount */}
+      <p className="text-lg font-extrabold text-primary font-headline">
+        {formatCurrency(tx.amount)}
+      </p>
+
+      {/* Divider */}
+      <div className="h-px bg-slate-100 my-4"></div>
+
+      {/* Bottom row: Order ID + Download */}
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] font-mono text-slate-300 truncate max-w-[160px]">
+          #{tx.orderId || tx.id}
+        </span>
+
+        {tx.paymentStatus === 'success' ? (
+          <button
+            onClick={handleDownload}
+            disabled={downloading}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-primary/8 text-primary hover:bg-primary hover:text-white transition-all duration-300 disabled:opacity-50 group/btn"
+          >
+            {downloading ? (
+              <>
+                <Loader2 size={14} className="animate-spin" />
+                Membuka...
+              </>
+            ) : (
+              <>
+                <span className="material-symbols-outlined text-[16px] group-hover/btn:animate-bounce">download</span>
+                Sertifikat
+              </>
+            )}
+          </button>
+        ) : tx.paymentStatus === 'pending' ? (
+          <span className="text-[11px] font-medium text-amber-500 flex items-center gap-1">
+            <span className="material-symbols-outlined text-[14px]">hourglass_top</span>
+            Menunggu pembayaran
+          </span>
+        ) : (
+          <span className="text-[11px] font-medium text-slate-300">
+            Transaksi gagal
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ProfilePage() {
   const { user, updateUser } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
   const [donationHistory, setDonationHistory] = useState([]);
+  const [activeFilter, setActiveFilter] = useState('all');
 
   // Load user's donation history from database
   useEffect(() => {
@@ -40,6 +164,22 @@ export default function ProfilePage() {
   const successDonations = donationHistory.filter(d => d.paymentStatus === 'success');
   const totalDonated = successDonations.reduce((sum, d) => sum + (d.amount || 0), 0);
   const uniquePrograms = new Set(successDonations.map(d => d.campaignId)).size;
+
+  // Filter donations based on active tab
+  const filteredDonations = activeFilter === 'all'
+    ? donationHistory
+    : donationHistory.filter(d => {
+        if (activeFilter === 'failed') return d.paymentStatus !== 'success' && d.paymentStatus !== 'pending';
+        return d.paymentStatus === activeFilter;
+      });
+
+  // Count per status for tab badges
+  const statusCounts = {
+    all: donationHistory.length,
+    success: donationHistory.filter(d => d.paymentStatus === 'success').length,
+    pending: donationHistory.filter(d => d.paymentStatus === 'pending').length,
+    failed: donationHistory.filter(d => d.paymentStatus !== 'success' && d.paymentStatus !== 'pending').length,
+  };
 
   return (
     <div className="animate-fade-in pt-32 pb-12">
@@ -82,69 +222,64 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Donation History */}
+        {/* ── Donation History — Card Layout ── */}
         <div className="mt-10">
-          <h2 className="text-2xl font-extrabold text-on-surface mb-6 font-headline tracking-tight">Riwayat Donasi</h2>
-          <div className="bg-surface-container-lowest rounded-[1.5rem] border border-outline-variant/20 shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-outline-variant/20 bg-surface-container/50">
-                    <th className="text-left px-6 py-4 font-bold text-on-surface-variant uppercase tracking-wider text-xs">Tanggal</th>
-                    <th className="text-left px-6 py-4 font-bold text-on-surface-variant uppercase tracking-wider text-xs">Program</th>
-                    <th className="text-left px-6 py-4 font-bold text-on-surface-variant uppercase tracking-wider text-xs">Nominal</th>
-                    <th className="text-center px-6 py-4 font-bold text-on-surface-variant uppercase tracking-wider text-xs">Status</th>
-                    <th className="text-center px-6 py-4 font-bold text-on-surface-variant uppercase tracking-wider text-xs">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-outline-variant/10">
-                  {donationHistory.length === 0 ? (
-                    <tr><td colSpan={5} className="px-6 py-12 text-center text-on-surface-variant font-medium">Belum ada riwayat donasi. Mari mulai menyebar kebaikan!</td></tr>
-                  ) : donationHistory.map((tx) => (
-                    <tr key={tx.id || tx.orderId} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-6 py-5 text-on-surface font-medium">{formatDateShort(tx.createdAt)}</td>
-                      <td className="px-6 py-5 text-on-surface font-bold">{tx.donorName || '-'}</td>
-                      <td className="px-6 py-5 text-primary font-bold">{formatCurrency(tx.amount)}</td>
-                      <td className="px-6 py-5 text-center">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full ${
-                          tx.paymentStatus === 'success' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
-                          tx.paymentStatus === 'pending' ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-red-100 text-red-800 border border-red-200'
-                        }`}>
-                          <span className="material-symbols-outlined text-[14px]">
-                            {tx.paymentStatus === 'success' ? 'check_circle' : tx.paymentStatus === 'pending' ? 'schedule' : 'cancel'}
-                          </span>
-                          {tx.paymentStatus === 'success' ? 'Berhasil' : tx.paymentStatus === 'pending' ? 'Menunggu' : 'Gagal'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-5 text-center">
-                        {tx.paymentStatus === 'success' ? (
-                          <button
-                            onClick={() => {
-                              generateCertificate({
-                                donorName: user?.username || 'Donatur',
-                                program: tx.donorName || 'Program',
-                                amount: tx.amount,
-                                date: tx.createdAt,
-                                transactionId: tx.orderId,
-                              });
-                              toast.success('Sertifikat berhasil diunduh');
-                            }}
-                            className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-surface-container hover:bg-primary hover:text-white text-primary transition-all shadow-sm"
-                            title="Unduh Sertifikat"
-                          >
-                            <span className="material-symbols-outlined text-[18px]">download</span>
-                          </button>
-                        ) : (
-                          <span className="text-slate-300">-</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {/* Section Header */}
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-2xl font-extrabold text-on-surface font-headline tracking-tight">Riwayat Donasi</h2>
+            <div className="flex items-center gap-1.5 text-xs text-slate-400">
+              <span className="material-symbols-outlined text-[14px]">info</span>
+              Sertifikat tersedia untuk transaksi berhasil
             </div>
           </div>
-          <p className="text-xs text-on-surface-variant font-medium mt-4 text-center flex items-center justify-center gap-1.5"><span className="material-symbols-outlined text-[14px]">info</span> Tersedia fasilitas Unduh Sertifikat khusus untuk transaksi yang Berhasil.</p>
+
+          {/* Filter Tabs */}
+          <div className="flex gap-2 mb-6 overflow-x-auto pb-1 scrollbar-hide">
+            {FILTER_TABS.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveFilter(tab.key)}
+                className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-300 ${
+                  activeFilter === tab.key
+                    ? 'bg-primary text-white shadow-md shadow-primary/20'
+                    : 'bg-white text-slate-500 border border-slate-100 hover:border-primary/20 hover:text-primary'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[16px]">{tab.icon}</span>
+                {tab.label}
+                {statusCounts[tab.key] > 0 && (
+                  <span className={`ml-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                    activeFilter === tab.key ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-400'
+                  }`}>
+                    {statusCounts[tab.key]}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Donation Cards Grid */}
+          {filteredDonations.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-slate-100 py-16 px-6 text-center">
+              <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <span className="material-symbols-outlined text-3xl text-slate-300">
+                  {activeFilter === 'all' ? 'volunteer_activism' : activeFilter === 'success' ? 'check_circle' : activeFilter === 'pending' ? 'schedule' : 'cancel'}
+                </span>
+              </div>
+              <p className="text-base font-bold text-slate-800 mb-1">
+                {activeFilter === 'all' ? 'Belum ada riwayat donasi' : `Tidak ada transaksi ${FILTER_TABS.find(t => t.key === activeFilter)?.label.toLowerCase()}`}
+              </p>
+              <p className="text-sm text-slate-400 max-w-xs mx-auto">
+                {activeFilter === 'all' ? 'Mari mulai menyebar kebaikan! Jelajahi program donasi kami.' : 'Coba pilih filter lain untuk melihat transaksi Anda.'}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {filteredDonations.map((tx) => (
+                <DonationCard key={tx.id || tx.orderId} tx={tx} user={user} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
