@@ -422,7 +422,6 @@ export default function CampaignDetailPage() {
               );
             })}
           </div>
-          </div>
         </section>
       </main>
 
