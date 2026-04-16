@@ -121,8 +121,8 @@ export default function CampaignDetailPage() {
         // Logic based on final status
         if (finalStatus === 'success' || finalStatus === 'settlement' || finalStatus === 'capture') {
           setShowThankYou(true);
-        } else if (finalStatus === 'pending') {
-          // If they closed popup without paying but order is pending
+        } else if (finalStatus === 'pending' || finalStatus === 'closed') {
+          // If they closed popup without paying but order is pending/closed
           setPendingToken(data.token);
           setPendingOrderId(data.orderId);
           setShowContinueModal(true);
@@ -161,7 +161,7 @@ export default function CampaignDetailPage() {
 
       if (finalStatus === 'success' || finalStatus === 'settlement' || finalStatus === 'capture') {
         setShowThankYou(true);
-      } else if (finalStatus === 'pending') {
+      } else if (finalStatus === 'pending' || finalStatus === 'closed') {
         setShowContinueModal(true); // User closed it again without paying
       }
     } catch (error) {
