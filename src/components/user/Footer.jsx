@@ -164,7 +164,7 @@ export default function Footer() {
             </li>
             <li className="flex items-start gap-2 group">
               <span className="material-symbols-outlined text-sm mt-0.5">location_on</span>
-              <a href="https://maps.app.goo.gl/gQEKb9B1HXZ9Vb9y9" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">
+              <a href="https://www.google.com/maps/search/?api=1&query=South+Quarter+Tower+A+Jakarta" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">
                 Jakarta South Quarter, Tower A, Lantai 12
               </a>
             </li>
