@@ -1,78 +1,103 @@
 <div align="center">
+  
+  <img src="https://raw.githubusercontent.com/ravel-iska/infaqLy/main/server/qrcode.png" alt="InfaqLy Logo" width="200" height="200"/>
 
-# 🌟 InfaqLy
+  <h1>✨ InfaqLy ✨<br/><sub>The Genesis of Syariah Crowdfunding</sub></h1>
 
-**Platform Crowdfunding Syariah Modern, Transparan, & Tanpa Batas**
+  <p>
+    <b>Merevolusi penggalangan dana umat melalui ekosistem digital <i>(Crowdfunding)</i> yang transparan, minim potongan, dan berteknologi tinggi.</b>
+  </p>
 
-![InfaqLy Banner](https://raw.githubusercontent.com/ravel-iska/infaqLy/main/server/qrcode.png)
+  <br />
 
-[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](#)
-[![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)](#)
-[![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](#)
-[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](#)
-[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](#)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](#)
+  <img src="https://img.shields.io/badge/Status-Production_Ready-success?style=for-the-badge&logo=rocket" alt="Status" />
+  <img src="https://img.shields.io/badge/Architecture-MERN_Monolithic-8A2BE2?style=for-the-badge&logo=databricks" alt="Architecture" />
+  <img src="https://img.shields.io/badge/Category-Islamic_Crowdfunding-FF6B6B?style=for-the-badge&logo=awsorganizations" alt="Category" />
 
-*InfaqLy adalah sebuah mahakarya platform donasi digital yang dirancang menggunakan pendekatan arsitektur terkini. Dibangun khusus dari nol untuk menjamin transparansi penyaluran dana, keamanan sekelas perbankan, dan kenyamanan donatur.*
+  <br /><br />
 
-[Sorotan Fitur](#-sorotan-fitur) • [Instalasi Lokal](#-panduan-instalasi-development-lokal) • [Railway Deployment](#%EF%B8%8F-panduan-deployment-railwayapp) • [Sistem Keamanan](#-keamanan-kelas-berlian)
+  [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](#)
+  [![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)](#)
+  [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](#)
+  [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](#)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](#)
+  [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](#)
 
----
+  <br />
+
+  [Fitur Utama](#-katalis-penggalangan-dana) • 
+  [Instalasi Lokal](#-panduan-instalasi-lokal) • 
+  [Cloud Deployment](#%EF%B8%8F-panduan-cloud-deployment) • 
+  [Sistem Keamanan](#-keamanan-kelas-berlian)
+
 </div>
 
-## 🎯 Sorotan Fitur
+<hr />
 
-| Kategori | Sorotan Kemampuan |
+## 📖 Tentang Aplikasi Crowdfunding Jaringan Umat
+
+Berbeda dengan platform konvensional, **InfaqLy** dirancang secara spesifik sebagai jembatan **Crowdfunding Syariah**. Setiap dana yang digalang dari *Crowd* (masyarakat luas) secara langsung dipetakan demi mendukung kampanye sosial, pembangunan masjid, kesehatan, atau santunan yatim dengan pembukuan real-time. Tidak ada lagi kotak amal kayu yang tak transparan; selamat datang di kotak amal dunia digital.
+
+<br />
+
+## 🚀 Katalis Penggalangan Dana
+
+| Kategori Ekosistem | Keunggulan InfaqLy |
 | :--- | :--- |
-| 💳 **Pembayaran Pintar** | Menerima Transfer Bank (VA), e-Wallet (GoPay, OVO, ShopeePay), dan QRIS dengan integrasi webhook **Midtrans** *real-time*. |
-| 📱 **Autentikasi WhatsApp** | Login & konfirmasi One-Time Password (OTP) instan tanpa repot menggunakan protokol **Fonnte API**. Melindungi dari akun lelucon (spam). |
-| 📜 **Sertifikat Generatif** | Setiap donator otomatis mendapatkan *Sertifikat Penghargaan PDF* elegan sebagai kenang-kenangan amal, dicetak detik itu juga. |
-| 🎨 **UI/UX Memukau** | Menghipnotis pandangan dengan estetika tajam *Glassmorphism*, transisi Mode Gelap rapi, dan sentuhan tata graha murni dari *Tailwind CSS*. |
-| ⚙️ **Panel Admin Eksekutif** | Pantau analitik kampanye *live*, konfirmasi *withdrawal*, dan **Ubah Konfigurasi API Jarak Jauh** (Midtrans/WhatsApp) via web! |
+| 💸 **Dynamic Payment Gateway** | Didukung algoritma *Midtrans* yang mampu melacak dan memverifikasi ratusan transfer bank (VA), e-Wallet (GoPay, OVO), & QRIS dari berbagai *donatur* secara serentak (*real-time*). |
+| 🛡️ **Anti-Spam OTP (WhatsApp)** | Menghapus era login email via link! Menggunakan tembakan kilat *Fonnte API* untuk melacak nomor HP asli masyarakat (Crowd) dan menghanguskan akun-akun palsu pencari celah. |
+| 🎫 **Sertifikat Amal Generatif** | Mekanisme cerdas yang mencetak *Sertifikat Penghargaan PDF* eksklusif atas nama donatur secara seketika. Meningkatkan rasa bangga dan memicu efek psikologi "Viral Crowdfunding". |
+| 💎 **UI/UX Sekelas Startup** | Dilapisi jubah *Glassmorphism* dan mode gelap premium dengan *Zero-Jitter Animations* berkat arsitektur *Tailwind*. Meyakinkan pengguna hanya dengan lirikan pertama. |
+| 🎛️ **Omni-Admin Dashboard** | Sebagai komandan sistem, Admin dapat melacak analitik donasi *live*, mencairkan dana (*withdrawal*), dan merubah setir mesin API Utama hanya dari layar tablet—tanpa mengubah script `.env`. |
 
----
+<br />
 
-## 📥 Panduan Instalasi (Development Lokal)
-
-Sistem ini bersifat universal. Anda dapat merajut proyek ini di **Windows**, **macOS**, dan **Linux** asalkan memenuhi prasyarat: `Node.js v20+` dan basis data `PostgreSQL` aktif.
+## 📥 Panduan Instalasi Lokal 
+Sistem Crowdfunding ini amat fleksibel dan dapat dieksekusi di OS mana pun (Windows / macOS / Linux).
+> **Syarat Wajib:** `Node.js (v20+)` & Mesin Database `PostgreSQL`.
 
 <details>
-<summary><b>🔥 Langkah 1: Tarik Kode & Instalasi Bawaan</b></summary>
-Buka bilah baris perintah (Terminal/PowerShell/Bash) Anda:
+<summary><b>1. 📡 Kloning Ruang Angkasa (Instalasi Root)</b></summary>
+<br/>
+
+Buka gerbang *Terminal* (Bash) atau *PowerShell* (Windows) milik Anda:
 
 ```bash
 git clone https://github.com/ravel-iska/infaqLy.git
 cd infaqLy
-```
-Pasang secara saksama seluruh instrumen *Frontend* dan *Backend* dalam sekali ayunan napas:
-```bash
+
+# Menarik masuk seluruh dependensi Frontend dan Backend sekaligus
 npm install
 npm run postinstall
 ```
 </details>
 
 <details>
-<summary><b>🔑 Langkah 2: Rahasia Variabel Lingkungan (.env)</b></summary>
+<summary><b>2. 🔑 Perakitan Kunci Rahasia (.env)</b></summary>
+<br/>
 
-Anda perlu menciptakan klona *environment variable* di dapur pacu server.
+Meniru variabel *environment* ke dapur pacu utama:
 
-**Untuk Komandan Windows (CMD/PowerShell):**
+**Untuk Pengguna Windows (Command Prompt/PowerShell):**
 ```cmd
 cd server
 copy .env.example .env
 ```
-**Untuk Ksatria macOS / Linux:**
+**Untuk Pengguna macOS / Linux:**
 ```bash
 cd server
 cp .env.example .env
 ```
-Buka berkas `.env` tersebut dengan *code editor*, lalu modifikasi jantung kehidupannya:
-```env
-# Hubungkan ke palung data lokal Anda (Ganti username & password yang sesuai)
-DATABASE_URL="postgres://username:password@localhost:5432/infaqly_db" 
-JWT_SECRET="tulis_kode_rahasia_sepanjang_mungkin_agar_anti_bocor"
 
-# Hak kepemilikan galeri awan (Opsional tapi wajib untuk gambar)
+Buka dan penuhi `.env` dengan takdir spesifikasi berikut:
+```env
+# URL Database Postgres Anda
+DATABASE_URL="postgres://username:password@localhost:5432/infaqly_db" 
+
+# Jaring perlindungan Token JWT (Harus diisi teks rumit)
+JWT_SECRET="sandi_kripto_kompleks_anda_di_sini"
+
+# Cloudinary - Pustaka Penyimpanan Awang (Untuk gambar kampanye)
 CLOUDINARY_CLOUD_NAME="..."
 CLOUDINARY_API_KEY="..."
 CLOUDINARY_API_SECRET="..."
@@ -80,9 +105,10 @@ CLOUDINARY_API_SECRET="..."
 </details>
 
 <details>
-<summary><b>🧱 Langkah 3: Tempa Struktur Database (Drizzle ORM)</b></summary>
+<summary><b>3. 🧬 Restorasi Model Data (Drizzle)</b></summary>
+<br/>
 
-Pastikan layanan *PostgreSQL* di laptop Anda menyala bebas. Kembali ke pangkal proyek (`infaqLy`), lalu tempa kerangka tabelnya:
+*PostgreSQL* wajib menyala! Masuk ke pangkal akar direktori (`infaqLy`), lalu tempa tabel arsitektur *crowdfunding*-nya:
 ```bash
 npm --prefix server run db:push
 npm --prefix server run db:seed
@@ -90,54 +116,59 @@ npm --prefix server run db:seed
 </details>
 
 <details>
-<summary><b>🚀 Langkah 4: Nyalakan Mesin Utama (One-Click Start)</b></summary>
-Kami menyematkan proyektil *Concurrent Scripts* super canggih. Anda tidak perlu repot membuka banyak terminal!
+<summary><b>4. ⚡ Reaktor Mesin Dihidupkan (One-Click Start)</b></summary>
+<br/>
+
+Skrip ajaib *Concurrent* memungkinkan Anda menyalakan semua reaktor (FE, BE, dan studio DB) dalam 1 baris perintah:
 
 ```bash
 npm run dev
 ```
 
-Sekejap mata, portal ini siap diakses:
-* 🌐 **Situs Publik UI:** `http://localhost:5173`
-* ⚙️ **Saraf API Backend:** `http://localhost:5000`
-* 💾 **Radar Database (Drizzle Studio):** `https://local.drizzle.studio`
+Sistem mengudara, cek kanal-kanal ini di browser kesayangan Anda:
+* ✨ **Portal Pengguna (Crowd):** [`http://localhost:5173`](http://localhost:5173)
+* ⚙️ **Urat Nadi API Backend:** `http://localhost:5000`
+* 📊 **Studio Visual Tabel Database:** [`https://local.drizzle.studio`](https://local.drizzle.studio)
 </details>
 
----
+<br />
 
-## ☁️ Panduan Deployment (Railway.app)
+## ☁️ Panduan Cloud Deployment
 
-Aplikasi InfaqLy sangat mendukung arsitektur terbang tanpa awak (*Serverless*). Salah satu ekosistem paling mulus untuk melempar proyek ini ke hadapan publik adalah **[Railway.app](https://railway.app/)**, yang diotaki oleh mesin bedah *Nixpacks*.
+Menciptakan situs penggalangan berskala massal tidak pernah semudah melempar batu. InfaqLy sangat kompatibel dengan kontainer nir-server *(Serverless)* dari [Railway.app](https://railway.app/).
 
-Berikut adalah kitab panduan rilisnya:
+<details>
+<summary><b>Lihat Panduan Singkat Railway (7 Langkah)</b></summary>
+<br/>
 
-1. 📂 **Ambulans GitHub**: Pastikan Anda sudah menyimpan (`git push`) versi bersih kode ini ke repositori Anda sendiri.
-2. 🚉 **Terminal Railway**: Masuk ke dasbor Railway, lakukan `New Project` > `Deploy from GitHub repo`, dan tunjuk *infaqLy*.
-3. 🗄️ **Sisipkan Otak Data**: Di kanvas *Deployment*, tekan sakelar `Create/New` > `Database` > pilih `Add PostgreSQL`. Tunggulah sampai berdenyut *online*.
-4. 🔗 **Operasi Pengikatan Parameter**:
-   - Ketuk kotak *Web App* (infaqLy) milik Anda.
-   - Pindah ke layar **Variables**.
-   - Cari tombol ajaib **Reference Variable**, lalu klik URL bawaan dari kotak *Postgres* Anda (Biasanya bernama `DATABASE_URL`).
-5. 🔐 **Inyeksi Kunci Utama**: Tetap pada bilah *Variables*, isi parameter tambahan:
-   - `JWT_SECRET` (Gunakan kata sandi liar pilihan Anda)
-   - `PORT` dengan nilai `5000`
-   - `NODE_ENV` dengan isian `production`
-   - *(Catatan Emas: Detail rumit seperti lisensi Midtrans atau token Fonnte WhatsApp tidak perlu Anda taruh di sini. Semua itu **BEBAS DIATUR** kapan saja lewat panel grafis Admin rahasia Anda pada saat Web menyala!)*
-6. 🏗️ **Puncak Menara Build**: Railway otomatis memahami bahwa ini adalah ekosistem monolit raksasa. Perintah bawaan `npm run build` dan `npm start` akan memandu roket meluncur sendiri.
-7. 🌍 **Tembakkan ke Dunia Nyata**: Terakhir, masuk bagian **Settings**, gulung ke bawah pada ruang *Networking*, dan tekan sakral `Generate Domain`. Bagikan *Internet URL* Anda kepada kerabat terkasih.
+1. 📂 **Ambulans GitHub**: Dorong (`git push`) *update* proyek sempurna ini ke rumah GitHub Pribadi Anda terlebih dahulu.
+2. 🚉 **Terminal Railway**: Registrasi ke Platform Railway, lakukan `New Project` > `Deploy from GitHub repo`, temukan *"infaqLy"*.
+3. 🗄️ **Pusat Logistik Data**: Jangan langsung tekan Deploy! Ke beranda proyek Railway Anda, klik logo `+ / Create` > `Database` > pilih `Add PostgreSQL`.
+4. 🔗 **Injeksi Nadi Database**:
+   - Ketuk pilar layanan **Web App (infaqLy)** Anda.
+   - Pelesir ke tab **Variables**.
+   - Pilih **Reference Variable**, tujuannya adalah menyambungkan nilai URL dengan kotak penyedia data PostgreSQL.
+5. 🔐 **Variabel Spesifik Produksi**: Anda cuma perlu menginput ini:
+   - `JWT_SECRET` (Karangan Password Liar)
+   - `PORT` (Isi `5000`)
+   - `NODE_ENV` (Isi `production`)
+   *(Terkait **API MIDTRANS** dan **FONNTE OTP*, tak perlu ditaruh ke sini! Sang Komandan bisa mengisi nilainya super gampang secara *live* di Menu Sentral Admin Website Nanti!)*
+6. 🏗️ **Puncak Menara Build**: Railway secara senyap mendeteksi skrip `npm run build` dan `npm start`. Anda tak perlu ngapa-ngapain selain menyiapkan secangkir kopi selagi robot (*Nixpacks*) merakit kode.
+7. 🌍 **Tembakkan ke Dunia Nyata**: Pergi ke **Settings** layanan Web, temukan blok *Networking*, letuskan tembakan pamungkas dengan menekan tombol `Generate Domain`.
+</details>
 
----
+<br />
 
-## 🛡️ Keamanan Kelas Berlian (Penetrasi Anti-Hacker)
+## 🛡️ Keamanan Kelas Berlian
 
-Jangan remehkan kecantikan luarnya. InfaqLy dilindungi oleh lapis pelindung berstandar industri:
-* **Anti Webhook-Spoofing:** Memvalidasi aliran balik Midtrans dengan benteng verifikasi kriptografik murni `SHA-512` melawan manipulasi riwayat penyelesaian dana.
-* **SQL Injection & XSS Guard:** Eksekusi gerbang data dijahit erat dengan peredam *Drizzle-ORM*.
-* **WhatsApp Anti-DOS Cooldown:** Penyekat mesin *OTP Spammer*. Jeda purna waktu berlaku di antrean *database*, mematikan upaya serangan *brute force* SMS.
+Meminta dan mengamankan dana publik adalah tanggung jawab raksasa.
+* **Midtrans Webhook Anti-Spoofing:** Setipis algoritma finansial sekelas VISA, setiap kilasan lunas yang masuk ke server ditolak jika tiada sandi rahasia validasi murni `SHA-512`.
+* **SQL Injection Parimeter:** Kode operasi menabur kueri menggunakan `drizzle-orm sql`, menangkis peretas yang mencoba mengekstrak angka mutasi.
+* **WhatsApp API Rate-Limit Armor:** Ada perlindungan selang detik antrean basis data ketika ada peretas jahat ingin mengirimi *BOT DOS* ke nomor ponsel.
 
----
+<br />
 
 <div align="center">
-<b>Dikembangkan Sepenuh Hati untuk Skripsi & Kebaikan Publik</b><br>
-Hak Cipta © 2026. All Rights Reserved.
+<b>Menembus Masa Depan Crowdfunding dengan 0% Kehilangan Data</b><br>
+Hak Cipta © 2026. Dikembangkan untuk Kehebatan Tugas Akhir & Skripsi. <br>All Rights Reserved.
 </div>
