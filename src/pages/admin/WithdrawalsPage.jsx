@@ -1,56 +1,63 @@
 import { useState, useRef, useEffect } from 'react';
 import { formatCurrency } from '@/utils/formatCurrency';
-import { formatDateTime, nowTimestamp } from '@/utils/formatDate';
-import { getAllCampaigns } from '@/services/campaignService';
+import { formatDateTime } from '@/utils/formatDate';
+import api from '@/services/api';
 import toast from 'react-hot-toast';
-
-const INITIAL_HISTORY = [
-  { id: 1, datetime: '2026-04-10T14:30:00', amount: 50000000, bank: 'BCA - 1234567890 - Yayasan Al-Ikhlas', note: 'Penyaluran renovasi masjid', evidence: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=300&h=200&fit=crop' },
-  { id: 2, datetime: '2026-04-01T09:15:00', amount: 80000000, bank: 'BCA - 1234567890 - Yayasan Al-Ikhlas', note: 'Penyaluran santunan yatim', evidence: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=300&h=200&fit=crop' },
-  { id: 3, datetime: '2026-03-15T11:45:00', amount: 50000000, bank: 'BSI - 9876543210 - Yayasan Nurul Iman', note: 'Penyaluran wakaf quran', evidence: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=300&h=200&fit=crop' },
-];
+import { Loader2 } from 'lucide-react';
 
 export default function WithdrawalsPage() {
-  const [history, setHistory] = useState(() => {
-    try {
-      const saved = localStorage.getItem('infaqly_withdrawals');
-      return saved ? JSON.parse(saved) : INITIAL_HISTORY;
-    } catch {
-      return INITIAL_HISTORY;
-    }
-  });
+  const [history, setHistory] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
-  const [settled, setSettled] = useState(0);
+  
+  const [balancePending, setBalancePending] = useState(true);
+  const [balance, setBalance] = useState({ settled: 0, withdrawn: 0, available: 0 });
+
+  const fetchData = async () => {
+    try {
+      const [histRes, balRes] = await Promise.all([
+        api.get('/withdrawals'),
+        api.get('/withdrawals/balance'),
+      ]);
+      setHistory(histRes.withdrawals || []);
+      setBalance(balRes);
+    } catch (err) {
+      toast.error('Gagal memuat data penarikan');
+    } finally {
+      setBalancePending(false);
+    }
+  };
 
   useEffect(() => {
-    (async () => {
-      try {
-        const campaigns = await getAllCampaigns();
-        setSettled(campaigns.reduce((s, c) => s + c.collected, 0));
-      } catch {}
-    })();
+    fetchData();
   }, []);
 
-  const totalWithdrawn = history.reduce((s, h) => s + h.amount, 0);
-  const available = Math.max(0, settled - totalWithdrawn);
+  const handleNewWithdrawal = async (data) => {
+    try {
+      const formData = new FormData();
+      formData.append('amount', data.amount);
+      formData.append('bankInfo', data.bankInfo);
+      formData.append('note', data.note);
+      if (data.evidenceFile) {
+        formData.append('evidence', data.evidenceFile);
+      }
 
-  // Simpan ke localStorage setiap kali history berubah
-  const saveHistory = (newHistory) => {
-    setHistory(newHistory);
-    localStorage.setItem('infaqly_withdrawals', JSON.stringify(newHistory));
+      await api.upload('/withdrawals', formData);
+      toast.success(`Penarikan ${formatCurrency(data.amount)} berhasil dicatat!`);
+      setShowModal(false);
+      fetchData(); // Refresh list and balance
+    } catch (err) {
+      toast.error(err.message || 'Terjadi kesalahan sistem');
+    }
   };
 
-  const handleNewWithdrawal = (data) => {
-    const newEntry = {
-      id: Date.now(),
-      datetime: nowTimestamp(),
-      ...data,
-    };
-    saveHistory([newEntry, ...history]);
-    setShowModal(false);
-    toast.success(`Penarikan ${formatCurrency(data.amount)} berhasil dicatat!`);
-  };
+  if (balancePending) {
+    return (
+      <div className="flex items-center justify-center py-32">
+        <Loader2 className="w-12 h-12 text-admin-accent animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="animate-fade-in space-y-6 pb-12">
@@ -72,7 +79,7 @@ export default function WithdrawalsPage() {
             <span className="material-symbols-outlined text-admin-text-secondary text-[20px]">account_balance_wallet</span>
             <p className="text-sm font-semibold text-admin-text-secondary">Saldo Total Terkumpul (Settled)</p>
           </div>
-          <p className="text-2xl font-bold text-admin-text font-mono mt-1 tracking-tight">{formatCurrency(settled)}</p>
+          <p className="text-2xl font-bold text-admin-text font-mono mt-1 tracking-tight">{formatCurrency(balance.settled)}</p>
         </div>
         <div className="admin-card p-5 border border-admin-border relative overflow-hidden group">
            <div className="absolute right-0 top-0 w-24 h-24 bg-danger/5 rounded-bl-[100px] -z-10 group-hover:bg-danger/10 transition-colors"></div>
@@ -80,7 +87,7 @@ export default function WithdrawalsPage() {
             <span className="material-symbols-outlined text-danger text-[20px]">publish</span>
             <p className="text-sm font-semibold text-admin-text-secondary">Total Dana Keluar / Ditarik</p>
           </div>
-          <p className="text-2xl font-bold text-danger font-mono mt-1 tracking-tight">{formatCurrency(totalWithdrawn)}</p>
+          <p className="text-2xl font-bold text-danger font-mono mt-1 tracking-tight">{formatCurrency(balance.withdrawn)}</p>
         </div>
         <div className="admin-card p-5 border border-admin-border border-l-4 border-l-admin-accent-secondary relative overflow-hidden group">
            <div className="absolute right-0 top-0 w-24 h-24 bg-admin-accent-secondary/5 rounded-bl-[100px] -z-10 group-hover:bg-admin-accent-secondary/10 transition-colors"></div>
@@ -88,7 +95,7 @@ export default function WithdrawalsPage() {
             <span className="material-symbols-outlined text-admin-accent-secondary text-[20px]">credit_score</span>
             <p className="text-sm font-semibold text-admin-text-secondary">Saldo Siap Dicairkan</p>
           </div>
-          <p className="text-2xl font-bold text-admin-accent-secondary font-mono mt-1 tracking-tight">{formatCurrency(available)}</p>
+          <p className="text-2xl font-bold text-admin-accent-secondary font-mono mt-1 tracking-tight">{formatCurrency(balance.available)}</p>
         </div>
       </div>
 
@@ -120,19 +127,19 @@ export default function WithdrawalsPage() {
               <tbody className="divide-y divide-admin-border">
                 {history.map((h) => (
                   <tr key={h.id} className="hover:bg-admin-bg-hover transition-colors">
-                    <td className="px-6 py-4 text-admin-text-muted font-mono font-medium text-xs">{formatDateTime(h.datetime)}</td>
+                    <td className="px-6 py-4 text-admin-text-muted font-mono font-medium text-xs">{formatDateTime(h.createdAt)}</td>
                     <td className="px-6 py-4 text-admin-text font-mono font-bold tracking-tight">{formatCurrency(h.amount)}</td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-admin-text font-medium">
                         <span className="material-symbols-outlined text-admin-text-muted text-[16px]">account_balance</span>
-                        {h.bank}
+                        {h.bankInfo}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-admin-text-secondary font-medium">{h.note}</td>
                     <td className="px-6 py-4 text-center">
-                      {h.evidence ? (
+                      {h.evidenceUrl ? (
                         <button
-                          onClick={() => setPreviewImage(h.evidence)}
+                          onClick={() => setPreviewImage(h.evidenceUrl)}
                           className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-admin-bg border border-admin-border text-admin-accent hover:border-admin-accent hover:bg-admin-accent/10 transition-colors text-xs font-bold"
                         >
                           <span className="material-symbols-outlined text-[16px]">visibility</span> Lihat
@@ -152,7 +159,7 @@ export default function WithdrawalsPage() {
       {/* Withdrawal Modal */}
       {showModal && (
         <WithdrawalModal
-          available={available}
+          available={balance.available}
           onClose={() => setShowModal(false)}
           onSubmit={handleNewWithdrawal}
         />
@@ -180,6 +187,7 @@ function WithdrawalModal({ available, onClose, onSubmit }) {
   const [bank, setBank] = useState('');
   const [note, setNote] = useState('');
   const [evidencePreview, setEvidencePreview] = useState(null);
+  const [evidenceFile, setEvidenceFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -194,6 +202,9 @@ function WithdrawalModal({ available, onClose, onSubmit }) {
       toast.error('Ukuran file maksimal 10MB');
       return;
     }
+
+    setEvidenceFile(file);
+
     if (file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (ev) => setEvidencePreview(ev.target.result);
@@ -214,6 +225,7 @@ function WithdrawalModal({ available, onClose, onSubmit }) {
 
   const removeEvidence = () => {
     setEvidencePreview(null);
+    setEvidenceFile(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -234,18 +246,17 @@ function WithdrawalModal({ available, onClose, onSubmit }) {
       toast.error('Keterangan wajib diisi');
       return;
     }
-    if (!evidencePreview) {
+    if (!evidenceFile) {
       toast.error('Bukti penyaluran wajib diunggah');
       return;
     }
 
     setLoading(true);
-    await new Promise(r => setTimeout(r, 500));
-    onSubmit({
+    await onSubmit({
       amount: Number(amount),
-      bank: bank.trim(),
+      bankInfo: bank.trim(),
       note: note.trim(),
-      evidence: evidencePreview.startsWith('pdf:') ? null : evidencePreview,
+      evidenceFile: evidenceFile,
     });
     setLoading(false);
   };
