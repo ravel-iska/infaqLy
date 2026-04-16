@@ -67,8 +67,8 @@ export default function Navbar() {
               to={item.path}
               className={({ isActive }) =>
                 isActive 
-                  ? "text-emerald-700 dark:text-emerald-400 font-semibold border-b-2 border-emerald-600 dark:border-emerald-400 pb-1" 
-                  : "hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors border-b-2 border-transparent pb-1"
+                  ? "relative text-emerald-700 dark:text-emerald-400 font-semibold after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-emerald-600 dark:after:bg-emerald-400 after:rounded-full" 
+                  : "relative hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
               }
             >
               {item.label}
