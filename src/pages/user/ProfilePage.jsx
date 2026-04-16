@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { formatDateShort } from '@/utils/formatDate';
@@ -403,7 +404,7 @@ function EditProfileModal({ user, onClose, onSave }) {
             Batal
           </button>
           <button onClick={handleSave} disabled={loading} className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5">
-            {loading ? <span className="animate-pulse">Menyiapkan...</span> : <><span className="material-symbols-outlined text-[18px]">save</span> Simpan Perubahan</>}
+            {loading ? <><Loader2 size={18} className="animate-spin" /> Menyiapkan...</> : <><span className="material-symbols-outlined text-[18px]">save</span> Simpan Perubahan</>}
           </button>
         </div>
       </div>

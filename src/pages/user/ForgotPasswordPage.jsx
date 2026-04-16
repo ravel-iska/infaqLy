@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 import api from '@/services/api';
 import toast from 'react-hot-toast';
 
@@ -149,7 +150,7 @@ export default function ForgotPasswordPage() {
                 />
               </div>
               <button onClick={handleFindAccount} disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-on-primary font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
-                {loading ? <span className="animate-pulse">Mencari Data...</span> : <>
+                {loading ? <><Loader2 size={20} className="animate-spin" /> Mencari Data...</> : <>
                   <span>Kirim Kode OTP</span>
                   <span className="material-symbols-outlined text-[18px]">send</span>
                 </>}
@@ -260,7 +261,7 @@ export default function ForgotPasswordPage() {
                 )}
               </div>
               <button onClick={handleResetPassword} disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-on-primary font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 mt-4">
-                {loading ? <span className="animate-pulse">Menyimpan Sandi...</span> : <>
+                {loading ? <><Loader2 size={18} className="animate-spin" /> Menyimpan Sandi...</> : <>
                   <span>Simpan Password</span>
                   <span className="material-symbols-outlined text-[18px]">save</span>
                 </>}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { QUICK_AMOUNTS, MIN_DONATION } from '@/utils/constants';
 import { formatTimeAgo } from '@/utils/formatDate';
@@ -322,7 +323,7 @@ export default function CampaignDetailPage() {
                       disabled={payLoading}
                       className="w-full mt-2 py-4 rounded-2xl bg-gradient-to-r from-primary to-primary-fixed text-on-primary font-bold text-base shadow-xl shadow-primary/30 hover:shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all flex justify-center items-center gap-2"
                     >
-                      {payLoading ? <span className="animate-pulse">Memproses...</span> : <>
+                      {payLoading ? <><Loader2 size={20} className="animate-spin" /> Memproses...</> : <>
                         Salurkan Kebaikan <span className="material-symbols-outlined text-[18px]">favorite</span>
                       </>}
                     </button>

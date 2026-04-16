@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { register } from '@/services/authService';
 import toast from 'react-hot-toast';
@@ -129,7 +130,7 @@ export default function RegisterPage() {
           </div>
 
           <button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-on-primary font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 mt-4">
-            {loading ? <span className="animate-pulse">Memproses pendaftaran...</span> : <>
+            {loading ? <><Loader2 size={20} className="animate-spin" /> Memproses pendaftaran...</> : <>
               <span>Buat Akun Anda</span>
               <span className="material-symbols-outlined text-[20px]">person_add</span>
             </>}
