@@ -8,6 +8,13 @@
       "when": 1776269725497,
       "tag": "0000_heavy_skullbuster",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776339496176,
+      "tag": "0001_ordinary_zaladane",
+      "breakpoints": true
     }
   ]
 }
