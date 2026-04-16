@@ -15,6 +15,12 @@ export async function listWithdrawals() {
 export async function createWithdrawal(data: {
   amount: number; bankInfo: string; note?: string; evidenceUrl?: string; createdBy: string;
 }) {
+  const balance = await getBalance();
+  if (data.amount <= 0) throw new Error('Nominal penarikan tidak valid.');
+  if (data.amount > balance.available) {
+    throw new Error(`Penarikan ditolak: Saldo platform tidak mencukupi (Tersedia: ${balance.available})`);
+  }
+
   const [withdrawal] = await db.insert(withdrawals).values({
     amount: data.amount,
     bankInfo: data.bankInfo,
