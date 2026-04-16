@@ -22,8 +22,7 @@ export function generateCertificate({ donorName, program, amount, date, transact
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     @page {
-      size: A4 portrait;
-      margin: 0;
+      margin: 0.5cm;
     }
 
     body {
@@ -39,9 +38,9 @@ export function generateCertificate({ donorName, program, amount, date, transact
 
     .receipt {
       width: 100%;
-      max-width: 520px;
+      max-width: 420px; /* Lebar optimal untuk struk menengah */
       background: #ffffff;
-      border-radius: 24px;
+      border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
     }
@@ -49,7 +48,7 @@ export function generateCertificate({ donorName, program, amount, date, transact
     /* Green Header Strip */
     .header {
       background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
-      padding: 36px 32px 28px;
+      padding: 24px 24px 16px;
       text-align: center;
       position: relative;
     }
@@ -59,25 +58,25 @@ export function generateCertificate({ donorName, program, amount, date, transact
       bottom: -1px;
       left: 0;
       right: 0;
-      height: 20px;
+      height: 16px;
       background: #fff;
-      border-radius: 20px 20px 0 0;
+      border-radius: 16px 16px 0 0;
     }
 
     .brand {
       font-family: 'Outfit', sans-serif;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
       color: rgba(255,255,255,0.95);
       letter-spacing: -0.5px;
     }
-    .brand-icon { font-size: 26px; vertical-align: middle; margin-right: 4px; }
+    .brand-icon { font-size: 22px; vertical-align: middle; margin-right: 4px; }
 
     .header-title {
       font-family: 'Outfit', sans-serif;
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 600;
-      color: rgba(255,255,255,0.75);
+      color: rgba(255,255,255,0.85);
       margin-top: 6px;
       letter-spacing: 2px;
       text-transform: uppercase;
@@ -85,7 +84,7 @@ export function generateCertificate({ donorName, program, amount, date, transact
 
     /* Body */
     .body {
-      padding: 28px 32px 32px;
+      padding: 16px 24px 24px;
     }
 
     /* Success Badge */
@@ -96,29 +95,29 @@ export function generateCertificate({ donorName, program, amount, date, transact
       background: #ecfdf5;
       border: 1px solid #a7f3d0;
       color: #059669;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
-      padding: 6px 14px;
+      padding: 4px 12px;
       border-radius: 100px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     /* Donor Section */
     .donor-section {
       text-align: center;
-      margin-bottom: 28px;
+      margin-bottom: 20px;
     }
     .donor-label {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       color: #94a3b8;
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
     .donor-name {
       font-family: 'Outfit', sans-serif;
-      font-size: 28px;
+      font-size: 22px;
       font-weight: 800;
       color: #0f172a;
       letter-spacing: -0.5px;
@@ -128,22 +127,22 @@ export function generateCertificate({ donorName, program, amount, date, transact
     .amount-box {
       background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
       border: 1px solid #bbf7d0;
-      border-radius: 16px;
-      padding: 20px;
+      border-radius: 12px;
+      padding: 16px;
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
     .amount-label {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       color: #64748b;
       text-transform: uppercase;
       letter-spacing: 1px;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     .amount-value {
       font-family: 'Outfit', sans-serif;
-      font-size: 32px;
+      font-size: 28px;
       font-weight: 800;
       color: #059669;
       letter-spacing: -1px;
@@ -152,38 +151,43 @@ export function generateCertificate({ donorName, program, amount, date, transact
     /* Detail Rows */
     .details {
       border-top: 1px dashed #e2e8f0;
-      padding-top: 20px;
-      margin-bottom: 24px;
+      padding-top: 16px;
+      margin-bottom: 20px;
     }
     .detail-row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
+      align-items: flex-start;
+      padding: 8px 0;
+      gap: 12px;
     }
     .detail-row + .detail-row {
       border-top: 1px solid #f8fafc;
     }
     .detail-key {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
       color: #94a3b8;
+      flex-shrink: 0;
     }
     .detail-val {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       color: #334155;
       text-align: right;
+      word-break: break-word;
     }
 
     /* Footer */
     .footer {
       background: #f8fafc;
       border-top: 1px solid #f1f5f9;
-      padding: 20px 32px;
+      padding: 16px 24px;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 4px;
       align-items: center;
+      text-align: center;
     }
     .footer-text {
       font-size: 10px;
@@ -197,16 +201,16 @@ export function generateCertificate({ donorName, program, amount, date, transact
     /* Thank You Message */
     .thankyou {
       text-align: center;
-      padding: 16px 0 0;
-      font-size: 13px;
+      padding: 8px 0 0;
+      font-size: 12px;
       color: #64748b;
       font-weight: 500;
-      line-height: 1.6;
+      line-height: 1.5;
     }
     .thankyou em {
       display: block;
       font-style: normal;
-      font-size: 18px;
+      font-size: 16px;
       margin-top: 4px;
     }
 
@@ -237,10 +241,34 @@ export function generateCertificate({ donorName, program, amount, date, transact
       box-shadow: 0 12px 32px rgba(5, 150, 105, 0.4);
     }
 
+    /* ATURAN SAAT DICETAK ATAU SAVE PDF DI MHP/MOBILE */
     @media print {
-      body { background: none; padding: 0; }
-      .receipt { box-shadow: none; max-width: 100%; }
+      body { 
+        background: transparent; 
+        padding: 0; 
+        margin: 0; 
+        min-height: auto; 
+        display: block; 
+      }
+      .receipt { 
+        box-shadow: none; 
+        max-width: 100%; 
+        margin: 0 auto;
+        border-radius: 0;
+        border: none;
+      }
       .btn-print { display: none !important; }
+      
+      /* Hilangkan border/shadow berlebihan, optimalkan font */
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      /* Jangan pecah halaman di elemen ini */
+      .header, .body, .details, .amount-box, .footer {
+        page-break-inside: avoid;
+      }
     }
   </style>
 </head>
