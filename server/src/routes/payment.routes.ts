@@ -90,7 +90,7 @@ router.post('/notification', async (req: Request, res: Response) => {
 // Called by frontend after Snap popup closes to ensure DB is updated
 router.get('/check-status/:orderId', requireAuth, async (req: Request, res: Response) => {
   try {
-    const { orderId } = req.params;
+    const orderId = req.params.orderId as string;
     const statusResult = await paymentService.checkTransactionStatus(orderId);
     
     // Update DB with latest status from Midtrans

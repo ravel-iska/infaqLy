@@ -149,6 +149,11 @@ export async function handleNotification(body: any) {
     status = 'expired';
   }
 
+  // Get current status before updating (to prevent double-counting)
+  const [existing] = await db.select({ paymentStatus: donations.paymentStatus })
+    .from(donations).where(eq(donations.orderId, orderId)).limit(1);
+  const wasAlreadySuccess = existing?.paymentStatus === 'success';
+
   // Update donation record
   const [donation] = await db.update(donations)
     .set({
@@ -161,8 +166,8 @@ export async function handleNotification(body: any) {
     .where(eq(donations.orderId, orderId))
     .returning();
 
-  // If success, update campaign collected + donors count
-  if (status === 'success' && donation) {
+  // If transitioning TO success (and wasn't already success), update campaign
+  if (status === 'success' && donation && !wasAlreadySuccess) {
     await db.execute(
       `UPDATE campaigns SET collected = collected + ${donation.amount}, donors = donors + 1, updated_at = NOW() WHERE id = ${donation.campaignId}`
     );
