@@ -46,18 +46,18 @@ export default function SettingsPage() {
         setEnv(s.midtrans_env || 'sandbox');
         setMidtransTab(s.midtrans_env || 'sandbox');
 
-        // Legacy fallback
+        // Legacy fallback (User had filled these as production credentials previously)
         const legacyMerchantId = s.midtrans_merchant_id || '';
         const legacyServerKey = s.midtrans_server_key || '';
         const legacyClientKey = s.midtrans_client_key || '';
 
-        setSandboxMerchantId(s.midtrans_sandbox_merchant_id || legacyMerchantId);
-        setSandboxServerKey(s.midtrans_sandbox_server_key || legacyServerKey);
-        setSandboxClientKey(s.midtrans_sandbox_client_key || legacyClientKey);
+        setSandboxMerchantId(s.midtrans_sandbox_merchant_id || '');
+        setSandboxServerKey(s.midtrans_sandbox_server_key || '');
+        setSandboxClientKey(s.midtrans_sandbox_client_key || '');
 
-        setProdMerchantId(s.midtrans_prod_merchant_id || '');
-        setProdServerKey(s.midtrans_prod_server_key || '');
-        setProdClientKey(s.midtrans_prod_client_key || '');
+        setProdMerchantId(s.midtrans_prod_merchant_id || legacyMerchantId);
+        setProdServerKey(s.midtrans_prod_server_key || legacyServerKey);
+        setProdClientKey(s.midtrans_prod_client_key || legacyClientKey);
 
         setWaToken(s.fonnte_token || '');
         setAdminPhone(s.fonnte_admin_phone || '');
