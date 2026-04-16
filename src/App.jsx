@@ -15,6 +15,7 @@ import LoginPage from '@/pages/user/LoginPage';
 import RegisterPage from '@/pages/user/RegisterPage';
 import ForgotPasswordPage from '@/pages/user/ForgotPasswordPage';
 import ProfilePage from '@/pages/user/ProfilePage';
+import HowToDonatePage from '@/pages/user/HowToDonatePage';
 
 // Admin Pages
 import AdminLoginPage from '@/pages/admin/AdminLoginPage';
@@ -71,6 +72,7 @@ function AppRoutes() {
         <Route path="/" element={<HomePage />} />
         <Route path="/explore" element={<ExplorePage />} />
         <Route path="/explore/:campaignId" element={<RequireAuth><CampaignDetailPage /></RequireAuth>} />
+        <Route path="/cara-donasi" element={<HowToDonatePage />} />
         <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
       </Route>
 
