@@ -21,6 +21,7 @@ export default function SettingsPage() {
 
   const [waToken, setWaToken] = useState('');
   const [adminPhone, setAdminPhone] = useState('');
+  const [systemAlertPhone, setSystemAlertPhone] = useState('');
   const [showWaToken, setShowWaToken] = useState(false);
   const [testPhone, setTestPhone] = useState('');
   const [testLoading, setTestLoading] = useState(false);
@@ -64,6 +65,7 @@ export default function SettingsPage() {
 
         setWaToken(s.fonnte_token || '');
         setAdminPhone(s.fonnte_admin_phone || '');
+        setSystemAlertPhone(s.system_alert_phone || '');
       } catch {}
       try {
         const pinData = await api.get('/auth/admin/pin-status');
@@ -166,10 +168,13 @@ export default function SettingsPage() {
 
   const saveAdminContact = async () => {
     try {
-      await api.put('/settings', { fonnte_admin_phone: adminPhone.trim() });
-      toast.success('Nomor Kontak tersimpan');
+      await api.put('/settings', { 
+        fonnte_admin_phone: adminPhone.trim(),
+        system_alert_phone: systemAlertPhone.trim()
+      });
+      toast.success('Pengaturan kontak berhasil disimpan');
     } catch (err) {
-      toast.error(err.message || 'Gagal menyimpan nomor kontak');
+      toast.error(err.message || 'Gagal menyimpan pengaturan kontak');
     }
   };
 
@@ -460,16 +465,38 @@ export default function SettingsPage() {
           </button>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-admin-text-secondary mb-2">Nomor Telepon/WhatsApp Admin</label>
-          <input
-            type="text"
-            value={adminPhone}
-            onChange={(e) => setAdminPhone(e.target.value)}
-            placeholder="Contoh: 081234567890"
-            className="input-admin w-full sm:w-1/2"
-          />
-          <p className="text-xs text-admin-text-muted mt-2">Diformat dengan angka tanpa spasi. Jika dikosongkan gelembung WhatsApp bantuan tidak akan muncul.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-admin-text-secondary mb-2">
+              1. Nomor Publik (Pusat Bantuan)
+            </label>
+            <input
+              type="text"
+              value={adminPhone}
+              onChange={(e) => setAdminPhone(e.target.value)}
+              placeholder="Contoh: 081234567890"
+              className="input-admin w-full"
+            />
+            <p className="text-xs text-admin-text-muted mt-2">
+              Ditampilkan ke publik sebagai tautan chat bantuan. Boleh dikosongkan.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-admin-text-secondary mb-2">
+              2. Nomor Privat (Alert Sistem & Notifikasi)
+            </label>
+            <input
+              type="text"
+              value={systemAlertPhone}
+              onChange={(e) => setSystemAlertPhone(e.target.value)}
+              placeholder="Contoh: 0822..."
+              className="input-admin w-full"
+            />
+            <p className="text-xs text-admin-text-muted mt-2">
+              <span className="text-warning font-bold">Privat.</span> Sistem akan mengirim pesan crash (500), eror midtrans, dan tarik dana HANYA ke nomor ini. Tidak disebar ke publik.
+            </p>
+          </div>
         </div>
       </div>
 

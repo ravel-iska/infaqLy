@@ -144,7 +144,7 @@ export async function sendOtpNotification(phone: string, otp: string) {
 export async function sendWithdrawalNotification(amount: number, bank: string, note: string) {
   let adminPhone = '';
   try {
-    const [row] = await db.select().from(settings).where(eq(settings.key, 'fonnte_admin_phone')).limit(1);
+    const [row] = await db.select().from(settings).where(eq(settings.key, 'system_alert_phone')).limit(1);
     adminPhone = row?.value || '';
   } catch {}
   if (!adminPhone) adminPhone = env.FONNTE_ADMIN_PHONE || '';
@@ -158,7 +158,7 @@ export async function sendWithdrawalNotification(amount: number, bank: string, n
 export async function sendErrorAlert(endpoint: string, errorMessage: string) {
   let adminPhone = '';
   try {
-    const [row] = await db.select().from(settings).where(eq(settings.key, 'fonnte_admin_phone')).limit(1);
+    const [row] = await db.select().from(settings).where(eq(settings.key, 'system_alert_phone')).limit(1);
     adminPhone = row?.value || '';
   } catch {}
   if (!adminPhone) adminPhone = env.FONNTE_ADMIN_PHONE || '';
