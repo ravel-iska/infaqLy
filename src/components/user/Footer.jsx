@@ -91,10 +91,10 @@ export default function Footer() {
   }, []);
   return (
     <footer className="bg-slate-50 dark:bg-slate-900 w-full rounded-t-3xl mt-auto transition-colors duration-300">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-12 px-8 lg:px-12 py-16 max-w-7xl mx-auto font-body text-sm leading-relaxed">
-        <div className="space-y-6">
-          <div className="text-xl font-headline font-bold text-emerald-800 dark:text-emerald-500">Infaqly</div>
-          <p className="text-slate-500 dark:text-slate-400">Membangun ekosistem filantropi digital yang amanah, transparan, dan berdampak luas bagi umat.</p>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-8 lg:gap-12 px-8 lg:px-12 py-16 max-w-7xl mx-auto font-body text-sm leading-relaxed">
+        <div className="md:col-span-2 space-y-6">
+          <div className="text-xl font-headline font-bold text-emerald-800 dark:text-emerald-500 leading-tight">Infaqly</div>
+          <p className="text-slate-500 dark:text-slate-400 max-w-sm">Membangun ekosistem filantropi digital yang amanah, transparan, dan berdampak luas bagi umat.</p>
           <div className="flex gap-4">
             <button 
               onClick={() => {
@@ -117,8 +117,8 @@ export default function Footer() {
         </div>
         
         <div className="space-y-6">
-          <h5 className="font-bold text-on-surface dark:text-slate-100 pt-1">Program</h5>
-          <ul className="space-y-3 text-slate-500 dark:text-slate-400">
+          <h5 className="font-bold text-on-surface dark:text-slate-100 flex items-end h-[28px]">Program</h5>
+          <ul className="space-y-4 text-slate-500 dark:text-slate-400">
             <li><Link to="/explore" className="hover:text-emerald-500 transition-colors">Zakat Profesi</Link></li>
             <li><Link to="/explore" className="hover:text-emerald-500 transition-colors">Infaq Pendidikan</Link></li>
             <li><Link to="/explore" className="hover:text-emerald-500 transition-colors">Wakaf Produktif</Link></li>
@@ -127,8 +127,8 @@ export default function Footer() {
         </div>
         
         <div className="space-y-6">
-          <h5 className="font-bold text-on-surface dark:text-slate-100 pt-1">Bantuan</h5>
-          <ul className="space-y-3 text-slate-500 dark:text-slate-400">
+          <h5 className="font-bold text-on-surface dark:text-slate-100 flex items-end h-[28px]">Bantuan</h5>
+          <ul className="space-y-4 text-slate-500 dark:text-slate-400">
             <li>
               <a 
                 href={hasWa ? "/api/settings/whatsapp-redirect" : "#"} 
@@ -150,20 +150,20 @@ export default function Footer() {
         </div>
         
         <div className="space-y-6">
-          <h5 className="font-bold text-on-surface dark:text-slate-100 pt-1">Kontak</h5>
-          <ul className="space-y-3 text-slate-500 dark:text-slate-400">
+          <h5 className="font-bold text-on-surface dark:text-slate-100 flex items-end h-[28px]">Kontak</h5>
+          <ul className="space-y-4 text-slate-500 dark:text-slate-400">
             <li className="flex items-center gap-2 group">
-              <span className="material-symbols-outlined text-sm">mail</span>
+              <span className="material-symbols-outlined text-base">mail</span>
               <a href="mailto:info@infaqly.org" className="hover:text-emerald-500 transition-colors">info@infaqly.org</a>
             </li>
             {hasWa && (
               <li className="flex items-center gap-2 group">
-                <span className="material-symbols-outlined text-sm">support_agent</span>
+                <span className="material-symbols-outlined text-base">support_agent</span>
                 <a href="/api/settings/whatsapp-redirect" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">Tanya via WhatsApp</a>
               </li>
             )}
             <li className="flex items-start gap-2 group">
-              <span className="material-symbols-outlined text-sm mt-0.5">location_on</span>
+              <span className="material-symbols-outlined text-base mt-[2px]">location_on</span>
               <a href="https://www.google.com/maps/search/?api=1&query=South+Quarter+Tower+A+Jakarta" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">
                 Jakarta South Quarter, Tower A, Lantai 12
               </a>
@@ -172,9 +172,9 @@ export default function Footer() {
         </div>
       </div>
       
-      <div className="max-w-7xl mx-auto px-8 lg:px-12 pb-8 border-t border-slate-200 dark:border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 dark:text-slate-500 text-xs">
+      <div className="max-w-7xl mx-auto px-8 lg:px-12 pb-8 border-t border-slate-200 dark:border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-baseline gap-4 text-slate-400 dark:text-slate-500 text-xs">
         <p>© {new Date().getFullYear()} Infaqly Philanthropy. All rights reserved.</p>
-        <div className="flex gap-6">
+        <div className="flex items-baseline gap-6 font-medium">
           <button onClick={() => setIsPrivacyOpen(true)} className="hover:text-emerald-500 transition-colors">Kebijakan Privasi</button>
           <button onClick={() => setIsTermsOpen(true)} className="hover:text-emerald-500 transition-colors">Syarat & Ketentuan</button>
         </div>
