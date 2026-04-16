@@ -90,6 +90,20 @@ export function openSnapPopup(snapToken, callbacks = {}) {
 
     window.snap.pay(snapToken, {
       onSuccess: (result) => {
+        // Force close Midtrans' generic "Payment Successful" screen
+        try {
+          if (typeof window.snap.hide === 'function') {
+            window.snap.hide();
+          }
+          const iframeFrame = document.getElementById('snap-midtrans');
+          if (iframeFrame) iframeFrame.remove();
+          
+          // Fallback if Midtrans changed classnames
+          document.body.style.overflow = '';
+          const snapOverlay = document.querySelector('.snap-overlay');
+          if (snapOverlay) snapOverlay.remove();
+        } catch (e) {}
+
         callbacks.onSuccess?.(result);
         resolve({ status: 'success', result });
       },
