@@ -15,26 +15,37 @@ async function getMidtransConfig() {
   let midtransEnv: 'sandbox' | 'production' = 'sandbox';
 
   try {
-    const rows = await db.select().from(settings).where(
-      eq(settings.key, 'midtrans_server_key')
-    ).limit(1);
-    serverKey = rows[0]?.value || '';
-
-    const rows2 = await db.select().from(settings).where(
-      eq(settings.key, 'midtrans_client_key')
-    ).limit(1);
-    clientKey = rows2[0]?.value || '';
-
-    const rows3 = await db.select().from(settings).where(
-      eq(settings.key, 'midtrans_merchant_id')
-    ).limit(1);
-    merchantId = rows3[0]?.value || '';
-
     const rows4 = await db.select().from(settings).where(
       eq(settings.key, 'midtrans_env')
     ).limit(1);
     const dbEnv = rows4[0]?.value;
     if (dbEnv === 'production' || dbEnv === 'sandbox') midtransEnv = dbEnv;
+
+    const prefix = midtransEnv === 'production' ? 'midtrans_prod_' : 'midtrans_sandbox_';
+
+    // SERVER KEY
+    const r1 = await db.select().from(settings).where(eq(settings.key, prefix + 'server_key')).limit(1);
+    serverKey = r1[0]?.value || '';
+    if (!serverKey) {
+      const fb = await db.select().from(settings).where(eq(settings.key, 'midtrans_server_key')).limit(1);
+      serverKey = fb[0]?.value || '';
+    }
+
+    // CLIENT KEY
+    const r2 = await db.select().from(settings).where(eq(settings.key, prefix + 'client_key')).limit(1);
+    clientKey = r2[0]?.value || '';
+    if (!clientKey) {
+      const fb = await db.select().from(settings).where(eq(settings.key, 'midtrans_client_key')).limit(1);
+      clientKey = fb[0]?.value || '';
+    }
+
+    // MERCHANT ID
+    const r3 = await db.select().from(settings).where(eq(settings.key, prefix + 'merchant_id')).limit(1);
+    merchantId = r3[0]?.value || '';
+    if (!merchantId) {
+      const fb = await db.select().from(settings).where(eq(settings.key, 'midtrans_merchant_id')).limit(1);
+      merchantId = fb[0]?.value || '';
+    }
   } catch (err) {
     console.warn('[Midtrans] Failed to read settings from DB, using env fallback');
   }

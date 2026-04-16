@@ -5,10 +5,17 @@ import toast from 'react-hot-toast';
 
 export default function SettingsPage() {
   const [env, setEnv] = useState('sandbox');
-  const [merchantId, setMerchantId] = useState('');
-  const [serverKey, setServerKey] = useState('');
-  const [clientKey, setClientKey] = useState('');
+  // Sandbox Keys
+  const [sandboxMerchantId, setSandboxMerchantId] = useState('');
+  const [sandboxServerKey, setSandboxServerKey] = useState('');
+  const [sandboxClientKey, setSandboxClientKey] = useState('');
+  // Prod Keys
+  const [prodMerchantId, setProdMerchantId] = useState('');
+  const [prodServerKey, setProdServerKey] = useState('');
+  const [prodClientKey, setProdClientKey] = useState('');
+
   const [showServerKey, setShowServerKey] = useState(false);
+  const [midtransTab, setMidtransTab] = useState('sandbox');
 
   const [waToken, setWaToken] = useState('');
   const [adminPhone, setAdminPhone] = useState('');
@@ -35,10 +42,23 @@ export default function SettingsPage() {
       try {
         const data = await api.get('/settings');
         const s = data.settings || {};
+        
         setEnv(s.midtrans_env || 'sandbox');
-        setMerchantId(s.midtrans_merchant_id || '');
-        setServerKey(s.midtrans_server_key || '');
-        setClientKey(s.midtrans_client_key || '');
+        setMidtransTab(s.midtrans_env || 'sandbox');
+
+        // Legacy fallback
+        const legacyMerchantId = s.midtrans_merchant_id || '';
+        const legacyServerKey = s.midtrans_server_key || '';
+        const legacyClientKey = s.midtrans_client_key || '';
+
+        setSandboxMerchantId(s.midtrans_sandbox_merchant_id || legacyMerchantId);
+        setSandboxServerKey(s.midtrans_sandbox_server_key || legacyServerKey);
+        setSandboxClientKey(s.midtrans_sandbox_client_key || legacyClientKey);
+
+        setProdMerchantId(s.midtrans_prod_merchant_id || '');
+        setProdServerKey(s.midtrans_prod_server_key || '');
+        setProdClientKey(s.midtrans_prod_client_key || '');
+
         setWaToken(s.fonnte_token || '');
         setAdminPhone(s.fonnte_admin_phone || '');
       } catch {}
@@ -107,11 +127,14 @@ export default function SettingsPage() {
     try {
       await api.put('/settings', {
         midtrans_env: env,
-        midtrans_merchant_id: merchantId,
-        midtrans_server_key: serverKey,
-        midtrans_client_key: clientKey,
+        midtrans_sandbox_merchant_id: sandboxMerchantId,
+        midtrans_sandbox_server_key: sandboxServerKey,
+        midtrans_sandbox_client_key: sandboxClientKey,
+        midtrans_prod_merchant_id: prodMerchantId,
+        midtrans_prod_server_key: prodServerKey,
+        midtrans_prod_client_key: prodClientKey,
       });
-      toast.success('Pengaturan Midtrans tersimpan');
+      toast.success('Semua konfigurasi Midtrans berhasil disimpan!');
     } catch (err) {
       toast.error(err.message || 'Gagal menyimpan');
     }
@@ -241,85 +264,168 @@ export default function SettingsPage() {
       </div>
 
       {/* MIDTRANS CONFIGURATION */}
-      <div className="admin-card p-6 sm:p-8">
+      <div className="admin-card p-6 sm:p-8 border-l-4 border-l-admin-accent relative overflow-hidden">
+        {/* Dynamic Badge indicating ACTIVE mode */}
+        <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl text-[11px] font-bold uppercase tracking-wider text-white shadow-Sm ${env === 'production' ? 'bg-success' : 'bg-admin-accent'}`}>
+          Active: {env === 'production' ? 'Production' : 'Sandbox'}
+        </div>
+
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-admin-border pb-5">
           <div>
             <h2 className="text-lg font-semibold text-admin-text flex items-center gap-2">
               <span className="material-symbols-outlined text-admin-accent">account_balance</span> Payment Gateway
             </h2>
-            <p className="text-sm text-admin-text-muted mt-1">Konfigurasi API Midtrans</p>
+            <p className="text-sm text-admin-text-muted mt-1">Simpan dan pilih antara API Sandbox / Live Production</p>
           </div>
           <button onClick={saveMidtrans} className="btn-admin-primary flex items-center gap-2 px-6">
-            <span className="material-symbols-outlined text-[18px]">save</span> Simpan
+            <span className="material-symbols-outlined text-[18px]">save</span> Simpan Semua
           </button>
         </div>
 
-        <div className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-admin-text-secondary mb-2">Mode Lingkungan</label>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setEnv('sandbox')}
-                className={`px-4 py-2 rounded-admin text-sm font-medium transition-colors ${env === 'sandbox' ? 'bg-admin-accent text-white' : 'bg-admin-bg-hover text-admin-text-secondary hover:text-admin-text'}`}
-              >
-                Sandbox Mode
-              </button>
-              <button
-                onClick={() => setEnv('production')}
-                className={`px-4 py-2 rounded-admin text-sm font-medium transition-colors ${env === 'production' ? 'bg-success text-white' : 'bg-admin-bg-hover text-admin-text-secondary hover:text-admin-text'}`}
-              >
-                Live Production
-              </button>
-            </div>
+        <div className="space-y-6">
+          <div className="bg-admin-bg-sidebar p-1 rounded-xl shadow-inner inline-flex">
+            <button
+              onClick={() => setEnv('sandbox')}
+              className={`px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${
+                env === 'sandbox' 
+                  ? 'bg-admin-accent text-white shadow-md' 
+                  : 'text-admin-text-muted hover:text-admin-text'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">science</span> Gunakan Sandbox
+            </button>
+            <button
+              onClick={() => setEnv('production')}
+              className={`px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${
+                env === 'production' 
+                  ? 'bg-success text-white shadow-md' 
+                  : 'text-admin-text-muted hover:text-admin-text'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">rocket_launch</span> Gunakan Live Production
+            </button>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-admin-text-secondary mb-2">Merchant ID</label>
-            <input
-              type="text"
-              value={merchantId}
-              onChange={(e) => setMerchantId(e.target.value)}
-              placeholder={env === 'sandbox' ? 'Gxxxxxxxx' : 'Mxxxxxxxx'}
-              className="input-admin"
-            />
-          </div>
+          <p className="text-sm text-admin-text-muted">
+            <span className="material-symbols-outlined text-[16px] inline-block align-text-bottom mr-1">info</span>
+            Modul transaksi pelanggan saat ini dialihkan menggunakan API: <strong className={env === 'production' ? 'text-success' : 'text-admin-accent'}>{env.toUpperCase()}</strong>.
+          </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <label className="block text-sm font-medium text-admin-text-secondary mb-2">Client Key</label>
-              <input
-                type="text"
-                value={clientKey}
-                onChange={(e) => setClientKey(e.target.value)}
-                className="input-admin"
-              />
+          <div className="border border-admin-border rounded-xl mt-4">
+            {/* View Tabs */}
+            <div className="flex border-b border-admin-border bg-admin-bg-sidebar rounded-t-xl overflow-hidden">
+              <button 
+                onClick={() => setMidtransTab('sandbox')}
+                className={`flex-1 px-4 py-3 text-sm font-bold border-b-2 transition-colors ${midtransTab === 'sandbox' ? 'border-admin-accent text-admin-accent bg-admin-bg-card' : 'border-transparent text-admin-text-muted hover:bg-admin-bg-hover'}`}
+              >
+                KredenSial Sandbox
+              </button>
+              <button 
+                onClick={() => setMidtransTab('production')}
+                className={`flex-1 px-4 py-3 text-sm font-bold border-b-2 transition-colors ${midtransTab === 'production' ? 'border-success text-success bg-admin-bg-card' : 'border-transparent text-admin-text-muted hover:bg-admin-bg-hover'}`}
+              >
+                Kredensial Live Production
+              </button>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-admin-text-secondary mb-2">Server Key</label>
-              <div className="relative">
-                <input
-                  type={showServerKey ? 'text' : 'password'}
-                  value={serverKey}
-                  onChange={(e) => setServerKey(e.target.value)}
-                  className="input-admin pr-12"
-                />
-                <button onClick={() => setShowServerKey(!showServerKey)} className="absolute right-4 top-1/2 -translate-y-1/2 text-admin-text-muted hover:text-admin-text transition-colors">
-                  <span className="material-symbols-outlined text-[20px]">{showServerKey ? 'visibility_off' : 'visibility'}</span>
-                </button>
-              </div>
+
+            <div className="p-5 space-y-4 bg-admin-bg/30">
+              {/* Conditional Form Render */}
+              {midtransTab === 'sandbox' ? (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-admin-text-secondary mb-2">Sandbox Merchant ID</label>
+                    <input
+                      type="text"
+                      value={sandboxMerchantId}
+                      onChange={(e) => setSandboxMerchantId(e.target.value)}
+                      placeholder="Gxxxxxxxx"
+                      className="input-admin border-admin-accent/30 focus:border-admin-accent"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-admin-text-secondary mb-2">Sandbox Client Key</label>
+                      <input
+                        type="text"
+                        value={sandboxClientKey}
+                        onChange={(e) => setSandboxClientKey(e.target.value)}
+                        placeholder="SB-Mid-client-xxxxx"
+                        className="input-admin border-admin-accent/30 focus:border-admin-accent"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-admin-text-secondary mb-2">Sandbox Server Key</label>
+                      <div className="relative">
+                        <input
+                          type={showServerKey ? 'text' : 'password'}
+                          value={sandboxServerKey}
+                          onChange={(e) => setSandboxServerKey(e.target.value)}
+                          placeholder="SB-Mid-server-xxxxx"
+                          className="input-admin pr-12 border-admin-accent/30 focus:border-admin-accent"
+                        />
+                        <button onClick={() => setShowServerKey(!showServerKey)} className="absolute right-4 top-1/2 -translate-y-1/2 text-admin-text-muted hover:text-admin-text transition-colors">
+                          <span className="material-symbols-outlined text-[20px]">{showServerKey ? 'visibility_off' : 'visibility'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-admin-text-secondary mb-2">Production Merchant ID</label>
+                    <input
+                      type="text"
+                      value={prodMerchantId}
+                      onChange={(e) => setProdMerchantId(e.target.value)}
+                      placeholder="Mxxxxxxxx"
+                      className="input-admin border-success/30 focus:border-success"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-admin-text-secondary mb-2">Production Client Key</label>
+                      <input
+                        type="text"
+                        value={prodClientKey}
+                        onChange={(e) => setProdClientKey(e.target.value)}
+                        placeholder="Mid-client-xxxxx"
+                        className="input-admin border-success/30 focus:border-success"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-admin-text-secondary mb-2">Production Server Key</label>
+                      <div className="relative">
+                        <input
+                          type={showServerKey ? 'text' : 'password'}
+                          value={prodServerKey}
+                          onChange={(e) => setProdServerKey(e.target.value)}
+                          placeholder="Mid-server-xxxxx"
+                          className="input-admin pr-12 border-success/30 focus:border-success"
+                        />
+                        <button onClick={() => setShowServerKey(!showServerKey)} className="absolute right-4 top-1/2 -translate-y-1/2 text-admin-text-muted hover:text-admin-text transition-colors">
+                          <span className="material-symbols-outlined text-[20px]">{showServerKey ? 'visibility_off' : 'visibility'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
           <div className="pt-2">
-            <label className="block text-sm font-medium text-admin-text-secondary mb-2">Notification Webhook URL</label>
+            <label className="block text-sm font-medium text-admin-text-secondary mb-2">Notification Webhook URL (Dipakai di kedua mode)</label>
             <div className="flex gap-2">
-              <input type="text" value={webhookUrl} readOnly className="input-admin flex-1 !text-admin-text-muted" />
+              <input type="text" value={webhookUrl} readOnly className="input-admin flex-1 !text-admin-text-muted font-mono" />
               <button onClick={() => copyToClipboard(webhookUrl)} className="btn-admin-ghost flex items-center gap-1.5 flex-shrink-0">
                 <span className="material-symbols-outlined text-[18px]">content_copy</span> Salin
               </button>
             </div>
             <p className="text-[12px] text-admin-text-muted font-medium mt-1.5 flex items-center gap-1">
-              <span className="material-symbols-outlined text-[14px]">info</span> Konfigurasi pada Payment Notification URL di Midtrans.
+              <span className="material-symbols-outlined text-[14px]">info</span> Pastikan URL ini sudah tertanam di Dashboard Midtrans (Sandbox & Prod).
             </p>
           </div>
         </div>
