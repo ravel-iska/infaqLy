@@ -53,32 +53,32 @@ export default function Navbar() {
   return (
     <nav className={`fixed top-0 w-full z-50 transition-colors duration-300 ease-in-out ${scrolled ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-sm dark:border-b dark:border-slate-800' : 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md'}`}>
       <div className="flex justify-between items-center px-4 md:px-8 py-3 md:py-4 max-w-7xl mx-auto w-full">
-        <div className="flex items-baseline gap-8 lg:gap-12">
+        <div className="flex-1 flex items-baseline">
           {/* Logo */}
           <Link to="/" className="text-2xl font-headline font-bold text-emerald-800 dark:text-emerald-400">
             Infaqly
           </Link>
+        </div>
           
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-baseline gap-8 font-body text-sm tracking-tight text-slate-600 dark:text-slate-300">
-          {USER_NAV_ITEMS.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) =>
-                isActive 
-                  ? "relative text-emerald-700 dark:text-emerald-400 font-semibold after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-emerald-600 dark:after:bg-emerald-400 after:rounded-full" 
-                  : "relative hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
-          </div>
+        {/* Desktop Nav */}
+        <div className="hidden md:flex flex-[2] justify-center items-baseline gap-8 font-body text-sm tracking-tight text-slate-600 dark:text-slate-300">
+        {USER_NAV_ITEMS.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) =>
+              isActive 
+                ? "relative text-emerald-700 dark:text-emerald-400 font-semibold after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-emerald-600 dark:after:bg-emerald-400 after:rounded-full" 
+                : "relative hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+            }
+          >
+            {item.label}
+          </NavLink>
+        ))}
         </div>
 
         {/* Desktop Auth */}
-        <div className="hidden md:flex items-center gap-4 font-body text-sm tracking-tight">
+        <div className="hidden md:flex flex-1 justify-end items-center gap-4 font-body text-sm tracking-tight">
           
           {/* Theme Toggle Button */}
           <button onClick={toggleTheme} className="p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors">
