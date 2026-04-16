@@ -91,19 +91,29 @@ export default function CampaignDetailPage() {
         await loadSnapScript();
 
         // Buka Snap Popup
-        await openSnapPopup(data.token, {
+        const snapResult = await openSnapPopup(data.token, {
           onSuccess: () => {
             toast.success('Pembayaran berhasil! Jazakallahu khairan 🤲', { duration: 5000 });
-            navigate('/profile');
           },
           onPending: () => {
             toast.success('Pembayaran dalam proses. Menunggu konfirmasi bank.', { duration: 5000 });
-            navigate('/profile');
           },
           onClose: () => {
-            toast('Pembayaran belum diselesaikan — status tetap pending', { icon: 'ℹ️' });
+            toast('Pembayaran belum diselesaikan — cek status di Profil Anda', { icon: 'ℹ️' });
           },
         });
+
+        // After popup closes, poll Midtrans for real status and update DB
+        if (data.orderId) {
+          try {
+            await api.get(`/payment/check-status/${data.orderId}`);
+          } catch {}
+        }
+
+        // Navigate to profile if payment was success or pending
+        if (snapResult.status === 'success' || snapResult.status === 'pending') {
+          navigate('/profile');
+        }
       } else if (data.redirectUrl) {
         window.open(data.redirectUrl, '_blank');
       }

@@ -86,4 +86,33 @@ router.post('/notification', async (req: Request, res: Response) => {
   }
 });
 
+// GET /api/payment/check-status/:orderId — poll Midtrans API for real-time status
+// Called by frontend after Snap popup closes to ensure DB is updated
+router.get('/check-status/:orderId', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const { orderId } = req.params;
+    const statusResult = await paymentService.checkTransactionStatus(orderId);
+    
+    // Update DB with latest status from Midtrans
+    if (statusResult) {
+      const result = await paymentService.handleNotification(statusResult);
+      
+      // Send WA notification on success
+      if (result.status === 'success' && result.donation) {
+        const d = result.donation;
+        const campaign = await campaignService.getCampaignById(d.campaignId);
+        sendDonationNotification(
+          d.donorName, d.donorPhone || '', campaign?.title || '', d.amount, d.orderId
+        ).catch(() => {});
+      }
+      
+      return res.json({ status: result.status, orderId });
+    }
+    
+    return res.json({ status: 'pending', orderId });
+  } catch (err: any) {
+    return res.status(400).json({ error: err.message });
+  }
+});
+
 export default router;

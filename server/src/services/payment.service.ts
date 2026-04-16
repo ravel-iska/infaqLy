@@ -171,3 +171,34 @@ export async function handleNotification(body: any) {
   return { orderId, status, donation };
 }
 
+/**
+ * Check transaction status directly from Midtrans API.
+ * Used as fallback when webhooks don't fire.
+ */
+export async function checkTransactionStatus(orderId: string) {
+  const config = await getMidtransConfig();
+  if (!config.serverKey) return null;
+
+  const BASE_URL = config.env === 'production'
+    ? 'https://api.midtrans.com/v2'
+    : 'https://api.sandbox.midtrans.com/v2';
+
+  const auth = Buffer.from(config.serverKey + ':').toString('base64');
+
+  try {
+    const response = await fetch(`${BASE_URL}/${orderId}/status`, {
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Basic ${auth}`,
+      },
+    });
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    return data;
+  } catch {
+    return null;
+  }
+}
+

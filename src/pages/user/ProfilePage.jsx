@@ -101,7 +101,6 @@ function DonationCard({ tx, user, onPaymentSuccess }) {
       await openSnapPopup(tx.snapToken, {
         onSuccess: () => {
           toast.success('Pembayaran berhasil! Jazakallahu khairan 🤲', { duration: 5000 });
-          onPaymentSuccess?.();
         },
         onPending: () => {
           toast.success('Pembayaran dalam proses. Menunggu konfirmasi bank.', { duration: 5000 });
@@ -110,6 +109,15 @@ function DonationCard({ tx, user, onPaymentSuccess }) {
           toast('Pembayaran belum diselesaikan', { icon: 'ℹ️' });
         },
       });
+
+      // Poll Midtrans for real status and update DB
+      if (tx.orderId) {
+        try {
+          await api.get(`/payment/check-status/${tx.orderId}`);
+        } catch {}
+      }
+      // Always reload donations list
+      onPaymentSuccess?.();
     } catch {
       toast.error('Gagal membuka halaman pembayaran. Token mungkin sudah expired.');
     } finally {
