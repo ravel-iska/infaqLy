@@ -29,6 +29,7 @@ export async function getUserDonations(userId: string) {
     paymentMethod: donations.paymentMethod,
     paymentStatus: donations.paymentStatus,
     isAnonymous: donations.isAnonymous,
+    snapToken: donations.snapToken,
     paidAt: donations.paidAt,
     createdAt: donations.createdAt,
   }).from(donations).where(eq(donations.userId, userId)).orderBy(desc(donations.createdAt));

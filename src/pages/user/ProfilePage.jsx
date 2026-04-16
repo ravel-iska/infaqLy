@@ -5,6 +5,7 @@ import { formatCurrency } from '@/utils/formatCurrency';
 import { formatDateShort } from '@/utils/formatDate';
 import { generateCertificate } from '@/utils/generateCertificate';
 import { updateProfile, changePassword, uploadAvatar, deleteAvatar } from '@/services/authService';
+import { openSnapPopup, loadSnapScript } from '@/services/midtrans';
 import api from '@/services/api';
 import toast from 'react-hot-toast';
 
@@ -31,8 +32,9 @@ const FILTER_TABS = [
 ];
 
 /** Single donation card */
-function DonationCard({ tx, user }) {
+function DonationCard({ tx, user, onPaymentSuccess }) {
   const [downloading, setDownloading] = useState(false);
+  const [paying, setPaying] = useState(false);
 
   const statusConfig = {
     success: {
@@ -59,6 +61,14 @@ function DonationCard({ tx, user }) {
       border: 'border-red-200',
       dot: 'bg-red-500',
     },
+    expired: {
+      label: 'Kedaluwarsa',
+      icon: 'timer_off',
+      bg: 'bg-slate-50',
+      text: 'text-slate-600',
+      border: 'border-slate-200',
+      dot: 'bg-slate-400',
+    },
   };
 
   const status = statusConfig[tx.paymentStatus] || statusConfig.failed;
@@ -76,6 +86,34 @@ function DonationCard({ tx, user }) {
       toast.success('Sertifikat berhasil dibuka!');
     } finally {
       setTimeout(() => setDownloading(false), 1200);
+    }
+  };
+
+  /** Resume pending payment using stored Snap token */
+  const handleResumePay = async () => {
+    if (!tx.snapToken) {
+      toast.error('Token pembayaran sudah kedaluwarsa. Silakan buat donasi baru.');
+      return;
+    }
+    setPaying(true);
+    try {
+      await loadSnapScript();
+      await openSnapPopup(tx.snapToken, {
+        onSuccess: () => {
+          toast.success('Pembayaran berhasil! Jazakallahu khairan 🤲', { duration: 5000 });
+          onPaymentSuccess?.();
+        },
+        onPending: () => {
+          toast.success('Pembayaran dalam proses. Menunggu konfirmasi bank.', { duration: 5000 });
+        },
+        onClose: () => {
+          toast('Pembayaran belum diselesaikan', { icon: 'ℹ️' });
+        },
+      });
+    } catch {
+      toast.error('Gagal membuka halaman pembayaran. Token mungkin sudah expired.');
+    } finally {
+      setPaying(false);
     }
   };
 
@@ -106,9 +144,9 @@ function DonationCard({ tx, user }) {
       {/* Divider */}
       <div className="h-px bg-slate-100 my-4"></div>
 
-      {/* Bottom row: Order ID + Download */}
+      {/* Bottom row: Order ID + Action */}
       <div className="flex items-center justify-between">
-        <span className="text-[11px] font-mono text-slate-300 truncate max-w-[160px]">
+        <span className="text-[11px] font-mono text-slate-300 truncate max-w-[120px]">
           #{tx.orderId || tx.id}
         </span>
 
@@ -131,13 +169,26 @@ function DonationCard({ tx, user }) {
             )}
           </button>
         ) : tx.paymentStatus === 'pending' ? (
-          <span className="text-[11px] font-medium text-amber-500 flex items-center gap-1">
-            <span className="material-symbols-outlined text-[14px]">hourglass_top</span>
-            Menunggu pembayaran
-          </span>
+          <button
+            onClick={handleResumePay}
+            disabled={paying}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 hover:bg-amber-500 hover:text-white border border-amber-200 hover:border-amber-500 transition-all duration-300 disabled:opacity-50"
+          >
+            {paying ? (
+              <>
+                <Loader2 size={14} className="animate-spin" />
+                Memuat...
+              </>
+            ) : (
+              <>
+                <span className="material-symbols-outlined text-[16px]">payment</span>
+                Bayar Sekarang
+              </>
+            )}
+          </button>
         ) : (
           <span className="text-[11px] font-medium text-slate-300">
-            Transaksi gagal
+            Transaksi {tx.paymentStatus === 'expired' ? 'kedaluwarsa' : 'gagal'}
           </span>
         )}
       </div>
@@ -152,14 +203,14 @@ export default function ProfilePage() {
   const [activeFilter, setActiveFilter] = useState('all');
 
   // Load user's donation history from database
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await api.get('/donations/me');
-        setDonationHistory(data.donations || []);
-      } catch {}
-    })();
-  }, []);
+  const loadDonations = async () => {
+    try {
+      const data = await api.get('/donations/me');
+      setDonationHistory(data.donations || []);
+    } catch {}
+  };
+
+  useEffect(() => { loadDonations(); }, []);
 
   const successDonations = donationHistory.filter(d => d.paymentStatus === 'success');
   const totalDonated = successDonations.reduce((sum, d) => sum + (d.amount || 0), 0);
@@ -225,7 +276,7 @@ export default function ProfilePage() {
         {/* ── Donation History — Card Layout ── */}
         <div className="mt-10">
           {/* Section Header */}
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-2">
             <h2 className="text-2xl font-extrabold text-on-surface font-headline tracking-tight">Riwayat Donasi</h2>
             <div className="flex items-center gap-1.5 text-xs text-slate-400">
               <span className="material-symbols-outlined text-[14px]">info</span>
@@ -233,13 +284,13 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Filter Tabs */}
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-1 scrollbar-hide">
+          {/* Filter Tabs — grid 2x2 on mobile, inline on desktop */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
             {FILTER_TABS.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveFilter(tab.key)}
-                className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-300 ${
+                className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 ${
                   activeFilter === tab.key
                     ? 'bg-primary text-white shadow-md shadow-primary/20'
                     : 'bg-white text-slate-500 border border-slate-100 hover:border-primary/20 hover:text-primary'
@@ -276,7 +327,7 @@ export default function ProfilePage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {filteredDonations.map((tx) => (
-                <DonationCard key={tx.id || tx.orderId} tx={tx} user={user} />
+                <DonationCard key={tx.id || tx.orderId} tx={tx} user={user} onPaymentSuccess={loadDonations} />
               ))}
             </div>
           )}
