@@ -4,6 +4,22 @@ import { db } from '../config/database.js';
 import { settings } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 
+function maskSecret(val: string) {
+  if (!val) return '';
+  if (val.length <= 8) return '********';
+  return val.slice(0, 4) + '********' + val.slice(-4);
+}
+
+const SENSITIVE_KEYS = [
+  'midtrans_server_key',
+  'midtrans_client_key',
+  'midtrans_sandbox_server_key',
+  'midtrans_sandbox_client_key',
+  'midtrans_prod_server_key',
+  'midtrans_prod_client_key',
+  'fonnte_token'
+];
+
 const router = Router();
 
 // GET /api/settings/public - get public settings (open for all)
@@ -35,7 +51,12 @@ router.get('/', requireAdmin, async (req: Request, res: Response) => {
     const rows = await db.select().from(settings);
     const result: Record<string, string> = {};
     for (const row of rows) {
-      result[row.key] = row.value || '';
+      if (row.key === 'admin_logout_pin') continue; // NEVER send PIN hash to client
+      if (SENSITIVE_KEYS.includes(row.key)) {
+        result[row.key] = maskSecret(row.value || '');
+      } else {
+        result[row.key] = row.value || '';
+      }
     }
     return res.json({ settings: result });
   } catch (err: any) {
@@ -49,6 +70,11 @@ router.put('/', requireAdmin, async (req: Request, res: Response) => {
     const data = req.body as Record<string, string>;
 
     for (const [key, value] of Object.entries(data)) {
+      // Skip untouched/masked passwords
+      if (typeof value === 'string' && value.includes('********')) {
+        continue;
+      }
+      
       const existing = await db.select().from(settings).where(eq(settings.key, key)).limit(1);
       if (existing.length > 0) {
         await db.update(settings).set({ value: String(value), updatedAt: new Date() }).where(eq(settings.key, key));
