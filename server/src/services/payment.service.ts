@@ -2,6 +2,7 @@ import { env } from '../config/env.js';
 import { db } from '../config/database.js';
 import { donations, campaigns, settings } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
+import crypto from 'crypto';
 
 /**
  * Get Midtrans config from database settings → env fallback.
@@ -138,6 +139,16 @@ export async function handleNotification(body: any) {
   const orderId = body.order_id;
   const transactionStatus = body.transaction_status;
   const fraudStatus = body.fraud_status;
+
+  // Validate Midtrans Signature Key to prevent Webhook Spoofing
+  const config = await getMidtransConfig();
+  if (body.signature_key && config.serverKey) {
+    const hashString = orderId + body.status_code + body.gross_amount + config.serverKey;
+    const generatedHash = crypto.createHash('sha512').update(hashString).digest('hex');
+    if (generatedHash !== body.signature_key) {
+      throw new Error('SECURITY_ERROR: Manipulasi webhook terdeteksi! (Signature Mismatch)');
+    }
+  }
 
   // Map Midtrans status to our status
   let status: 'success' | 'pending' | 'expired' | 'failed' = 'pending';
