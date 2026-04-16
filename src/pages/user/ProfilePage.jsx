@@ -126,35 +126,35 @@ function DonationCard({ tx, user, onPaymentSuccess }) {
   };
 
   return (
-    <div className="group bg-white rounded-2xl border border-slate-100 hover:border-primary/20 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
+    <div className="group bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-primary/20 dark:hover:border-emerald-500/50 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 dark:hover:shadow-emerald-900/10">
       {/* Top row: Date + Status badge */}
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
           <span className="material-symbols-outlined text-[14px]">calendar_today</span>
           {formatDateShort(tx.createdAt)}
         </span>
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full ${status.bg} ${status.text} border ${status.border}`}>
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full ${status.bg} ${status.text} border ${status.border} dark:bg-opacity-10 dark:border-opacity-20`}>
           <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`}></span>
           {status.label}
         </span>
       </div>
 
       {/* Program name */}
-      <h3 className="text-base font-bold text-on-surface leading-snug mb-1 line-clamp-1">
+      <h3 className="text-base font-bold text-on-surface dark:text-slate-200 leading-snug mb-1 line-clamp-1">
         {tx.donorName || 'Program Donasi'}
       </h3>
 
       {/* Amount */}
-      <p className="text-lg font-extrabold text-primary font-headline">
+      <p className="text-lg font-extrabold text-primary dark:text-emerald-400 font-headline">
         {formatCurrency(tx.amount)}
       </p>
 
       {/* Divider */}
-      <div className="h-px bg-slate-100 my-4"></div>
+      <div className="h-px bg-slate-100 dark:bg-slate-700 my-4"></div>
 
       {/* Bottom row: Order ID + Action */}
       <div className="flex items-center justify-between">
-        <span className="text-[11px] font-mono text-slate-300 truncate max-w-[120px]">
+        <span className="text-[11px] font-mono text-slate-300 dark:text-slate-500 truncate max-w-[120px]">
           #{tx.orderId || tx.id}
         </span>
 
@@ -244,19 +244,19 @@ export default function ProfilePage() {
     <div className="animate-fade-in pt-32 pb-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Profile Card */}
-        <div className="bg-surface-container-lowest p-6 md:p-8 rounded-[2rem] border border-outline-variant/20 shadow-ambient flex flex-col sm:flex-row items-center sm:items-start gap-6 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-secondary-container"></div>
+        <div className="bg-surface-container-lowest dark:bg-slate-800 p-6 md:p-8 rounded-[2rem] border border-outline-variant/20 dark:border-slate-700 shadow-ambient flex flex-col sm:flex-row items-center sm:items-start gap-6 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary dark:from-emerald-500 to-secondary-container dark:to-emerald-800"></div>
           <Avatar user={user} size="lg" />
           <div className="flex-1 text-center sm:text-left">
-            <h1 className="text-2xl font-bold text-on-surface font-headline">{user?.username || 'User Explorer'}</h1>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 mt-3 text-sm text-on-surface-variant font-medium">
+            <h1 className="text-2xl font-bold text-on-surface dark:text-white font-headline">{user?.username || 'User Explorer'}</h1>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 mt-3 text-sm text-on-surface-variant dark:text-slate-400 font-medium">
               <span className="flex items-center justify-center sm:justify-start gap-1.5"><span className="material-symbols-outlined text-[16px]">mail</span> {user?.email || 'email@example.com'}</span>
               <span className="flex items-center justify-center sm:justify-start gap-1.5"><span className="material-symbols-outlined text-[16px]">phone</span> {user?.whatsapp || 'Belum diisi'}</span>
             </div>
           </div>
           <button
             onClick={() => setShowEditModal(true)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all shadow-sm"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-primary/10 dark:bg-emerald-900/30 text-primary dark:text-emerald-400 hover:bg-primary dark:hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
           >
             <span className="material-symbols-outlined text-[18px]">edit</span> Edit Profil
           </button>
@@ -264,20 +264,20 @@ export default function ProfilePage() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-          <div className="bg-surface-container-lowest p-6 rounded-[1.5rem] border border-outline-variant/10 text-center shadow-sm relative overflow-hidden group hover:border-primary/30 transition-colors">
-            <span className="material-symbols-outlined text-3xl text-primary/20 absolute -right-2 -bottom-2 group-hover:scale-110 transition-transform">account_balance_wallet</span>
-            <p className="text-sm text-on-surface-variant font-medium">Total Donasi Saya</p>
-            <p className="text-2xl font-bold text-primary mt-2 font-headline">{formatCurrency(totalDonated)}</p>
+          <div className="bg-surface-container-lowest dark:bg-slate-800 p-6 rounded-[1.5rem] border border-outline-variant/10 dark:border-slate-700 text-center shadow-sm relative overflow-hidden group hover:border-primary/30 dark:hover:border-emerald-500/30 transition-colors">
+            <span className="material-symbols-outlined text-3xl text-primary/20 dark:text-emerald-500/10 absolute -right-2 -bottom-2 group-hover:scale-110 transition-transform">account_balance_wallet</span>
+            <p className="text-sm text-on-surface-variant dark:text-slate-400 font-medium">Total Donasi Saya</p>
+            <p className="text-2xl font-bold text-primary dark:text-emerald-400 mt-2 font-headline">{formatCurrency(totalDonated)}</p>
           </div>
-          <div className="bg-surface-container-lowest p-6 rounded-[1.5rem] border border-outline-variant/10 text-center shadow-sm relative overflow-hidden group hover:border-primary/30 transition-colors">
-            <span className="material-symbols-outlined text-3xl text-primary/20 absolute -right-2 -bottom-2 group-hover:scale-110 transition-transform">receipt_long</span>
-            <p className="text-sm text-on-surface-variant font-medium">Total Transaksi</p>
-            <p className="text-2xl font-bold text-on-surface mt-2 font-headline">{donationHistory.length} Kali</p>
+          <div className="bg-surface-container-lowest dark:bg-slate-800 p-6 rounded-[1.5rem] border border-outline-variant/10 dark:border-slate-700 text-center shadow-sm relative overflow-hidden group hover:border-primary/30 dark:hover:border-emerald-500/30 transition-colors">
+            <span className="material-symbols-outlined text-3xl text-primary/20 dark:text-emerald-500/10 absolute -right-2 -bottom-2 group-hover:scale-110 transition-transform">receipt_long</span>
+            <p className="text-sm text-on-surface-variant dark:text-slate-400 font-medium">Total Transaksi</p>
+            <p className="text-2xl font-bold text-on-surface dark:text-slate-200 mt-2 font-headline">{donationHistory.length} Kali</p>
           </div>
-          <div className="bg-surface-container-lowest p-6 rounded-[1.5rem] border border-outline-variant/10 text-center shadow-sm relative overflow-hidden group hover:border-primary/30 transition-colors">
-            <span className="material-symbols-outlined text-3xl text-primary/20 absolute -right-2 -bottom-2 group-hover:scale-110 transition-transform">volunteer_activism</span>
-            <p className="text-sm text-on-surface-variant font-medium">Program Dibantu</p>
-            <p className="text-2xl font-bold text-on-surface mt-2 font-headline">{uniquePrograms} Program</p>
+          <div className="bg-surface-container-lowest dark:bg-slate-800 p-6 rounded-[1.5rem] border border-outline-variant/10 dark:border-slate-700 text-center shadow-sm relative overflow-hidden group hover:border-primary/30 dark:hover:border-emerald-500/30 transition-colors">
+            <span className="material-symbols-outlined text-3xl text-primary/20 dark:text-emerald-500/10 absolute -right-2 -bottom-2 group-hover:scale-110 transition-transform">volunteer_activism</span>
+            <p className="text-sm text-on-surface-variant dark:text-slate-400 font-medium">Program Dibantu</p>
+            <p className="text-2xl font-bold text-on-surface dark:text-slate-200 mt-2 font-headline">{uniquePrograms} Program</p>
           </div>
         </div>
 
@@ -285,8 +285,8 @@ export default function ProfilePage() {
         <div className="mt-10">
           {/* Section Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-2">
-            <h2 className="text-2xl font-extrabold text-on-surface font-headline tracking-tight">Riwayat Donasi</h2>
-            <div className="flex items-center gap-1.5 text-xs text-slate-400">
+            <h2 className="text-2xl font-extrabold text-on-surface dark:text-white font-headline tracking-tight">Riwayat Donasi</h2>
+            <div className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
               <span className="material-symbols-outlined text-[14px]">info</span>
               Sertifikat tersedia untuk transaksi berhasil
             </div>
@@ -300,15 +300,15 @@ export default function ProfilePage() {
                 onClick={() => setActiveFilter(tab.key)}
                 className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 ${
                   activeFilter === tab.key
-                    ? 'bg-primary text-white shadow-md shadow-primary/20'
-                    : 'bg-white text-slate-500 border border-slate-100 hover:border-primary/20 hover:text-primary'
+                    ? 'bg-primary dark:bg-emerald-600 text-white shadow-md shadow-primary/20 dark:shadow-emerald-900/20'
+                    : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-100 dark:border-slate-700 hover:border-primary/20 dark:hover:border-emerald-500/20 hover:text-primary dark:hover:text-emerald-400'
                 }`}
               >
                 <span className="material-symbols-outlined text-[16px]">{tab.icon}</span>
                 {tab.label}
                 {statusCounts[tab.key] > 0 && (
                   <span className={`ml-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-                    activeFilter === tab.key ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-400'
+                    activeFilter === tab.key ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-300'
                   }`}>
                     {statusCounts[tab.key]}
                   </span>
@@ -319,16 +319,16 @@ export default function ProfilePage() {
 
           {/* Donation Cards Grid */}
           {filteredDonations.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-100 py-16 px-6 text-center">
-              <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span className="material-symbols-outlined text-3xl text-slate-300">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 py-16 px-6 text-center">
+              <div className="w-16 h-16 bg-slate-50 dark:bg-slate-700/50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <span className="material-symbols-outlined text-3xl text-slate-300 dark:text-slate-500">
                   {activeFilter === 'all' ? 'volunteer_activism' : activeFilter === 'success' ? 'check_circle' : activeFilter === 'pending' ? 'schedule' : 'cancel'}
                 </span>
               </div>
-              <p className="text-base font-bold text-slate-800 mb-1">
+              <p className="text-base font-bold text-slate-800 dark:text-slate-200 mb-1">
                 {activeFilter === 'all' ? 'Belum ada riwayat donasi' : `Tidak ada transaksi ${FILTER_TABS.find(t => t.key === activeFilter)?.label.toLowerCase()}`}
               </p>
-              <p className="text-sm text-slate-400 max-w-xs mx-auto">
+              <p className="text-sm text-slate-400 dark:text-slate-400/80 max-w-xs mx-auto">
                 {activeFilter === 'all' ? 'Mari mulai menyebar kebaikan! Jelajahi program donasi kami.' : 'Coba pilih filter lain untuk melihat transaksi Anda.'}
               </p>
             </div>
@@ -476,26 +476,25 @@ function EditProfileModal({ user, onClose, onSave }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in" onClick={onClose}>
-      <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-xl mx-4 animate-scale-in overflow-hidden border border-outline-variant/20" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-xl mx-4 animate-scale-in overflow-hidden border border-outline-variant/20 dark:border-slate-700" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="flex items-center justify-between px-8 py-6 border-b border-outline-variant/10 bg-surface-container-lowest">
-          <h2 className="text-2xl font-bold text-on-surface font-headline flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary">edit_square</span> Edit Profil
+        <div className="flex items-center justify-between px-8 py-6 border-b border-outline-variant/10 dark:border-slate-700 bg-surface-container-lowest dark:bg-slate-800/80">
+          <h2 className="text-2xl font-bold text-on-surface dark:text-white font-headline flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary dark:text-emerald-400">edit_square</span> Edit Profil
           </h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition-colors">
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
 
-        {/* Form */}
-        <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
+        <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto w-full max-w-full">
           {/* Avatar Upload */}
-          <div className="flex flex-col items-center gap-4 pb-6 border-b border-outline-variant/10">
+          <div className="flex flex-col items-center gap-4 pb-6 border-b border-outline-variant/10 dark:border-slate-700">
             <div className="relative group">
               {avatarPreview ? (
-                <img src={avatarPreview} alt="Avatar" className="w-24 h-24 rounded-full object-cover border-4 border-surface-container shadow-md" />
+                <img src={avatarPreview} alt="Avatar" className="w-24 h-24 rounded-full object-cover border-4 border-surface-container dark:border-slate-800 shadow-md" />
               ) : (
-                <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center shadow-md border-4 border-surface-container">
+                <div className="w-24 h-24 rounded-full bg-primary dark:bg-emerald-600 flex items-center justify-center shadow-md border-4 border-surface-container dark:border-slate-800">
                   <span className="text-4xl font-bold text-white">{form.username?.[0]?.toUpperCase() || 'U'}</span>
                 </div>
               )}
@@ -519,7 +518,7 @@ function EditProfileModal({ user, onClose, onSave }) {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="px-4 py-2 rounded-lg bg-surface-container text-xs font-bold text-on-surface hover:bg-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
+                className="px-4 py-2 rounded-lg bg-surface-container dark:bg-slate-700 text-xs font-bold text-on-surface dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
               >
                 <span className="material-symbols-outlined text-[16px]">photo_library</span> Pilih Foto
               </button>
@@ -527,7 +526,7 @@ function EditProfileModal({ user, onClose, onSave }) {
                 <button
                   type="button"
                   onClick={removeAvatar}
-                  className="px-4 py-2 rounded-lg bg-red-50 text-xs font-bold text-red-600 hover:bg-red-100 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
+                  className="px-4 py-2 rounded-lg bg-red-50 dark:bg-red-900/30 text-xs font-bold text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
                 >
                   <span className="material-symbols-outlined text-[16px]">delete</span> Hapus
                 </button>
@@ -537,17 +536,17 @@ function EditProfileModal({ user, onClose, onSave }) {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-on-surface mb-2">Username *</label>
-            <input type="text" value={form.username} onChange={(e) => update('username', e.target.value)} className="w-full bg-surface-container/50 border border-outline-variant/30 text-on-surface placeholder:text-slate-400 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium" placeholder="ahmadrahmani" />
+            <label className="block text-sm font-bold text-on-surface dark:text-slate-200 mb-2">Username *</label>
+            <input type="text" value={form.username} onChange={(e) => update('username', e.target.value)} className="w-full bg-surface-container/50 dark:bg-slate-900 border border-outline-variant/30 dark:border-slate-600 text-on-surface dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-emerald-500/30 focus:border-primary dark:focus:border-emerald-500 transition-all font-medium" placeholder="ahmadrahmani" />
           </div>
           <div>
-            <label className="block text-sm font-bold text-on-surface mb-2">Email *</label>
-            <input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} className="w-full bg-surface-container/50 border border-outline-variant/30 text-on-surface placeholder:text-slate-400 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium" placeholder="ahmad@email.com" />
+            <label className="block text-sm font-bold text-on-surface dark:text-slate-200 mb-2">Email *</label>
+            <input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} className="w-full bg-surface-container/50 dark:bg-slate-900 border border-outline-variant/30 dark:border-slate-600 text-on-surface dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-emerald-500/30 focus:border-primary dark:focus:border-emerald-500 transition-all font-medium" placeholder="ahmad@email.com" />
           </div>
           <div>
-            <label className="block text-sm font-bold text-on-surface mb-2">Nomor WhatsApp *</label>
-            <input type="text" value={form.whatsapp} onChange={(e) => update('whatsapp', e.target.value)} className="w-full bg-surface-container/50 border border-outline-variant/30 text-on-surface placeholder:text-slate-400 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium" placeholder="081234567890" />
-            <p className="text-xs text-slate-500 font-medium mt-1.5 flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">info</span> Untuk notifikasi donasi via WhatsApp</p>
+            <label className="block text-sm font-bold text-on-surface dark:text-slate-200 mb-2">Nomor WhatsApp *</label>
+            <input type="text" value={form.whatsapp} onChange={(e) => update('whatsapp', e.target.value)} className="w-full bg-surface-container/50 dark:bg-slate-900 border border-outline-variant/30 dark:border-slate-600 text-on-surface dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-emerald-500/30 focus:border-primary dark:focus:border-emerald-500 transition-all font-medium" placeholder="081234567890" />
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1.5 flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">info</span> Untuk notifikasi donasi via WhatsApp</p>
           </div>
 
           {/* Change Password Toggle */}
@@ -559,21 +558,21 @@ function EditProfileModal({ user, onClose, onSave }) {
           </div>
 
           {passwordSection && (
-            <div className="space-y-4 pt-4 pb-2 pl-6 border-l-4 border-primary/20 animate-slide-down">
+            <div className="space-y-4 pt-4 pb-2 pl-6 border-l-4 border-primary/20 dark:border-emerald-500/30 animate-slide-down">
               <div>
-                <label className="block text-sm font-bold text-on-surface mb-2">Kata Sandi Lama *</label>
+                <label className="block text-sm font-bold text-on-surface dark:text-slate-200 mb-2">Kata Sandi Lama *</label>
                 <div className="relative">
-                  <input type={showCurrent ? 'text' : 'password'} value={passwords.current} onChange={(e) => updatePw('current', e.target.value)} className="w-full bg-surface-container/50 border border-outline-variant/30 text-on-surface placeholder:text-slate-400 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium pr-12" placeholder="••••••••" />
-                  <button type="button" onClick={() => setShowCurrent(!showCurrent)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors">
+                  <input type={showCurrent ? 'text' : 'password'} value={passwords.current} onChange={(e) => updatePw('current', e.target.value)} className="w-full bg-surface-container/50 dark:bg-slate-900 border border-outline-variant/30 dark:border-slate-600 text-on-surface dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-emerald-500/30 focus:border-primary dark:focus:border-emerald-500 transition-all font-medium pr-12" placeholder="••••••••" />
+                  <button type="button" onClick={() => setShowCurrent(!showCurrent)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-emerald-400 transition-colors">
                     <span className="material-symbols-outlined text-[20px]">{showCurrent ? 'visibility_off' : 'visibility'}</span>
                   </button>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-bold text-on-surface mb-2">Kata Sandi Baru *</label>
+                <label className="block text-sm font-bold text-on-surface dark:text-slate-200 mb-2">Kata Sandi Baru *</label>
                 <div className="relative">
-                  <input type={showNew ? 'text' : 'password'} value={passwords.newPass} onChange={(e) => updatePw('newPass', e.target.value)} className="w-full bg-surface-container/50 border border-outline-variant/30 text-on-surface placeholder:text-slate-400 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium pr-12" placeholder="••••••••" />
-                  <button type="button" onClick={() => setShowNew(!showNew)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors">
+                  <input type={showNew ? 'text' : 'password'} value={passwords.newPass} onChange={(e) => updatePw('newPass', e.target.value)} className="w-full bg-surface-container/50 dark:bg-slate-900 border border-outline-variant/30 dark:border-slate-600 text-on-surface dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-emerald-500/30 focus:border-primary dark:focus:border-emerald-500 transition-all font-medium pr-12" placeholder="••••••••" />
+                  <button type="button" onClick={() => setShowNew(!showNew)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-emerald-400 transition-colors">
                     <span className="material-symbols-outlined text-[20px]">{showNew ? 'visibility_off' : 'visibility'}</span>
                   </button>
                 </div>
@@ -582,8 +581,8 @@ function EditProfileModal({ user, onClose, onSave }) {
                 )}
               </div>
               <div>
-                <label className="block text-sm font-bold text-on-surface mb-2">Konfirmasi Sandi Baru *</label>
-                <input type="password" value={passwords.confirm} onChange={(e) => updatePw('confirm', e.target.value)} className="w-full bg-surface-container/50 border border-outline-variant/30 text-on-surface placeholder:text-slate-400 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium" placeholder="••••••••" />
+                <label className="block text-sm font-bold text-on-surface dark:text-slate-200 mb-2">Konfirmasi Sandi Baru *</label>
+                <input type="password" value={passwords.confirm} onChange={(e) => updatePw('confirm', e.target.value)} className="w-full bg-surface-container/50 dark:bg-slate-900 border border-outline-variant/30 dark:border-slate-600 text-on-surface dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-emerald-500/30 focus:border-primary dark:focus:border-emerald-500 transition-all font-medium" placeholder="••••••••" />
                 {passwords.confirm && passwords.confirm !== passwords.newPass && (
                   <p className="text-xs text-danger font-bold mt-1.5">Sandi tidak cocok!</p>
                 )}
@@ -593,11 +592,11 @@ function EditProfileModal({ user, onClose, onSave }) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-8 py-5 border-t border-outline-variant/10 bg-surface-container-lowest">
-          <button onClick={onClose} className="px-5 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors">
+        <div className="flex items-center justify-end gap-3 px-8 py-5 border-t border-outline-variant/10 dark:border-slate-700 bg-surface-container-lowest dark:bg-slate-800/80 w-full mb-0 pb-6 rounded-b-[2rem]">
+          <button onClick={onClose} className="px-5 py-2.5 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
             Batal
           </button>
-          <button onClick={handleSave} disabled={loading} className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5">
+          <button onClick={handleSave} disabled={loading} className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary dark:bg-emerald-600 hover:bg-primary/90 dark:hover:bg-emerald-500 text-white font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5">
             {loading ? <><Loader2 size={18} className="animate-spin" /> Menyiapkan...</> : <><span className="material-symbols-outlined text-[18px]">save</span> Simpan Perubahan</>}
           </button>
         </div>

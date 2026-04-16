@@ -49,7 +49,7 @@ function FloatingWA() {
 
 export default function UserLayout() {
   return (
-    <div className="min-h-screen flex flex-col user-bg">
+    <div className="min-h-screen flex flex-col user-bg dark:bg-slate-900 transition-colors duration-300">
       <Navbar />
       <main className="flex-1">
         <Outlet />

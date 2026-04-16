@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 // Layouts
 import UserLayout from '@/layouts/UserLayout';
@@ -155,22 +156,26 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              borderRadius: '12px',
-              background: '#1E293B',
-              color: '#F1F5F9',
-              fontSize: '14px',
-            },
-          }}
-        />
-      </BrowserRouter>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <AppRoutes />
+          <Toaster 
+            position="top-center"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#333',
+                color: '#fff',
+                borderRadius: '8px',
+              },
+              success: {
+                iconTheme: { primary: '#10B981', secondary: '#fff' },
+              },
+            }}
+          />
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

@@ -34,15 +34,15 @@ export default function LoginPage() {
 
   return (
     <div className="w-full animate-scale-in">
-      <div className="bg-surface-container-lowest p-8 md:p-10 rounded-[2rem] ambient-shadow border border-white/40">
+      <div className="bg-surface-container-lowest dark:bg-slate-800 p-8 md:p-10 rounded-[2rem] ambient-shadow border border-white/40 dark:border-slate-700">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold font-headline text-on-surface">Masuk ke InfaqLy</h1>
-          <p className="mt-3 text-sm text-on-surface-variant font-medium">Selamat datang kembali, mari lanjutkan kebaikan</p>
+          <h1 className="text-3xl font-bold font-headline text-on-surface dark:text-white">Masuk ke InfaqLy</h1>
+          <p className="mt-3 text-sm text-on-surface-variant dark:text-slate-400 font-medium">Selamat datang kembali, mari lanjutkan kebaikan</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-bold text-on-surface mb-2">
+            <label className="block text-sm font-bold text-on-surface dark:text-slate-200 mb-2">
               Username atau No. WhatsApp
             </label>
             <input
@@ -50,13 +50,13 @@ export default function LoginPage() {
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               placeholder="Contoh: ahmad / 081234567890"
-              className="w-full bg-surface-container/50 border border-slate-200 text-on-surface placeholder:text-slate-400 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium"
+              className="w-full bg-surface-container/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 text-on-surface dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-emerald-500/30 focus:border-primary dark:focus:border-emerald-500 transition-all font-medium"
               autoFocus
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-on-surface mb-2">
+            <label className="block text-sm font-bold text-on-surface dark:text-slate-200 mb-2">
               Password
             </label>
             <div className="relative">
@@ -65,12 +65,12 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-surface-container/50 border border-slate-200 text-on-surface placeholder:text-slate-400 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium pr-12"
+                className="w-full bg-surface-container/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 text-on-surface dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-emerald-500/30 focus:border-primary dark:focus:border-emerald-500 transition-all font-medium pr-12"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-emerald-400 transition-colors"
               >
                 <span className="material-symbols-outlined text-[20px]">
                   {showPassword ? 'visibility_off' : 'visibility'}
@@ -91,7 +91,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary hover:bg-primary/90 text-on-primary font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 mt-2"
+            className="w-full bg-primary dark:bg-emerald-600 hover:bg-primary/90 dark:hover:bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 mt-2"
           >
             {loading ? (
               <><Loader2 size={20} className="animate-spin" /> Memverifikasi login...</>
@@ -104,10 +104,10 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-8 text-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
-          <p className="text-sm text-slate-600 font-medium">
+        <div className="mt-8 text-center bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700/50">
+          <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
             Belum tergabung bersama kami?{' '}
-            <Link to="/register" className="text-primary font-bold hover:underline">
+            <Link to="/register" className="text-primary dark:text-emerald-400 font-bold hover:underline">
               Daftar di sini
             </Link>
           </p>
