@@ -85,12 +85,6 @@ export async function createSnapToken(data: {
     ? 'https://app.midtrans.com/snap/v1'
     : 'https://app.sandbox.midtrans.com/snap/v1';
 
-  // Determine app URL for redirect after payment
-  const appUrl = process.env.APP_URL || process.env.RAILWAY_PUBLIC_DOMAIN
-    ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
-    : 'https://infaqly-production.up.railway.app';
-  const finishUrl = `${appUrl}/profile`;
-
   const transactionData = {
     transaction_details: { order_id: data.orderId, gross_amount: data.amount },
     item_details: [{
@@ -101,9 +95,6 @@ export async function createSnapToken(data: {
       first_name: data.donorName,
       email: data.donorEmail || 'donor@infaqly.com',
       phone: data.donorPhone || '',
-    },
-    callbacks: {
-      finish: finishUrl,
     },
   };
 
