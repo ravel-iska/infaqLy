@@ -26,65 +26,93 @@ InfaqLy adalah sebuah platform donasi dan *crowdfunding* berbasis syariah yang d
 
 ---
 
-## 📥 Panduan Instalasi (Development)
+## 📥 Panduan Instalasi (Development Lokal)
 
-Pastikan NodeJS (v20+) dan PostgreSQL sudah terpasang di komputer Anda.
+Proyek ini dapat dijalankan dengan lancar di Windows, macOS, maupun Linux. Pastikan Anda telah menginstal **Node.js (v20+)**, **Git**, dan **PostgreSQL**.
 
-### 1. Kloning Repositori
+### 1. Kloning Repositori & Instalasi
+Buka terminal (Command Prompt/PowerShell untuk Windows, Terminal untuk macOS/Linux).
+
 ```bash
 git clone https://github.com/ravel-iska/infaqLy.git
 cd infaqLy
 ```
 
-### 2. Instalasi Dependensi Terpusat
-Jalankan perintah ini di *root directory*. Ini otomatis akan menginstal dependensi untuk *frontend* maupun *backend* secara bersamaan.
+*(Langkah ini berlaku universal untuk semua OS)*. Instalasi dependensi menggunakan skrip yang sudah disiapkan:
 ```bash
 npm install
 npm run postinstall
 ```
 
-### 3. Konfigurasi Variabel Lingkungan
-Masuk ke *folder* `server` dan buat file `.env`:
+### 2. Konfigurasi Variabel Lingkungan (.env)
+Buka folder `server` dan buat file konfigurasi Anda:
+
+**Pengguna Windows (Command Prompt/PowerShell):**
+```cmd
+cd server
+copy .env.example .env
+```
+
+**Pengguna macOS / Linux:**
 ```bash
 cd server
 cp .env.example .env
 ```
-Isi nilai variabel `.env` dengan kredensial PostgreSQL dan API Key milik Anda:
+
+Buka file `.env` yang baru dibuat dengan *code editor* Anda dan isi parameter berikut:
 ```env
-DATABASE_URL="postgres://username:password@localhost:5432/infaqly_db"
-JWT_SECRET="rahasia_super_kuat_kamu"
-# Credential Cloudinary
+DATABASE_URL="postgres://username:password@localhost:5432/infaqly_db" # Sesuaikan dengan DB lokal Anda
+JWT_SECRET="bebas_isi_text_acak_disini"
 CLOUDINARY_CLOUD_NAME="..."
 CLOUDINARY_API_KEY="..."
 CLOUDINARY_API_SECRET="..."
 ```
 
-### 4. Sinkronisasi Database
-Kembali ke akar proyek dan lakukan *push schema*.
+### 3. Migrasi Database (Drizzle ORM)
+Pastikan PostgreSQL Anda menyala. Kembali ke direktori root (`infaqLy`), lalu jalankan:
+
+**Pengguna Windows / macOS / Linux:**
 ```bash
 npm --prefix server run db:push
 npm --prefix server run db:seed
 ```
 
-### 5. Jalankan Server!
-Proyek ini dikonfigurasi menggunakan *Concurrent Scripts*. Anda cukup menjalankan perintah ini, maka Backend, Frontend, & DB Studio akan menyala bersamaan!
+### 4. Menyalakan Server (One-Click Start)
+Menyalakan *Backend*, *Frontend*, dan *Database Studio* secara bersamaan.
+
 ```bash
 npm run dev
 ```
 
-🌐 **Frontend** berjalan di: `http://localhost:5173`
-⚙️ **Backend** berjalan di: `http://localhost:5000`
-💾 **Drizzle Studio** berjalan di: `https://local.drizzle.studio`
+🌐 **Frontend URL:** `http://localhost:5173`
+⚙️ **Backend URL:** `http://localhost:5000`
+💾 **Drizzle Studio URL:** `https://local.drizzle.studio`
 
 ---
 
-## ☁️ Panduan Deployment (Production)
+## ☁️ Panduan Deployment (Railway.app)
 
-Proyek ini sangat mendukung arsitektur serverless (seperti Railway, Vercel, Render) yang sudah terkonfigurasi dengan Nixpacks.
+Proyek ini sangat mendukung arsitektur *serverless*, salah satu yang paling direkomendasikan adalah [Railway.app](https://railway.app). Railway mendeteksi infrastruktur kita secara otomatis menggunakan *Nixpacks*.
 
-* **Perintah Build**: `npm run build`
-* **Perintah Start**: `npm start`
-* **Catatan Penting**: Variabel lingkungan API pihak ketiga seperti *Midtrans* dan *Fonnte* tidak di-hardcode. Semua dikonfigurasikan di halaman **Pengaturan Admin** secara langsung melalui antarmuka web, sehingga perubahan apa pun bisa *live* saat itu juga tanpa me-restart server.
+Ikuti langkah-langkah mudah berikut untuk *deploy* infaqLy ke Railway:
+
+1. **Persiapkan GitHub**: Pastikan kode sistem ini sudah Anda simpan (push) ke repositori GitHub pribadi Anda.
+2. **Buat Proyek di Railway**: Login ke dasbor Railway, klik `New Project` > `Deploy from GitHub repo` > Pilih repositori infaqLy Anda.
+3. **Tambahkan Database PostgreSQL (Add-on)**:
+   - Di tampilan kanvas Railway, tekan tombol `Create` (atau `+`), pilih `Database` > `Add PostgreSQL`.
+   - Tunggu hingga *database* siap dipakai.
+4. **Hubungkan Database ke Aplikasi**:
+   - Klik kotak layanan *Web App* infaqLy di kanvas.
+   - Buka masuk ke tab **Variables**.
+   - Klik tombol **Reference Variable**, lalu hubungkan dengan *DATABASE_URL* dari PostgreSQL kotak sebelah yang baru saja Anda buat.
+5. **Tambahkan Variabel Wajib Lainnya**:
+   Di dalam tab **Variables** kotak *Web App* infaqLy, pastikan Anda juga menambahkan:
+   - `JWT_SECRET` (Isi dengan kombinasi *password* acak yang panjang).
+   - Kredensial `PORT` isi dengan `5000` (atau biarkan Railway mendeteksinya).
+   - `NODE_ENV` isi dengan `production`.
+   *(Catatan: Midtrans & Fonnte TIDAK PERLU dimasukkan di sini karena dapat dikonfigurasi melalui dasbor antarmuka admin UI web Anda secara dinamis!)*
+6. **Deploy!**: Railway akan otomatis mendeteksi bahwa ini aplikasi *Monorepo* Vite/Node Express. Perintah *Build* dan *Start* (`npm run build` dan `npm start`) yang ada di `package.json` akan dijalankan otomatis.
+7. **Atur Domain**: Masuk ke tab **Settings** di kotak Web App, gulir ke bagian **Networking**, lalu klik `Generate Domain` untuk mendapatkan *link* publik Anda!
 
 ---
 
