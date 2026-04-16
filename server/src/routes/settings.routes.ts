@@ -6,6 +6,24 @@ import { eq } from 'drizzle-orm';
 
 const router = Router();
 
+// GET /api/settings/public - get public settings (open for all)
+router.get('/public', async (req: Request, res: Response) => {
+  try {
+    const rows = await db.select().from(settings).where(eq(settings.key, 'fonnte_admin_phone')).limit(1);
+    const phone = rows.length > 0 ? rows[0].value : '';
+    let waUrl = '';
+    let displayPhone = '+62 21 555 1234';
+    if (phone) {
+      let cleanPhone = phone.replace(/^0/, '62').replace(/\D/g, '');
+      waUrl = `https://wa.me/${cleanPhone}`;
+      displayPhone = phone;
+    }
+    return res.json({ waUrl, phone: displayPhone });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/settings — get all settings (admin only)
 router.get('/', requireAdmin, async (req: Request, res: Response) => {
   try {

@@ -1,7 +1,22 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import api from '@/services/api';
 
 export default function Footer() {
+  const [waUrl, setWaUrl] = useState('');
+  const [phone, setPhone] = useState('+62 21 555 1234');
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const data = await api.get('/settings/public');
+        if (data.waUrl) setWaUrl(data.waUrl);
+        if (data.phone) setPhone(data.phone);
+      } catch (err) {}
+    };
+    fetchSettings();
+  }, []);
   return (
     <footer className="bg-slate-50 w-full rounded-t-3xl mt-auto">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-12 px-8 lg:px-12 py-16 max-w-7xl mx-auto font-body text-sm leading-relaxed">
@@ -42,9 +57,10 @@ export default function Footer() {
         <div className="space-y-6">
           <h5 className="font-bold text-on-surface">Bantuan</h5>
           <ul className="space-y-3 text-slate-500">
-            <li><a href="#" className="hover:text-emerald-500 transition-colors">Pusat Bantuan</a></li>
+            {waUrl ? (
+              <li><a href={waUrl} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">Hubungi Admin (WhatsApp)</a></li>
+            ) : null}
             <li><a href="#" className="hover:text-emerald-500 transition-colors">Cara Donasi</a></li>
-            <li><a href="#" className="hover:text-emerald-500 transition-colors">Verifikasi Akun</a></li>
             <li><a href="#" className="hover:text-emerald-500 transition-colors">Syarat & Ketentuan</a></li>
           </ul>
         </div>
@@ -53,7 +69,7 @@ export default function Footer() {
           <h5 className="font-bold text-on-surface">Kontak</h5>
           <ul className="space-y-3 text-slate-500">
             <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">mail</span> info@infaqly.org</li>
-            <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">call</span> +62 21 555 1234</li>
+            <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">call</span> {phone}</li>
             <li className="flex items-start gap-2"><span className="material-symbols-outlined text-sm">location_on</span> Jakarta South Quarter, Tower A, Lantai 12</li>
           </ul>
         </div>
