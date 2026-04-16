@@ -22,6 +22,12 @@ export default function CampaignDetailPage() {
   const [payLoading, setPayLoading] = useState(false);
   const [recentDonors, setRecentDonors] = useState([]);
 
+  // Modal States
+  const [showThankYou, setShowThankYou] = useState(false);
+  const [showContinueModal, setShowContinueModal] = useState(false);
+  const [pendingToken, setPendingToken] = useState(null);
+  const [pendingOrderId, setPendingOrderId] = useState(null);
+
   useEffect(() => {
     async function load() {
       try {
@@ -93,27 +99,35 @@ export default function CampaignDetailPage() {
         // Buka Snap Popup
         const snapResult = await openSnapPopup(data.token, {
           onSuccess: () => {
-            toast.success('Pembayaran berhasil! Jazakallahu khairan 🤲', { duration: 5000 });
+            // Kita sudah sukses
           },
           onPending: () => {
-            toast.success('Pembayaran dalam proses. Menunggu konfirmasi bank.', { duration: 5000 });
+            // Pending status
           },
           onClose: () => {
-            toast('Pembayaran belum diselesaikan — cek status di Profil Anda', { icon: 'ℹ️' });
+            // User closed the popup manually
           },
         });
 
         // After popup closes, poll Midtrans for real status and update DB
+        let finalStatus = snapResult.status;
         if (data.orderId) {
           try {
-            await api.get(`/payment/check-status/${data.orderId}`);
+            const res = await api.get(`/payment/check-status/${data.orderId}`);
+            finalStatus = res.data.status;
           } catch {}
         }
 
-        // Navigate to profile if payment was success or pending
-        if (snapResult.status === 'success' || snapResult.status === 'pending') {
-          navigate('/profile');
+        // Logic based on final status
+        if (finalStatus === 'success' || finalStatus === 'settlement' || finalStatus === 'capture') {
+          setShowThankYou(true);
+        } else if (finalStatus === 'pending') {
+          // If they closed popup without paying but order is pending
+          setPendingToken(data.token);
+          setPendingOrderId(data.orderId);
+          setShowContinueModal(true);
         }
+
       } else if (data.redirectUrl) {
         window.open(data.redirectUrl, '_blank');
       }
@@ -122,6 +136,36 @@ export default function CampaignDetailPage() {
       toast.error(error.message || 'Terjadi kesalahan saat memproses pembayaran');
     } finally {
       setPayLoading(false);
+    }
+  };
+
+  const handleContinuePayment = async () => {
+    setShowContinueModal(false);
+    if (!pendingToken) return;
+
+    try {
+      await loadSnapScript();
+      const snapResult = await openSnapPopup(pendingToken, {
+        onSuccess: () => {},
+        onPending: () => {},
+        onClose: () => {},
+      });
+
+      let finalStatus = snapResult.status;
+      if (pendingOrderId) {
+        try {
+          const res = await api.get(`/payment/check-status/${pendingOrderId}`);
+          finalStatus = res.data.status;
+        } catch {}
+      }
+
+      if (finalStatus === 'success' || finalStatus === 'settlement' || finalStatus === 'capture') {
+        setShowThankYou(true);
+      } else if (finalStatus === 'pending') {
+        setShowContinueModal(true); // User closed it again without paying
+      }
+    } catch (error) {
+      toast.error('Token pembayaran sudah kedaluwarsa. Silakan berdonasi lagi.');
     }
   };
 
@@ -378,8 +422,76 @@ export default function CampaignDetailPage() {
               );
             })}
           </div>
+          </div>
         </section>
       </main>
+
+      {/* Thank You Modal */}
+      {showThankYou && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center relative overflow-hidden transform transition-all scale-100 animate-slide-up">
+            <div className="mx-auto w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mb-6">
+              <span className="material-symbols-outlined text-[50px] text-emerald-500">check_circle</span>
+            </div>
+            
+            <h3 className="text-2xl font-extrabold text-slate-800 mb-2 font-headline">Jazakallahu Khairan!</h3>
+            <p className="text-slate-600 mb-6 leading-relaxed">
+              Kebaikan Anda senilai <strong className="text-emerald-600">{formatCurrency(parseInt(amount))}</strong> telah berhasil disalurkan. 
+              Semoga Allah lipat gandakan rezeki dan memberkahi Anda beserta keluarga. Amin.
+            </p>
+
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={() => {
+                  setShowThankYou(false);
+                  navigate('/profile');
+                }}
+                className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-md transition-all"
+              >
+                Lihat Sertifikat Donasi
+              </button>
+              <button 
+                onClick={() => setShowThankYou(false)}
+                className="w-full py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-all"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Continue Transaction Modal */}
+      {showContinueModal && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full text-center relative overflow-hidden transform transition-all scale-100 animate-slide-up">
+            <div className="mx-auto w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mb-6">
+              <span className="material-symbols-outlined text-[40px] text-amber-500">pause_circle</span>
+            </div>
+            
+            <h3 className="text-xl font-extrabold text-slate-800 mb-2 font-headline">Transaksi Tertunda</h3>
+            <p className="text-sm text-slate-600 mb-8 leading-relaxed">
+              Anda menutup halaman sebelum menyelesaikan pembayaran. Apakah Anda ingin melanjutkan transaksi ini?
+            </p>
+
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={handleContinuePayment}
+                className="w-full py-3.5 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-md transition-all flex justify-center items-center gap-2"
+              >
+                <span className="material-symbols-outlined text-[18px]">payment</span>
+                Ya, Lanjutkan Bayar
+              </button>
+              <button 
+                onClick={() => setShowContinueModal(false)}
+                className="w-full py-3.5 bg-transparent border border-slate-200 hover:bg-slate-50 text-slate-500 font-bold rounded-xl transition-all"
+              >
+                Nanti Saja
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
