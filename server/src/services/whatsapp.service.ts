@@ -153,3 +153,17 @@ export async function sendWithdrawalNotification(amount: number, bank: string, n
   const fmt = new Intl.NumberFormat('id-ID').format(amount);
   return sendWhatsApp(adminPhone, `💸 *infaqLy — Penarikan Dana*\n\n• Nominal: Rp ${fmt}\n• Rekening: ${bank}\n• Keterangan: ${note}\n• Waktu: ${new Date().toLocaleString('id-ID')}\n\n_Pesan otomatis dari infaqLy_`);
 }
+
+/** Error / Crash Alert to admin */
+export async function sendErrorAlert(endpoint: string, errorMessage: string) {
+  let adminPhone = '';
+  try {
+    const [row] = await db.select().from(settings).where(eq(settings.key, 'fonnte_admin_phone')).limit(1);
+    adminPhone = row?.value || '';
+  } catch {}
+  if (!adminPhone) adminPhone = env.FONNTE_ADMIN_PHONE || '';
+  if (!adminPhone) return { success: false, message: 'Admin phone not set' };
+
+  const msg = `🚨 *infaqLy API ALERT* 🚨\n\nTerjadi kesalahan fatal (Crash) pada sistem server!\n\n*Endpoint:* ${endpoint}\n*Error:* ${errorMessage}\n*Waktu:* ${new Date().toLocaleString('id-ID')}\n\n_Harap segera cek log pada dashboard Railway Anda._`;
+  return sendWhatsApp(adminPhone, msg);
+}
