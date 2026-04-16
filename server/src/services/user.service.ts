@@ -58,6 +58,9 @@ export async function changePassword(userId: string, currentPassword: string, ne
   const valid = await bcrypt.compare(currentPassword, user.passwordHash);
   if (!valid) throw new Error('Password lama salah');
 
+  const isSamePassword = await bcrypt.compare(newPassword, user.passwordHash);
+  if (isSamePassword) throw new Error('Password baru tidak boleh sama dengan password sebelumnya');
+
   const hash = await bcrypt.hash(newPassword, 12);
   await db.update(users).set({ passwordHash: hash, updatedAt: new Date() }).where(eq(users.id, userId));
 }
@@ -79,6 +82,12 @@ export async function findAccount(identifier: string) {
  * Reset password (after OTP verified)
  */
 export async function resetPassword(userId: string, newPassword: string) {
+  const [user] = await db.select({ passwordHash: users.passwordHash }).from(users).where(eq(users.id, userId)).limit(1);
+  if (!user) throw new Error('User tidak ditemukan');
+
+  const isSamePassword = await bcrypt.compare(newPassword, user.passwordHash);
+  if (isSamePassword) throw new Error('Password baru tidak boleh sama dengan password sebelumnya');
+
   const hash = await bcrypt.hash(newPassword, 12);
   await db.update(users).set({ passwordHash: hash, updatedAt: new Date() }).where(eq(users.id, userId));
 }
