@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { QUICK_AMOUNTS, MIN_DONATION } from '@/utils/constants';
 import { formatTimeAgo } from '@/utils/formatDate';
@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 
 export default function CampaignDetailPage() {
   const { campaignId } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [campaign, setCampaign] = useState(null);
   const [amount, setAmount] = useState('');
@@ -92,12 +93,14 @@ export default function CampaignDetailPage() {
         await openSnapPopup(data.token, {
           onSuccess: () => {
             toast.success('Pembayaran berhasil! Jazakallahu khairan 🤲', { duration: 5000 });
+            navigate('/profile');
           },
           onPending: () => {
-            toast.success('Pembayaran dalam proses. Silakan selesaikan transaksi Anda.', { duration: 5000 });
+            toast.success('Pembayaran dalam proses. Menunggu konfirmasi bank.', { duration: 5000 });
+            navigate('/profile');
           },
           onClose: () => {
-            toast('Pembayaran dibatalkan — status tetap pending sampai expired', { icon: 'ℹ️' });
+            toast('Pembayaran belum diselesaikan — status tetap pending', { icon: 'ℹ️' });
           },
         });
       } else if (data.redirectUrl) {
