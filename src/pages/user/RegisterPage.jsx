@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { register } from '@/services/authService';
+import api from '@/services/api';
 import toast from 'react-hot-toast';
 
 export default function RegisterPage() {
@@ -10,7 +11,13 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [duplicateError, setDuplicateError] = useState('');
-  const { loginUser } = useAuth();
+  
+  // OTP Modal State
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [verifying, setVerifying] = useState(false);
+  
+  const { loginUser, user, updateUser } = useAuth();
   const navigate = useNavigate();
 
   const update = (field, value) => {
@@ -43,8 +50,8 @@ export default function RegisterPage() {
     try {
       const result = await register({ username: username.trim(), email: email.trim(), whatsapp: whatsapp.trim(), password });
       loginUser(result.user, result.token);
-      toast.success('Pendaftaran berhasil! Selamat datang 🎉');
-      navigate('/explore');
+      toast.success('Pendaftaran tahap 1 berhasil! Cek WhatsApp Anda.');
+      setShowOtpModal(true); // Open OTP verification modal
     } catch (err) {
       const msg = err.message || 'Terjadi kesalahan saat mendaftar';
       if (msg.includes('sudah terdaftar') || msg.includes('sudah digunakan')) {
@@ -54,6 +61,44 @@ export default function RegisterPage() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    if (e) e.preventDefault();
+    if (!otp || otp.length !== 6) {
+      toast.error('Masukkan 6 digit kode OTP');
+      return;
+    }
+
+    setVerifying(true);
+    try {
+      await api.post('/auth/verify-registration', { code: otp });
+      if (user) {
+        updateUser({ isVerified: true });
+      } else {
+        // If user object isn't immediately available, we can rely on session restore later or update local storage manually, but `user` should be set by `loginUser`.
+        const cachedUser = JSON.parse(localStorage.getItem('infaqly_user') || '{}');
+        if (cachedUser) {
+          cachedUser.isVerified = true;
+          localStorage.setItem('infaqly_user', JSON.stringify(cachedUser));
+        }
+      }
+      toast.success('Pendaftaran Selesai! Selamat datang 🎉', { duration: 5000 });
+      navigate('/explore');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Kode OTP salah atau kedaluwarsa');
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    try {
+      await api.post('/auth/resend-registration-otp');
+      toast.success('Kode OTP baru telah dikirim ke WhatsApp Anda');
+    } catch (err) {
+      toast.error('Gagal mengirim ulang OTP');
     }
   };
 
@@ -71,6 +116,50 @@ export default function RegisterPage() {
 
   return (
     <div className="w-full animate-scale-in">
+      {/* OTP Modal overlay */}
+      {showOtpModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fade-in">
+          <div className="bg-surface-container-lowest dark:bg-slate-800 p-8 rounded-3xl shadow-2xl w-full max-w-md animate-slide-up border border-outline-variant/20 dark:border-slate-700 text-center relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary dark:from-emerald-500 to-secondary-container dark:to-emerald-800"></div>
+            <div className="w-16 h-16 bg-primary/10 dark:bg-emerald-900/40 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="material-symbols-outlined text-3xl text-primary dark:text-emerald-400">mark_email_read</span>
+            </div>
+            <h2 className="text-2xl font-bold font-headline text-on-surface dark:text-white mb-2">Verifikasi WhatsApp</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+              Kami telah mengirimkan 6 digit kode OTP ke nomor WhatsApp <br/>
+              <span className="font-bold text-slate-800 dark:text-slate-200">{form.whatsapp}</span>
+            </p>
+            
+            <form onSubmit={handleVerifyOtp} className="space-y-4">
+              <input
+                type="text"
+                maxLength={6}
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                placeholder="000000"
+                className="w-full text-center tracking-[1em] text-2xl font-bold bg-surface-container/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 text-on-surface dark:text-slate-100 placeholder:text-slate-400/50 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                autoFocus
+              />
+              <button
+                type="submit"
+                disabled={verifying || otp.length !== 6}
+                className="w-full bg-primary hover:bg-primary/90 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                {verifying ? <Loader2 size={18} className="animate-spin" /> : <span className="material-symbols-outlined text-[18px]">verified</span>}
+                {verifying ? 'Memverifikasi...' : 'Konfirmasi OTP'}
+              </button>
+            </form>
+
+            <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-700">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">Belum menerima kode?</p>
+              <button onClick={handleResendOtp} className="text-sm font-bold text-primary dark:text-emerald-400 hover:underline">
+                Kirim Ulang OTP
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-surface-container-lowest dark:bg-slate-800 p-8 md:p-10 rounded-[2rem] ambient-shadow border border-white/40 dark:border-slate-700">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold font-headline text-on-surface dark:text-white">Daftar Akun InfaqLy</h1>
@@ -102,7 +191,7 @@ export default function RegisterPage() {
           <div>
             <label className="block text-sm font-bold text-on-surface dark:text-slate-200 mb-2">Nomor WhatsApp *</label>
             <input type="text" value={form.whatsapp} onChange={(e) => update('whatsapp', e.target.value)} placeholder="Contoh: 081234567890" className="w-full bg-surface-container/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 text-on-surface dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-emerald-500/30 focus:border-primary dark:focus:border-emerald-500 transition-all font-medium" />
-            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">info</span> Digunakan untuk mengirim kuitansi donasi</p>
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">info</span> Digunakan untuk menerima OTP & kuitansi donasi</p>
           </div>
           <div>
             <label className="block text-sm font-bold text-on-surface dark:text-slate-200 mb-2">Password *</label>

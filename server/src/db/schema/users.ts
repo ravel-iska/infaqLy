@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, text, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, timestamp, pgEnum, boolean } from 'drizzle-orm/pg-core';
 
 export const roleEnum = pgEnum('user_role', ['user', 'admin']);
 
@@ -9,6 +9,7 @@ export const users = pgTable('users', {
   whatsapp: varchar('whatsapp', { length: 20 }).notNull().unique(),
   passwordHash: varchar('password_hash', { length: 255 }).notNull(),
   avatarUrl: text('avatar_url'),
+  isVerified: boolean('is_verified').notNull().default(false),
   role: roleEnum('role').notNull().default('user'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

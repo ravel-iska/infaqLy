@@ -209,6 +209,11 @@ export default function ProfilePage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [donationHistory, setDonationHistory] = useState([]);
   const [activeFilter, setActiveFilter] = useState('all');
+  
+  // OTP Verification States
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [verifying, setVerifying] = useState(false);
 
   // Load user's donation history from database
   const loadDonations = async () => {
@@ -219,6 +224,25 @@ export default function ProfilePage() {
   };
 
   useEffect(() => { loadDonations(); }, []);
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    if (!otp || otp.length !== 6) {
+      toast.error('Masukkan 6 digit kode OTP');
+      return;
+    }
+    setVerifying(true);
+    try {
+      await api.post('/auth/verify-registration', { code: otp });
+      updateUser({ isVerified: true });
+      toast.success('Pendaftaran Selesai! Selamat datang 🎉');
+      setShowOtpModal(false);
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Kode OTP salah atau kedaluwarsa');
+    } finally {
+      setVerifying(false);
+    }
+  };
 
   const successDonations = donationHistory.filter(d => d.paymentStatus === 'success');
   const totalDonated = successDonations.reduce((sum, d) => sum + (d.amount || 0), 0);
@@ -242,17 +266,97 @@ export default function ProfilePage() {
 
   return (
     <div className="animate-fade-in pt-32 pb-12">
+      {/* OTP Modal overlay for unverified profiles */}
+      {showOtpModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fade-in" style={{ zIndex: 9999 }}>
+          <div className="bg-surface-container-lowest dark:bg-slate-800 p-8 rounded-3xl shadow-2xl w-full max-w-md animate-slide-up border border-outline-variant/20 dark:border-slate-700 text-center relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary dark:from-emerald-500 to-secondary-container dark:to-emerald-800"></div>
+            <button onClick={() => setShowOtpModal(false)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 flex items-center justify-center text-slate-500 transition-colors z-10">
+              <span className="material-symbols-outlined text-[18px]">close</span>
+            </button>
+            <div className="w-16 h-16 bg-primary/10 dark:bg-emerald-900/40 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="material-symbols-outlined text-3xl text-primary dark:text-emerald-400">mark_email_read</span>
+            </div>
+            <h2 className="text-2xl font-bold font-headline text-on-surface dark:text-white mb-2">Verifikasi WhatsApp</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+              Kami telah mengirimkan 6 digit kode OTP ke nomor WhatsApp <br/>
+              <span className="font-bold text-slate-800 dark:text-slate-200">{user?.whatsapp}</span>
+            </p>
+            
+            <form onSubmit={handleVerifyOtp} className="space-y-4">
+              <input
+                type="text"
+                maxLength={6}
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                placeholder="000000"
+                className="w-full text-center tracking-[1em] text-2xl font-bold bg-surface-container/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 text-on-surface dark:text-slate-100 placeholder:text-slate-400/50 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                autoFocus
+              />
+              <button
+                type="submit"
+                disabled={verifying || otp.length !== 6}
+                className="w-full bg-primary hover:bg-primary/90 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                {verifying ? <Loader2 size={18} className="animate-spin" /> : <span className="material-symbols-outlined text-[18px]">verified</span>}
+                {verifying ? 'Memverifikasi...' : 'Konfirmasi OTP'}
+              </button>
+            </form>
+
+            <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-700">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">Belum menerima kode?</p>
+              <button 
+                onClick={async () => {
+                  try {
+                    await api.post('/auth/resend-registration-otp');
+                    toast.success('Kode OTP baru telah dikirim ke WhatsApp Anda');
+                  } catch (err) {
+                    toast.error('Gagal mengirim ulang OTP');
+                  }
+                }} 
+                className="text-sm font-bold text-primary dark:text-emerald-400 hover:underline"
+              >
+                Kirim Ulang OTP
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Profile Card */}
         <div className="bg-surface-container-lowest dark:bg-slate-800 p-6 md:p-8 rounded-[2rem] border border-outline-variant/20 dark:border-slate-700 shadow-ambient flex flex-col sm:flex-row items-center sm:items-start gap-6 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary dark:from-emerald-500 to-secondary-container dark:to-emerald-800"></div>
           <Avatar user={user} size="lg" />
           <div className="flex-1 text-center sm:text-left">
-            <h1 className="text-2xl font-bold text-on-surface dark:text-white font-headline">{user?.username || 'User Explorer'}</h1>
+            <h1 className="text-2xl font-bold text-on-surface dark:text-white font-headline flex items-center justify-center sm:justify-start gap-2">
+              {user?.username || 'User Explorer'}
+              {user?.isVerified && (
+                <span className="material-symbols-outlined text-emerald-500 bg-emerald-50 dark:bg-emerald-900/40 rounded-full w-6 h-6 flex items-center justify-center text-[16px] shadow-sm" title="Akun Terverifikasi">verified</span>
+              )}
+            </h1>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 mt-3 text-sm text-on-surface-variant dark:text-slate-400 font-medium">
-              <span className="flex items-center justify-center sm:justify-start gap-1.5"><span className="material-symbols-outlined text-[16px]">mail</span> {user?.email || 'email@example.com'}</span>
-              <span className="flex items-center justify-center sm:justify-start gap-1.5"><span className="material-symbols-outlined text-[16px]">phone</span> {user?.whatsapp || 'Belum diisi'}</span>
+              <span className="flex items-center justify-center sm:justify-start gap-1.5"><span className="material-symbols-outlined text-[16px]">mail</span> {user?.email || 'email@example.com'} {user?.isVerified && <span className="material-symbols-outlined text-emerald-500 text-[16px]">check_circle</span>}</span>
+              <span className="flex items-center justify-center sm:justify-start gap-1.5"><span className="material-symbols-outlined text-[16px]">phone</span> {user?.whatsapp || 'Belum diisi'} {user?.isVerified && <span className="material-symbols-outlined text-emerald-500 text-[16px]">check_circle</span>}</span>
             </div>
+            {!user?.isVerified && (
+              <div className="mt-4 flex justify-center sm:justify-start">
+                <button 
+                  onClick={async () => {
+                    try {
+                      await api.post('/auth/resend-registration-otp');
+                      toast.success('Kode OTP baru telah dikirim ke WhatsApp Anda!');
+                      setShowOtpModal(true);
+                    } catch (err) {
+                      toast.error('Gagal mengirim OTP ke Whatsapp');
+                    }
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 rounded-lg text-xs font-bold hover:bg-amber-100 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[16px]">warning</span> Belum Terverifikasi - Verifikasi Sekarang
+                </button>
+              </div>
+            )}
           </div>
           <button
             onClick={() => setShowEditModal(true)}

@@ -133,10 +133,17 @@ export async function sendDonationNotification(donorName: string, donorPhone: st
   return result;
 }
 
-/** OTP notification */
+/** OTP notification for password reset */
 export async function sendOtpNotification(phone: string, otp: string) {
   const msg = `🔐 *infaqLy — Reset Password*\n\nKode verifikasi Anda: *${otp}*\n\nBerlaku 5 menit. Jangan berikan ke siapapun.\n\n_Pesan otomatis dari infaqLy_`;
-  console.log(`[WA] 📤 Sending OTP to ${phone}...`);
+  console.log(`[WA] 📤 Sending Password Reset OTP to ${phone}...`);
+  return sendWhatsApp(phone, msg);
+}
+
+/** OTP notification for new account registration */
+export async function sendRegistrationOtpNotification(name: string, phone: string, otp: string) {
+  const msg = `🕌 *Assalamu'alaikum, ${name}!*\n\nSelamat datang di *infaqLy*! Silakan verifikasi nomor WhatsApp Anda dengan kode OTP berikut:\n\n*${otp}*\n\nKode berlaku 5 menit.\nJazakumullahu khairan. 🤲\n\n_Pesan otomatis dari infaqLy_`;
+  console.log(`[WA] 📤 Sending Registration OTP to ${phone}...`);
   return sendWhatsApp(phone, msg);
 }
 

@@ -1,7 +1,8 @@
 import { Router, Request, Response } from 'express';
 import * as authService from '../services/auth.service.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.middleware.js';
-import { sendWelcomeNotification } from '../services/whatsapp.service.js';
+import { sendWelcomeNotification, sendRegistrationOtpNotification } from '../services/whatsapp.service.js';
+import * as otpService from '../services/otp.service.js';
 import { db } from '../config/database.js';
 import { settings, users } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
@@ -22,17 +23,57 @@ router.post('/register', async (req: Request, res: Response) => {
 
     const result = await authService.registerUser({ username, email, whatsapp, password });
 
-    // Set USER session cookie (separate from admin)
+    // Generate OTP for phone verification
+    const otp = await otpService.generateOtp(result.user.id, 'verify_phone');
+
+    // Set USER session cookie
     res.cookie('infaqly_session', result.token, {
       httpOnly: true, sameSite: 'lax', maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    // Send welcome WA notification (background)
-    sendWelcomeNotification(username, whatsapp).catch(() => {});
+    // Send Registration OTP via WA (background, do not await)
+    sendRegistrationOtpNotification(username, whatsapp, otp).catch(() => {});
 
-    return res.status(201).json({ user: result.user, token: result.token });
+    return res.status(201).json({ user: result.user, token: result.token, message: 'OTP terkirim ke WhatsApp' });
   } catch (err: any) {
     return res.status(400).json({ error: err.message });
+  }
+});
+
+// POST /api/auth/verify-registration
+router.post('/verify-registration', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const { code } = req.body;
+    if (!code) return res.status(400).json({ error: 'Kode OTP wajib diisi' });
+
+    const userId = req.user!.id;
+    const isValid = await otpService.verifyOtp(userId, code, 'verify_phone');
+    if (!isValid) return res.status(400).json({ error: 'Kode OTP tidak valid atau kedaluwarsa' });
+
+    // Update user isVerified status
+    await db.update(users).set({ isVerified: true, updatedAt: new Date() }).where(eq(users.id, userId));
+
+    // Send Welcome WA notification now that they are verified
+    sendWelcomeNotification(req.user!.username, req.user!.whatsapp).catch(() => {});
+
+    return res.json({ message: 'Verifikasi berhasil' });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/auth/resend-registration-otp
+router.post('/resend-registration-otp', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    if (req.user!.isVerified) return res.status(400).json({ error: 'Akun sudah terverifikasi' });
+
+    const otp = await otpService.generateOtp(userId, 'verify_phone');
+    await sendRegistrationOtpNotification(req.user!.username, req.user!.whatsapp, otp);
+
+    return res.json({ message: 'Kode OTP baru telah dikirim ke WhatsApp Anda' });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
   }
 });
 
