@@ -26,13 +26,13 @@ export default defineConfig({
     drop: ['console', 'debugger'],
   },
   build: {
-    // Mempecah bundle kodingan pihak ketiga (library) agar cache browser pengguna lebih optimal
+    chunkSizeWarningLimit: 1500,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          charts: ['recharts'],
-          icons: ['lucide-react']
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
         }
       }
     }
