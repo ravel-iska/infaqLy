@@ -116,7 +116,7 @@ export default function DashboardPage() {
                     labelStyle={{ color: '#94A3B8', marginBottom: '4px' }}
                     formatter={(value, name, props) => [
                       formatCurrency(value), 
-                      `Total (${props.payload.count} txn)`
+                      `Total (${props.payload.count} transaksi)`
                     ]}
                   />
                   <Area 
