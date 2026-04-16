@@ -40,7 +40,7 @@ export default function ExplorePage() {
     });
 
   return (
-    <div className="animate-fade-in py-12 bg-surface min-h-screen font-body text-on-surface pb-24">
+    <div className="animate-fade-in pt-24 pb-12 bg-surface font-body text-on-surface">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         
         {/* Header */}
@@ -111,7 +111,7 @@ export default function ExplorePage() {
             <p className="text-on-surface-variant">Coba ubah kata kunci atau filter kategori pencarian Anda.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filtered.map((campaign, idx) => (
               <CampaignListCard key={campaign.id} campaign={campaign} idx={idx} />
             ))}
@@ -134,67 +134,49 @@ function CampaignListCard({ campaign, idx }) {
     : 'bg-tertiary-container text-on-tertiary-container';
 
   return (
-    <Link to={`/explore/${campaign.id}`} className="group bg-surface-container-lowest rounded-[2rem] overflow-hidden ambient-shadow border border-white/20 transition-all hover:-translate-y-2 flex flex-col sm:flex-row h-full">
-      
-      {/* Image Block */}
-      <div className="relative h-56 sm:h-auto sm:w-5/12 overflow-hidden flex-shrink-0">
-        <img
-          src={campaign.imageUrl || campaign.image || 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=600&auto=format&fit=crop&q=60'}
-          alt={campaign.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+    <Link to={`/explore/${campaign.id}`} className="group bg-surface-container-lowest rounded-[2rem] overflow-hidden ambient-shadow border border-white/20 transition-all hover:-translate-y-2 block h-full">
+      <div className="relative h-64 overflow-hidden">
+        <img 
+          src={campaign.imageUrl || campaign.image || 'https://lh3.googleusercontent.com/aida-public/AB6AXuCtvLNhQLwSvJ39x5VIL3RdjIq7aIRowq59uuy8WHLxJLbsuJYRQb-wnxUfKG4QpoHhYNp1hgH0UtFv9-coaYSyRKtyWkaLuWPWCjHM9dhtslpu8Z2wk_8tH30MyMs89oljB-QbX6YydPjoQ4rv_hW-xMW0QJwzwaRrTgqTAurVy2pWuNmHX6Sumk9OWOlN5oRlehvw9XQZkIxq5pF0L36j_RXkloIbGT5T3joE9knYsdg0fOgz-hMkkpULym054L3WtPu9j4RPPa0'} 
+          alt={campaign.title} 
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
         />
         <div className={`absolute top-4 left-4 ${tagColorClass} text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest`}>
           {categoryLabel}
         </div>
       </div>
-
-      {/* Content Block */}
-      <div className="flex-1 p-6 lg:p-8 flex flex-col justify-between">
-        <div>
-          <h3 className="font-headline text-xl font-bold mb-4 line-clamp-2 text-on-surface">{campaign.title}</h3>
-          
-          <div className="mb-6">
-            <div className="flex justify-between text-xs font-bold mb-2">
-              <span className="text-primary">{formatCurrency(campaign.collected)}</span>
-              <span className="text-on-surface-variant text-[10px] sm:text-xs">dari {formatCurrencyShort(campaign.target)}</span>
-            </div>
-            <div className="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
-              <div 
-                className="bg-primary-container h-full rounded-full transition-all duration-1000" 
-                style={{ width: `${Math.min(progress, 100)}%` }}
-              ></div>
-            </div>
+      <div className="p-8">
+        <h3 className="font-headline text-xl font-bold mb-4 line-clamp-2 text-on-surface h-14">{campaign.title}</h3>
+        <div className="mb-6">
+          <div className="flex justify-between text-xs font-bold mb-2">
+            <span className="text-primary">{formatCurrency(campaign.collected)}</span>
+            <span className="text-on-surface-variant">Target: {formatCurrencyShort(campaign.target)}</span>
+          </div>
+          <div className="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+            <div className="bg-primary-container h-full rounded-full transition-all duration-1000" style={{ width: `${Math.min(progress, 100)}%` }}></div>
           </div>
         </div>
-
-        <div>
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-2 text-xs font-medium text-on-surface-variant">
-              <span className="material-symbols-outlined text-[16px]">group</span>
-              {campaign.donors} Donatur
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex -space-x-3">
+            <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-200"></div>
+            <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-300"></div>
+            <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-400"></div>
+            <div className="w-8 h-8 rounded-full border-2 border-white bg-primary-container text-[10px] flex items-center justify-center font-bold text-on-primary">
+              +{campaign.donors > 99 ? '99' : campaign.donors}
             </div>
-            
-            {progress >= 100 ? (
-              <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
-                <span className="material-symbols-outlined text-[14px]">check_circle</span> Tercapai
-              </div>
-            ) : days <= 0 ? (
-              <div className="flex items-center gap-1 text-xs font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-full">
-                <span className="material-symbols-outlined text-[14px]">cancel</span> Ditutup
-              </div>
-            ) : (
-              <div className="flex items-center gap-1 text-xs font-medium text-on-surface-variant bg-surface-container px-2.5 py-1 rounded-full">
-                <span className="material-symbols-outlined text-[14px]">schedule</span> {days} Hari
-              </div>
-            )}
           </div>
-          
-          <button className="w-full py-3 bg-surface-container text-primary font-bold rounded-xl flex items-center justify-center gap-2 transition-colors group-hover:bg-primary group-hover:text-on-primary">
-            Donasi Sekarang <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-          </button>
+          {progress >= 100 ? (
+            <span className="text-xs font-medium text-emerald-600 font-bold">Tercapai!</span>
+          ) : days <= 0 ? (
+            <span className="text-xs font-medium text-red-500 font-bold">Ditutup</span>
+          ) : (
+            <span className="text-xs font-medium text-on-surface-variant">{days} Hari Lagi</span>
+          )}
         </div>
+        <button className="w-full py-3 bg-surface-container text-primary font-bold rounded-xl transition-colors group-hover:bg-primary group-hover:text-on-primary block text-center mt-auto">
+          Donasi Sekarang
+        </button>
       </div>
-      
     </Link>
   );
 }
