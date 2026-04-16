@@ -543,13 +543,13 @@ export default function SettingsPage() {
       {/* ════════════════════════════════════════ */}
       {/* PUSAT BANTUAN & INFO KONTAK ADMIN      */}
       {/* ════════════════════════════════════════ */}
-      <div className="admin-card p-6 border border-emerald-500/20 bg-emerald-50">
+      <div className="admin-card p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-semibold text-emerald-800">📞 Pusat Bantuan & Kontak Dukungan</h2>
-            <p className="text-sm text-emerald-600/80 mt-1">Nomor telepon ini yang akan ditampilkan di web & gelembung WhatsApp utama user</p>
+            <h2 className="text-lg font-semibold text-admin-text">📞 Pusat Bantuan & Kontak Dukungan</h2>
+            <p className="text-sm text-admin-text-muted mt-1">Nomor telepon ini yang akan ditampilkan di web & gelembung WhatsApp utama user</p>
           </div>
-          <button onClick={saveAdminContact} className="btn-admin-primary text-sm bg-emerald-600 hover:bg-emerald-700">
+          <button onClick={saveAdminContact} className="btn-admin-primary text-sm">
             <Save size={16} /> Simpan Nomor
           </button>
         </div>
@@ -557,15 +557,15 @@ export default function SettingsPage() {
         <div className="space-y-4">
           {/* Admin Phone */}
           <div>
-            <label className="block text-sm font-bold text-emerald-900 mb-1.5">Nomor Telepon/WhatsApp Admin</label>
+            <label className="block text-sm font-semibold text-admin-text-secondary mb-1.5">Nomor Telepon/WhatsApp Admin</label>
             <input
               type="text"
               value={adminPhone}
               onChange={(e) => setAdminPhone(e.target.value)}
               placeholder="Contoh: 081234567890"
-              className="input-admin border-emerald-200 focus:border-emerald-500 bg-white"
+              className="input-admin"
             />
-            <p className="text-xs text-emerald-700/70 mt-2 font-medium">Jika ini kosong, tombol WA Pusat Bantuan tidak akan berfungsi/hilang. Format wajib menggunakan awalan 08xxx atau 62xxx tanpa spasi/simbol.</p>
+            <p className="text-xs text-admin-text-muted mt-2">Jika ini kosong, tombol WA Pusat Bantuan tidak akan berfungsi/hilang. Format wajib menggunakan awalan 08xxx atau 62xxx tanpa spasi/simbol.</p>
           </div>
         </div>
       </div>
