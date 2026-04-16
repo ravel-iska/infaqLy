@@ -93,7 +93,8 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
     const { userId, code } = req.body;
     if (!userId || !code) return res.status(400).json({ error: 'userId dan kode OTP wajib diisi' });
 
-    const valid = await otpService.verifyOtp(userId, code, 'reset_password');
+    // Validate but DO NOT burn the OTP yet (wait until reset-password)
+    const valid = await otpService.verifyOtp(userId, code, 'reset_password', false);
     if (!valid) return res.status(400).json({ error: 'Kode OTP salah atau sudah expired' });
 
     return res.json({ message: 'OTP terverifikasi', verified: true });
@@ -105,9 +106,13 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
 // POST /api/users/reset-password
 router.post('/reset-password', async (req: Request, res: Response) => {
   try {
-    const { userId, newPassword } = req.body;
-    if (!userId || !newPassword) return res.status(400).json({ error: 'userId dan password baru wajib diisi' });
+    const { userId, code, newPassword } = req.body;
+    if (!userId || !newPassword || !code) return res.status(400).json({ error: 'Data tidak lengkap (wajib sertakan OTP)' });
     if (newPassword.length < 6) return res.status(400).json({ error: 'Password minimal 6 karakter' });
+
+    // Verify AND burn the OTP in one swift motion
+    const valid = await otpService.verifyOtp(userId, code, 'reset_password', true);
+    if (!valid) return res.status(400).json({ error: 'Sesi reset password tidak valid atau sudah daluwarsa' });
 
     await userService.resetPassword(userId, newPassword);
     return res.json({ message: 'Password berhasil direset' });

@@ -104,7 +104,7 @@ export default function ForgotPasswordPage() {
 
     setLoading(true);
     try {
-      await api.post('/users/reset-password', { userId: foundUser.id, newPassword });
+      await api.post('/users/reset-password', { userId: foundUser.id, code: otp.trim(), newPassword });
       toast.success('Password berhasil direset! 🎉');
       setStep(4);
     } catch (err) {

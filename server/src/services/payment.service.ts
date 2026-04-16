@@ -1,7 +1,7 @@
 import { env } from '../config/env.js';
 import { db } from '../config/database.js';
 import { donations, campaigns, settings } from '../db/schema.js';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import crypto from 'crypto';
 
 /**
@@ -182,7 +182,7 @@ export async function handleNotification(body: any) {
   if (status === 'success' && donation && !wasAlreadySuccess) {
     isNewSuccess = true;
     await db.execute(
-      `UPDATE campaigns SET collected = collected + ${donation.amount}, donors = donors + 1, updated_at = NOW() WHERE id = ${donation.campaignId}`
+      sql`UPDATE campaigns SET collected = collected + ${donation.amount}, donors = donors + 1, updated_at = NOW() WHERE id = ${donation.campaignId}`
     );
   }
 
