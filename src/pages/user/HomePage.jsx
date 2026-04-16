@@ -2,8 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { formatCurrency, formatCurrencyShort } from '@/utils/formatCurrency';
 import { getActiveCampaigns, daysRemaining } from '@/services/campaignService';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function HomePage() {
+  const { isAuthenticated } = useAuth();
   const [campaigns, setCampaigns] = useState([]);
   const location = useLocation();
 
@@ -62,7 +64,7 @@ export default function HomePage() {
               <img 
                 alt="Donasi InfaqLy" 
                 className="w-full h-full object-cover" 
-                src="https://plus.unsplash.com/premium_photo-1683141154082-324d296faa3c?w=600&auto=format&fit=crop&q=60"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtvLNhQLwSvJ39x5VIL3RdjIq7aIRowq59uuy8WHLxJLbsuJYRQb-wnxUfKG4QpoHhYNp1hgH0UtFv9-coaYSyRKtyWkaLuWPWCjHM9dhtslpu8Z2wk_8tH30MyMs89oljB-QbX6YydPjoQ4rv_hW-xMW0QJwzwaRrTgqTAurVy2pWuNmHX6Sumk9OWOlN5oRlehvw9XQZkIxq5pF0L36j_RXkloIbGT5T3joE9knYsdg0fOgz-hMkkpULym054L3WtPu9j4RPPa0"
               />
             </div>
             <div className="absolute -bottom-8 -left-8 bg-surface-container-lowest p-6 rounded-2xl shadow-2xl max-w-xs border border-white/50 backdrop-blur-sm hidden sm:block">
@@ -187,7 +189,11 @@ export default function HomePage() {
           <h2 className="font-headline text-3xl md:text-5xl font-bold mb-6 max-w-3xl mx-auto relative z-10">Wujudkan Dampak Nyata Hari Ini</h2>
           <p className="text-lg text-white/80 mb-10 max-w-xl mx-auto relative z-10">Bergabunglah dengan ribuan donatur lainnya dalam menebar kebaikan yang terukur dan transparan.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
-            <Link to="/register" className="bg-white text-primary px-10 py-4 rounded-xl font-bold text-lg shadow-xl hover:bg-surface transition-colors inline-block text-center">Daftar Sekarang</Link>
+            {!isAuthenticated ? (
+              <Link to="/register" className="bg-white text-primary px-10 py-4 rounded-xl font-bold text-lg shadow-xl hover:bg-surface transition-colors inline-block text-center">Daftar Sekarang</Link>
+            ) : (
+              <Link to="/profile" className="bg-white text-primary px-10 py-4 rounded-xl font-bold text-lg shadow-xl hover:bg-surface transition-colors inline-block text-center">Dashboard Anda</Link>
+            )}
             <Link to="/explore" className="bg-primary-container/20 border border-white/30 backdrop-blur-sm text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-white/20 transition-colors inline-block text-center">Mulai Berdonasi</Link>
           </div>
         </div>
