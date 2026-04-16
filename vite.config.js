@@ -21,5 +21,21 @@ export default defineConfig({
       },
     },
   },
+  esbuild: {
+    // Menghapus semua console.log di production agar kode sangat bersih dan ringan
+    drop: ['console', 'debugger'],
+  },
+  build: {
+    // Mempecah bundle kodingan pihak ketiga (library) agar cache browser pengguna lebih optimal
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          charts: ['recharts'],
+          icons: ['lucide-react']
+        }
+      }
+    }
+  }
 })
 

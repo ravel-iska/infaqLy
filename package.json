@@ -10,6 +10,7 @@
     "dev": "concurrently -k -n BE,FE,DB -c blue,green,yellow \"npm --prefix server run dev\" \"vite\" \"npm --prefix server run db:studio\"",
     "dev:fe": "vite",
     "dev:be": "npm --prefix server run dev",
+    "clean": "node -e \"const fs=require('fs'); ['dist', 'node_modules/.vite', 'server/dist', 'server/qrcode.png'].forEach(f => fs.rmSync(f, {recursive: true, force: true}))\"",
     "build": "npm --prefix server run build && vite build",
     "start": "npm --prefix server run db:push -- --force && node server/dist/db/seed.js && node server/dist/index.js",
     "postinstall": "cd server && npm install",
