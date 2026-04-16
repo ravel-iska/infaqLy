@@ -154,9 +154,20 @@ export default function Footer() {
         <div className="space-y-6">
           <h5 className="font-bold text-on-surface">Kontak</h5>
           <ul className="space-y-3 text-slate-500">
-            <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">mail</span> info@infaqly.org</li>
-            <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">call</span> {phone}</li>
-            <li className="flex items-start gap-2"><span className="material-symbols-outlined text-sm">location_on</span> Jakarta South Quarter, Tower A, Lantai 12</li>
+            <li className="flex items-center gap-2 group">
+              <span className="material-symbols-outlined text-sm">mail</span>
+              <a href="mailto:info@infaqly.org" className="hover:text-emerald-500 transition-colors">info@infaqly.org</a>
+            </li>
+            <li className="flex items-center gap-2 group">
+              <span className="material-symbols-outlined text-sm">call</span>
+              <a href={`tel:${phone.replace(/\D/g, '')}`} className="hover:text-emerald-500 transition-colors">{phone}</a>
+            </li>
+            <li className="flex items-start gap-2 group">
+              <span className="material-symbols-outlined text-sm mt-0.5">location_on</span>
+              <a href="https://maps.app.goo.gl/gQEKb9B1HXZ9Vb9y9" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">
+                Jakarta South Quarter, Tower A, Lantai 12
+              </a>
+            </li>
           </ul>
         </div>
       </div>
