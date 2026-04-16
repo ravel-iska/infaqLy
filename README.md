@@ -1,6 +1,6 @@
 <div align="center">
   
-  <img src="https://raw.githubusercontent.com/ravel-iska/infaqLy/main/server/qrcode.png" alt="InfaqLy Logo" width="200" height="200"/>
+  <img src="https://raw.githubusercontent.com/ravel-iska/infaqLy/main/public/logo.png" alt="InfaqLy Logo" width="200" height="200"/>
 
   <h1>✨ InfaqLy ✨<br/><sub>The Genesis of Syariah Crowdfunding</sub></h1>
 
