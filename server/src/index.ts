@@ -107,6 +107,23 @@ app.listen(env.PORT, () => {
   // ═══ WhatsApp Bot: Auto-start ═══
   startBot().catch((err) => console.error('[WABot] Auto-start error:', err));
   console.log('   📱 WABot: Baileys self-hosted (untuk OTP)\n');
+
+  // ═══ Auto-Restart Tengah Malam (Flush RAM) ═══
+  function scheduleMidnightRestart() {
+    const now = new Date();
+    const midnight = new Date();
+    midnight.setHours(24, 0, 0, 0); // Jam 00:00 keesokan harinya
+    const msUntilMidnight = midnight.getTime() - now.getTime();
+    
+    console.log(`   🔄 Auto-restart dijadwalkan dalam ${Math.round(msUntilMidnight / 1000 / 60 / 60)} jam.`);
+    
+    setTimeout(() => {
+      console.log('[SYSTEM] 🕛 Memulai Auto-Restart Tengah Malam (Flush Cache)...');
+      process.exit(0); // Memaksa tabung Railway mati, Railway akan seketika langsung menghidupkannya dengan tabung segar
+    }, msUntilMidnight);
+  }
+  
+  scheduleMidnightRestart();
 });
 
 export default app;

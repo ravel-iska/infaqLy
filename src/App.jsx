@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
@@ -16,6 +17,7 @@ import RegisterPage from '@/pages/user/RegisterPage';
 import ForgotPasswordPage from '@/pages/user/ForgotPasswordPage';
 import ProfilePage from '@/pages/user/ProfilePage';
 import HowToDonatePage from '@/pages/user/HowToDonatePage';
+import MaintenancePage from '@/pages/user/MaintenancePage';
 
 // Admin Pages
 import AdminLoginPage from '@/pages/admin/AdminLoginPage';
@@ -83,6 +85,36 @@ function LoadingScreen() {
 }
 
 function AppRoutes() {
+  const [isMaintenance, setIsMaintenance] = useState(false);
+  const [checkingMaintenance, setCheckingMaintenance] = useState(true);
+  const location = useLocation();
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/settings/public');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.settings?.maintenance_mode === 'true' || data.settings?.maintenance_mode === true) {
+            setIsMaintenance(true);
+          }
+        }
+      } catch (e) {
+        // Abaikan error agar app tetap fallback ke mode normal jika timeout/error
+      } finally {
+        setCheckingMaintenance(false);
+      }
+    })();
+  }, []);
+
+  if (checkingMaintenance) return <LoadingScreen />;
+
+  // PENGECUALIAN: /admin-panel tetap bisa diakses meskipun sedang maintenance
+  const isAdminRoute = location.pathname.startsWith('/admin-panel');
+  if (isMaintenance && !isAdminRoute) {
+    return <MaintenancePage />;
+  }
+
   return (
     <Routes>
       {/* ── User Public Routes ── */}

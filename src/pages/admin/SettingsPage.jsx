@@ -17,6 +17,8 @@ export default function SettingsPage() {
   const [showServerKey, setShowServerKey] = useState(false);
   const [midtransTab, setMidtransTab] = useState('sandbox');
 
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+
   const [waToken, setWaToken] = useState('');
   const [adminPhone, setAdminPhone] = useState('');
   const [showWaToken, setShowWaToken] = useState(false);
@@ -45,6 +47,7 @@ export default function SettingsPage() {
         
         setEnv(s.midtrans_env || 'sandbox');
         setMidtransTab(s.midtrans_env || 'sandbox');
+        setMaintenanceMode(s.maintenance_mode === 'true' || s.maintenance_mode === true);
 
         // Legacy fallback (User had filled these as production credentials previously)
         const legacyMerchantId = s.midtrans_merchant_id || '';
@@ -146,6 +149,18 @@ export default function SettingsPage() {
       toast.success('Token WhatsApp tersimpan');
     } catch (err) {
       toast.error(err.message || 'Gagal menyimpan token');
+    }
+  };
+
+  const toggleMaintenanceMode = async () => {
+    const newVal = !maintenanceMode;
+    if (newVal && !confirm('PENGINGAT: Mode Maintenance akan memblokir 100% akses pengguna public secara instan. Yakin ingin mengaktifkan?')) return;
+    try {
+      await api.put('/settings', { maintenance_mode: newVal.toString() });
+      setMaintenanceMode(newVal);
+      toast.success(newVal ? 'Sistem DIBLOKIR: Maintenance Aktif' : 'Sistem DIBUKA: Berjalan Normal');
+    } catch (err) {
+      toast.error('Gagal mengubah mode');
     }
   };
 
@@ -455,6 +470,32 @@ export default function SettingsPage() {
             className="input-admin w-full sm:w-1/2"
           />
           <p className="text-xs text-admin-text-muted mt-2">Diformat dengan angka tanpa spasi. Jika dikosongkan gelembung WhatsApp bantuan tidak akan muncul.</p>
+        </div>
+      </div>
+
+      {/* GLOBAL MAINTENANCE MODE */}
+      <div className={`admin-card p-6 sm:p-8 border-2 transition-colors ${maintenanceMode ? 'border-warning/50 bg-warning/5' : 'border-admin-border'}`}>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className={`p-3 rounded-xl flex-shrink-0 ${maintenanceMode ? 'bg-warning/20 text-warning' : 'bg-admin-bg-sidebar text-admin-text-muted'}`}>
+              <span className="material-symbols-outlined text-[28px]">{maintenanceMode ? 'engineering' : 'public'}</span>
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-admin-text flex items-center gap-2">
+                Mode Pemeliharaan (Maintenance)
+                {maintenanceMode && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-warning text-warning-content uppercase tracking-wider animate-pulse">Menyala</span>}
+              </h2>
+              <p className="text-sm text-admin-text-muted mt-1 max-w-xl">
+                Jika diaktifkan, seluruh antarmuka situs publik akan dikunci dan menampilkan layar "Sistem Sedang Diperbarui". Hanya panel admin yang tetap bisa diakses. Gunakan fitur ini saat sedang merombak kodingan atau peluncuran fitur baru.
+              </p>
+            </div>
+          </div>
+          <div className="flex-shrink-0">
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" className="sr-only peer" checked={maintenanceMode} onChange={toggleMaintenanceMode} />
+              <div className="w-14 h-7 bg-admin-bg border border-admin-border rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-admin-text-muted after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-warning peer-checked:after:bg-white peer-focus:ring-2 peer-focus:ring-warning/30"></div>
+            </label>
+          </div>
         </div>
       </div>
 
