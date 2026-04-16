@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 export default function Footer() {
   return (
@@ -8,12 +9,23 @@ export default function Footer() {
           <div className="text-xl font-headline font-bold text-emerald-800">Infaqly</div>
           <p className="text-slate-500">Membangun ekosistem filantropi digital yang amanah, transparan, dan berdampak luas bagi umat.</p>
           <div className="flex gap-4">
-            <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary cursor-pointer hover:bg-primary hover:text-on-primary transition-all">
+            <button 
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.origin);
+                toast.success('Tautan disalin ke clipboard!');
+              }}
+              title="Bagikan Website"
+              className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary cursor-pointer hover:bg-primary hover:text-on-primary transition-all"
+            >
               <span className="material-symbols-outlined text-sm">share</span>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary cursor-pointer hover:bg-primary hover:text-on-primary transition-all">
+            </button>
+            <a 
+              href="/"
+              title="Kunjungi Website"
+              className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary cursor-pointer hover:bg-primary hover:text-on-primary transition-all"
+            >
               <span className="material-symbols-outlined text-sm">language</span>
-            </div>
+            </a>
           </div>
         </div>
         

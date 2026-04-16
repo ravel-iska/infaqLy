@@ -74,8 +74,8 @@ export default function ExplorePage() {
                 className="w-full sm:min-w-[180px] appearance-none pl-6 pr-12 py-4 rounded-full border border-outline-variant/30 bg-surface-container-lowest text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-sm md:text-base cursor-pointer"
               >
                 <option value="all">Semua Kategori</option>
-                <option value="infaq">Kategori Infaq</option>
-                <option value="wakaf">Kategori Wakaf</option>
+                <option value="infaq">Infaq</option>
+                <option value="wakaf">Wakaf</option>
               </select>
               <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
                 expand_more
@@ -88,9 +88,9 @@ export default function ExplorePage() {
                 onChange={(e) => setSortBy(e.target.value)} 
                 className="w-full sm:min-w-[220px] appearance-none pl-6 pr-12 py-4 rounded-full border border-outline-variant/30 bg-surface-container-lowest text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-sm md:text-base cursor-pointer"
               >
-                <option value="newest">Urut: Terbaru</option>
-                <option value="most-donors">Urut: Paling Banyak Donasi</option>
-                <option value="ending-soon">Urut: Segera Berakhir</option>
+                <option value="newest">Terbaru</option>
+                <option value="most-donors">Paling Banyak Donasi</option>
+                <option value="ending-soon">Segera Berakhir</option>
               </select>
               <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
                 sort
