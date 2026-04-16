@@ -9,8 +9,13 @@ const router = Router();
 // GET /api/settings/public - get public settings (open for all)
 router.get('/public', async (req: Request, res: Response) => {
   try {
-    const rows = await db.select().from(settings).where(eq(settings.key, 'fonnte_admin_phone')).limit(1);
-    const phone = rows.length > 0 ? rows[0].value : '';
+    const rows = await db.select().from(settings);
+    const settingsMap: Record<string, string> = {};
+    for (const row of rows) {
+      settingsMap[row.key] = row.value || '';
+    }
+
+    const phone = settingsMap['fonnte_admin_phone'] || '';
     let waUrl = '';
     let displayPhone = '+62 21 555 1234';
     if (phone) {
@@ -18,7 +23,14 @@ router.get('/public', async (req: Request, res: Response) => {
       waUrl = `https://wa.me/${cleanPhone}`;
       displayPhone = phone;
     }
-    return res.json({ waUrl, phone: displayPhone });
+
+    return res.json({ 
+      waUrl, 
+      phone: displayPhone,
+      settings: {
+        maintenance_mode: settingsMap['maintenance_mode'] || 'false'
+      }
+    });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }
