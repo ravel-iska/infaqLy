@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import * as paymentService from '../services/payment.service.js';
 import * as donationService from '../services/donation.service.js';
 import * as campaignService from '../services/campaign.service.js';
-import { sendDonationNotification } from '../services/whatsapp.service.js';
+import { sendDonationNotification, sendErrorAlert } from '../services/whatsapp.service.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 
 const router = Router();
@@ -61,6 +61,9 @@ router.post('/create-token', requireAuth, async (req: Request, res: Response) =>
 
     return res.json({ token: snap.token, redirectUrl: snap.redirectUrl, orderId });
   } catch (err: any) {
+    if (err.message && err.message.toLowerCase().includes('midtrans')) {
+      sendErrorAlert(`POST /api/payment/create-token`, `Midtrans API Error: ${err.message}`).catch(() => {});
+    }
     return res.status(400).json({ error: err.message });
   }
 });
@@ -82,6 +85,7 @@ router.post('/notification', async (req: Request, res: Response) => {
     return res.json({ status: 'ok' });
   } catch (err: any) {
     console.error('[Webhook Error]', err.message);
+    sendErrorAlert(`POST /api/payment/notification`, `Midtrans Webhook Error: ${err.message}`).catch(() => {});
     return res.status(500).json({ error: err.message });
   }
 });
@@ -111,6 +115,9 @@ router.get('/check-status/:orderId', requireAuth, async (req: Request, res: Resp
     
     return res.json({ status: 'pending', orderId });
   } catch (err: any) {
+    if (err.message && err.message.toLowerCase().includes('midtrans')) {
+      sendErrorAlert(`GET /api/payment/check-status`, `Midtrans Polling Error: ${err.message}`).catch(() => {});
+    }
     return res.status(400).json({ error: err.message });
   }
 });
