@@ -225,6 +225,12 @@ export async function checkTransactionStatus(orderId: string) {
  * Bypasses Midtrans and forces a transaction to success.
  */
 export async function simulateSuccess(orderId: string) {
+  // Prevent usage in Production
+  const config = await getMidtransConfig();
+  if (config.env !== 'sandbox') {
+    throw new Error('SECURITY_ERROR: Fitur simulasi dinonaktifkan secara permanen pada mode Production. Ubah ke mode Sandbox terlebih dahulu di Pengaturan.');
+  }
+
   // Check existing transaction
   const [existing] = await db.select().from(donations).where(eq(donations.orderId, orderId)).limit(1);
   if (!existing) throw new Error('Opsi Developer: Transaksi tidak ditemukan di database.');

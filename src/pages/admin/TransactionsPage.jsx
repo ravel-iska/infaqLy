@@ -14,6 +14,7 @@ export default function TransactionsPage() {
   const [showSandbox, setShowSandbox] = useState(false);
   const [sandboxOrderId, setSandboxOrderId] = useState('');
   const [sandboxLoading, setSandboxLoading] = useState(false);
+  const [isSandboxMode, setIsSandboxMode] = useState(false);
 
   // Load from database
   const loadTransactions = async () => {
@@ -26,6 +27,15 @@ export default function TransactionsPage() {
       toast.error(err.message || 'Gagal memuat transaksi');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkEnvironment = async () => {
+    try {
+      const { data } = await api.get('/payment/client-config');
+      setIsSandboxMode(data.env === 'sandbox');
+    } catch (err) {
+      console.error('Failed to peek env:', err);
     }
   };
 
@@ -46,7 +56,10 @@ export default function TransactionsPage() {
     }
   };
 
-  useEffect(() => { loadTransactions(); }, []);
+  useEffect(() => { 
+    loadTransactions(); 
+    checkEnvironment();
+  }, []);
 
   const filtered = transactions.filter(tx => {
     if (statusFilter !== 'all' && tx.paymentStatus !== statusFilter) return false;
@@ -108,9 +121,11 @@ export default function TransactionsPage() {
           <button onClick={exportCSV} className="btn-admin-primary flex items-center justify-center gap-1.5 px-6">
             <span className="material-symbols-outlined text-[18px]">download</span> Export CSV
           </button>
-          <button onClick={() => setShowSandbox(true)} className="btn-admin-ghost flex items-center justify-center gap-1.5 px-4 bg-admin-bg border border-admin-border hover:border-admin-accent hover:text-admin-accent transition-colors font-mono tracking-tight" title="Developer Sandbox Mode">
-            <span className="material-symbols-outlined text-[18px]">bug_report</span> Sandbox
-          </button>
+          {isSandboxMode && (
+            <button onClick={() => setShowSandbox(true)} className="btn-admin-ghost flex items-center justify-center gap-1.5 px-4 bg-admin-bg border border-admin-border hover:border-admin-accent hover:text-admin-accent transition-colors font-mono tracking-tight" title="Developer Sandbox Mode">
+              <span className="material-symbols-outlined text-[18px]">bug_report</span> Sandbox
+            </button>
+          )}
         </div>
       </div>
 
