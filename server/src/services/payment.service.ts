@@ -160,10 +160,16 @@ export async function handleNotification(body: any) {
     status = 'expired';
   }
 
-  // Get current status before updating (to prevent double-counting)
+  // Get current status before updating (to prevent double-counting and sandbox overrides)
   const [existing] = await db.select({ paymentStatus: donations.paymentStatus })
     .from(donations).where(eq(donations.orderId, orderId)).limit(1);
   const wasAlreadySuccess = existing?.paymentStatus === 'success';
+
+  // SECURITY: Jika status lokal sudah success (baik asli maupun simulasi Sandbox), 
+  // ABAIKAN webhook Midtrans yang mencoba menurunkannya kembali jadi pending/gagal!
+  if (wasAlreadySuccess && status !== 'success') {
+    return { orderId, status: 'success', donation: existing, isNewSuccess: false };
+  }
 
   // Update donation record
   const [donation] = await db.update(donations)
