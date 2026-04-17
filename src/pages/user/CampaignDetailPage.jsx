@@ -115,7 +115,7 @@ export default function CampaignDetailPage() {
           try {
             // Add a cache buster timestamp so the browser NEVER caches the API response
             const res = await api.get(`/payment/check-status/${data.orderId}?t=${Date.now()}`);
-            finalStatus = res.data.status;
+            finalStatus = res.status;
           } catch {}
         }
 
@@ -156,7 +156,7 @@ export default function CampaignDetailPage() {
       if (pendingOrderId) {
         try {
           const res = await api.get(`/payment/check-status/${pendingOrderId}?t=${Date.now()}`);
-          finalStatus = res.data.status;
+          finalStatus = res.status;
         } catch {}
       }
 
