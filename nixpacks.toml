@@ -1,5 +1,0 @@
-[phases.install]
-cmds = ["npm ci --no-audit --no-fund --loglevel=error"]
-
-[phases.build]
-cmds = ["npm install --no-audit --no-fund --loglevel=error && npm run build"]
