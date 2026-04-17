@@ -225,10 +225,10 @@ export async function checkTransactionStatus(orderId: string) {
  * Bypasses Midtrans and forces a transaction to success.
  */
 export async function simulateSuccess(orderId: string) {
-  // Prevent usage in Production
+  // Security lock: Only allow in Sandbox mode
   const config = await getMidtransConfig();
-  if (config.env !== 'sandbox') {
-    throw new Error('SECURITY_ERROR: Fitur simulasi dinonaktifkan secara permanen pada mode Production. Ubah ke mode Sandbox terlebih dahulu di Pengaturan.');
+  if (config.env === 'production') {
+    throw new Error('SECURITY ALERT: Opsi Developer ditolak. Website Anda sedang dalam mode Production!');
   }
 
   // Check existing transaction
