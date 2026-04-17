@@ -116,7 +116,9 @@ export default function CampaignDetailPage() {
             // Add a cache buster timestamp so the browser NEVER caches the API response
             const res = await api.get(`/payment/check-status/${data.orderId}?t=${Date.now()}`);
             finalStatus = res.status;
-          } catch {}
+          } catch (e) {
+            toast.error("Gagal verifikasi Sandbox: " + (e.message || "Unknown ERROR"));
+          }
         }
 
         // Logic based on final status
