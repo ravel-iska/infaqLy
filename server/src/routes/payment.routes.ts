@@ -85,6 +85,10 @@ router.post('/notification', async (req: Request, res: Response) => {
     return res.json({ status: 'ok' });
   } catch (err: any) {
     console.error('[Webhook Error]', err.message);
+    if (err.message && err.message.includes('Mismatched') || err.message.includes('SECURITY_ERROR')) {
+       // Return 200 so Midtrans stops retrying on invalid signatures
+       return res.status(200).send('OK'); 
+    }
     sendErrorAlert(`POST /api/payment/notification`, `Midtrans Webhook Error: ${err.message}`).catch(() => {});
     return res.status(500).json({ error: err.message });
   }
@@ -123,7 +127,7 @@ router.get('/check-status/:orderId', requireAuth, async (req: Request, res: Resp
     // JANGAN tanya ke midtrans lagi, karena Midtrans pasti bilangnya "pending" dan akan me-reset statusnya!
     const localDonation = await donationService.getDonationByOrderId(orderId);
     if (localDonation && localDonation.paymentStatus === 'success') {
-      return res.json({ status: 'success', data: { status: 'success' }, orderId });
+      return res.json({ status: 'success', orderId, data: { status: 'success' } });
     }
 
     const statusResult = await paymentService.checkTransactionStatus(orderId);
@@ -141,10 +145,10 @@ router.get('/check-status/:orderId', requireAuth, async (req: Request, res: Resp
         ).catch(() => {});
       }
       
-      return res.json({ status: result.status, data: { status: result.status }, orderId });
+      return res.json({ status: result.status, orderId, data: { status: result.status } });
     }
     
-    return res.json({ status: 'pending', data: { status: 'pending' }, orderId });
+    return res.json({ status: 'pending', orderId, data: { status: 'pending' } });
   } catch (err: any) {
     if (err.message && err.message.toLowerCase().includes('midtrans')) {
       sendErrorAlert(`GET /api/payment/check-status`, `Midtrans Polling Error: ${err.message}`).catch(() => {});
