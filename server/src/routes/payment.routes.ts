@@ -3,7 +3,7 @@ import * as paymentService from '../services/payment.service.js';
 import * as donationService from '../services/donation.service.js';
 import * as campaignService from '../services/campaign.service.js';
 import { sendDonationNotification, sendErrorAlert } from '../services/whatsapp.service.js';
-import { requireAuth } from '../middleware/auth.middleware.js';
+import { requireAuth, requireAdmin } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
@@ -87,6 +87,28 @@ router.post('/notification', async (req: Request, res: Response) => {
     console.error('[Webhook Error]', err.message);
     sendErrorAlert(`POST /api/payment/notification`, `Midtrans Webhook Error: ${err.message}`).catch(() => {});
     return res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/payment/simulate-success/:orderId — Developer Sandbox mode
+// Only allowed for Admins to bypass Midtrans simulator
+router.post('/simulate-success/:orderId', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const orderId = req.params.orderId;
+    const result = await paymentService.simulateSuccess(orderId);
+
+    // Send WA notification on simulated success
+    if (result.isNewSuccess && result.donation) {
+      const d = result.donation;
+      const campaign = await campaignService.getCampaignById(d.campaignId);
+      sendDonationNotification(
+        d.donorName, d.donorPhone || '', campaign?.title || '', d.amount, d.orderId
+      ).catch(() => {});
+    }
+
+    return res.json({ status: 'ok', orderId });
+  } catch (err: any) {
+    return res.status(400).json({ error: err.message });
   }
 });
 

@@ -220,3 +220,35 @@ export async function checkTransactionStatus(orderId: string) {
   }
 }
 
+/**
+ * Simulate Payment Success (Developer Sandbox Mode)
+ * Bypasses Midtrans and forces a transaction to success.
+ */
+export async function simulateSuccess(orderId: string) {
+  // Check existing transaction
+  const [existing] = await db.select().from(donations).where(eq(donations.orderId, orderId)).limit(1);
+  if (!existing) throw new Error('Opsi Developer: Transaksi tidak ditemukan di database.');
+  
+  if (existing.paymentStatus === 'success') {
+    throw new Error('Opsi Developer: Transaksi ini sudah berstatus success.');
+  }
+
+  // Update donation to success
+  const [donation] = await db.update(donations)
+    .set({
+      paymentStatus: 'success',
+      paymentMethod: 'sandbox_simulation',
+      paidAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(donations.orderId, orderId))
+    .returning();
+
+  // Increment campaign collected amount
+  await db.execute(
+    sql`UPDATE campaigns SET collected = collected + ${donation.amount}, donors = donors + 1, updated_at = NOW() WHERE id = ${donation.campaignId}`
+  );
+
+  return { orderId, status: 'success', donation, isNewSuccess: true };
+}
+

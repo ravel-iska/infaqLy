@@ -10,6 +10,11 @@ export default function TransactionsPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
 
+  // Sandbox Modal State
+  const [showSandbox, setShowSandbox] = useState(false);
+  const [sandboxOrderId, setSandboxOrderId] = useState('');
+  const [sandboxLoading, setSandboxLoading] = useState(false);
+
   // Load from database
   const loadTransactions = async () => {
     setLoading(true);
@@ -21,6 +26,23 @@ export default function TransactionsPage() {
       toast.error(err.message || 'Gagal memuat transaksi');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSandboxSimulate = async (e) => {
+    e.preventDefault();
+    if (!sandboxOrderId.trim()) return toast.error('Masukkan Order ID!');
+    setSandboxLoading(true);
+    try {
+      await api.post(`/payment/simulate-success/${sandboxOrderId.trim()}`);
+      toast.success('Simulasi Pembayaran Berhasil!');
+      setSandboxOrderId('');
+      setShowSandbox(false);
+      loadTransactions();
+    } catch (err) {
+      toast.error(err.response?.data?.error || err.message || 'Gagal simulasi pembayaran');
+    } finally {
+      setSandboxLoading(false);
     }
   };
 
@@ -85,6 +107,9 @@ export default function TransactionsPage() {
           </button>
           <button onClick={exportCSV} className="btn-admin-primary flex items-center justify-center gap-1.5 px-6">
             <span className="material-symbols-outlined text-[18px]">download</span> Export CSV
+          </button>
+          <button onClick={() => setShowSandbox(true)} className="btn-admin-ghost flex items-center justify-center gap-1.5 px-4 bg-admin-bg border border-admin-border hover:border-admin-accent hover:text-admin-accent transition-colors font-mono tracking-tight" title="Developer Sandbox Mode">
+            <span className="material-symbols-outlined text-[18px]">bug_report</span> Sandbox
           </button>
         </div>
       </div>
@@ -198,6 +223,53 @@ export default function TransactionsPage() {
           </div>
         </div>
       </div>
+
+      {/* Sandbox Simulator Modal */}
+      {showSandbox && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-admin-bg border border-admin-border rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-slide-up">
+            <div className="p-6 border-b border-admin-border flex justify-between items-center bg-admin-bg-sidebar">
+              <h3 className="text-lg font-bold text-admin-text flex items-center gap-2">
+                <span className="material-symbols-outlined text-admin-accent">bug_report</span>
+                Developer Sandbox
+              </h3>
+              <button onClick={() => setShowSandbox(false)} className="text-admin-text-muted hover:text-danger transition-colors">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <form onSubmit={handleSandboxSimulate} className="p-6">
+              <div className="bg-warning/10 border border-warning/20 p-4 rounded-xl mb-6 flex items-start gap-3">
+                <span className="material-symbols-outlined text-warning shrink-0 mt-0.5">warning</span>
+                <p className="text-sm text-admin-text-secondary leading-relaxed">
+                  <strong className="text-admin-text block mb-1">Peringatan Mode Dev:</strong>
+                  Ini melompati Midtrans sepenuhnya dan akan mengubah database langsung menjadi "Success". Uang tidak benar-benar ditarik dari rekening manapun.
+                </p>
+              </div>
+
+              <div className="space-y-2 mb-8">
+                <label className="text-sm font-bold text-admin-text">Order ID Target</label>
+                <input
+                  type="text"
+                  placeholder="Misal: INF-XXXXXX"
+                  value={sandboxOrderId}
+                  onChange={(e) => setSandboxOrderId(e.target.value)}
+                  className="input-admin w-full font-mono font-bold tracking-wider text-admin-accent bg-admin-bg-sidebar"
+                  required
+                />
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button type="button" onClick={() => setShowSandbox(false)} className="btn-admin-ghost border border-admin-border">
+                  Batal
+                </button>
+                <button type="submit" disabled={sandboxLoading} className="btn-admin-primary">
+                  {sandboxLoading ? 'Menyimulasikan...' : 'Paksa Sukses Sekarang'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
