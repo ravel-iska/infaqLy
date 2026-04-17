@@ -113,7 +113,8 @@ function DonationCard({ tx, user, onPaymentSuccess }) {
       // Poll Midtrans for real status and update DB
       if (tx.orderId) {
         try {
-          await api.get(`/payment/check-status/${tx.orderId}`);
+          // No-cache
+          await api.get(`/payment/check-status/${tx.orderId}?t=${Date.now()}`);
         } catch {}
       }
       // Always reload donations list

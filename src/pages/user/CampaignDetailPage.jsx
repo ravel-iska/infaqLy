@@ -113,7 +113,8 @@ export default function CampaignDetailPage() {
         let finalStatus = snapResult.status;
         if (data.orderId) {
           try {
-            const res = await api.get(`/payment/check-status/${data.orderId}`);
+            // Add a cache buster timestamp so the browser NEVER caches the API response
+            const res = await api.get(`/payment/check-status/${data.orderId}?t=${Date.now()}`);
             finalStatus = res.data.status;
           } catch {}
         }
@@ -154,7 +155,7 @@ export default function CampaignDetailPage() {
       let finalStatus = snapResult.status;
       if (pendingOrderId) {
         try {
-          const res = await api.get(`/payment/check-status/${pendingOrderId}`);
+          const res = await api.get(`/payment/check-status/${pendingOrderId}?t=${Date.now()}`);
           finalStatus = res.data.status;
         } catch {}
       }
