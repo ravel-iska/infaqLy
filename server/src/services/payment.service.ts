@@ -161,7 +161,7 @@ export async function handleNotification(body: any) {
   }
 
   // Get current status before updating (to prevent double-counting and sandbox overrides)
-  const [existing] = await db.select({ paymentStatus: donations.paymentStatus })
+  const [existing] = await db.select()
     .from(donations).where(eq(donations.orderId, orderId)).limit(1);
   const wasAlreadySuccess = existing?.paymentStatus === 'success';
 
