@@ -36,6 +36,14 @@ export async function getUserDonations(userId: string) {
 }
 
 /**
+ * Get a specific donation by order ID
+ */
+export async function getDonationByOrderId(orderId: string) {
+  const rows = await db.select().from(donations).where(eq(donations.orderId, orderId)).limit(1);
+  return rows[0] || null;
+}
+
+/**
  * Create a new donation record (status: pending)
  */
 export async function createDonation(data: {

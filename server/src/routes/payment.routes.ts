@@ -117,6 +117,15 @@ router.post('/simulate-success/:orderId', requireAdmin, async (req: Request, res
 router.get('/check-status/:orderId', requireAuth, async (req: Request, res: Response) => {
   try {
     const orderId = req.params.orderId as string;
+    
+    // Developer Sandbox Fix: 
+    // Jika transaksi sudah keburu disimulasikan "success" via Admin Developer Tools,
+    // JANGAN tanya ke midtrans lagi, karena Midtrans pasti bilangnya "pending" dan akan me-reset statusnya!
+    const localDonation = await donationService.getDonationByOrderId(orderId);
+    if (localDonation && localDonation.paymentStatus === 'success') {
+      return res.json({ status: 'success', orderId });
+    }
+
     const statusResult = await paymentService.checkTransactionStatus(orderId);
     
     // Update DB with latest status from Midtrans
