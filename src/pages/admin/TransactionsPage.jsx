@@ -141,10 +141,10 @@ export default function TransactionsPage() {
             className="input-admin pl-12 sm:w-56 font-medium appearance-none"
           >
             <option value="all">Semua Status (All)</option>
-            <option value="success">✅ Berhasil (Success)</option>
-            <option value="pending">⏳ Menunggu (Pending)</option>
-            <option value="expired">❌ Kedaluwarsa (Expired)</option>
-            <option value="failed">❌ Gagal (Failed)</option>
+            <option value="success">Berhasil (Success)</option>
+            <option value="pending">Menunggu (Pending)</option>
+            <option value="expired">Kedaluwarsa (Expired)</option>
+            <option value="failed">Gagal (Failed)</option>
           </select>
           <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-admin-text-muted pointer-events-none text-[20px]">expand_more</span>
         </div>
@@ -207,7 +207,7 @@ export default function TransactionsPage() {
                           </span>
                           {tx.paymentStatus === 'pending' && (
                             <span className={`text-[10px] font-medium px-2 py-0.5 rounded ${isOverdue ? 'bg-danger/10 text-danger' : 'bg-admin-bg-sidebar text-admin-text-muted border border-admin-border'}`}>
-                              {isOverdue ? '⚠️ Menunggu Webhook API' : `⏱️ Auto-expire: ${remainHours}j ${remainMins}m`}
+                              {isOverdue ? '! Menunggu Webhook API' : `Auto-expire: ${remainHours}j ${remainMins}m`}
                             </span>
                           )}
                         </div>
