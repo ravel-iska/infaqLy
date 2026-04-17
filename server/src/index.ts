@@ -64,9 +64,20 @@ app.get('/api/health', (_req, res) => {
 // In production, serve the Vite-built frontend
 const frontendDist = path.resolve(__dirname, '../../dist');
 if (fs.existsSync(frontendDist)) {
-  app.use(express.static(frontendDist));
+  // Cache hashed assets aggressively (CSS/JS/images) — 1 year
+  app.use(express.static(frontendDist, {
+    maxAge: '365d',
+    immutable: true,
+    setHeaders: (res, filePath) => {
+      // HTML files should not be cached long (SPA needs fresh index.html)
+      if (filePath.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache');
+      }
+    },
+  }));
   // SPA fallback — all non-API routes serve index.html
   app.get('*', (_req, res) => {
+    res.setHeader('Cache-Control', 'no-cache');
     res.sendFile(path.join(frontendDist, 'index.html'));
   });
   console.log(`   📦 Serving frontend from ${frontendDist}`);

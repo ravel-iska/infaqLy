@@ -27,15 +27,19 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 1500,
+    // Minify with terser for smaller bundles
+    target: 'es2020',
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return 'vendor';
-          }
+          // Split vendor libraries into separate chunks for better caching
+          if (id.includes('node_modules/react-dom')) return 'react-dom';
+          if (id.includes('node_modules/react')) return 'react';
+          if (id.includes('node_modules/recharts') || id.includes('node_modules/d3')) return 'charts';
+          if (id.includes('node_modules/react-router')) return 'router';
+          if (id.includes('node_modules')) return 'vendor';
         }
       }
     }
   }
 })
-
