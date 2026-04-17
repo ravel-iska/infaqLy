@@ -108,18 +108,25 @@ app.listen(env.PORT, () => {
   startBot().catch((err) => console.error('[WABot] Auto-start error:', err));
   console.log('   📱 WABot: Baileys self-hosted (untuk OTP)\n');
 
-  // ═══ Auto-Restart Tengah Malam (Flush RAM) ═══
+  // ═══ Auto-Restart Tengah Malam WIB (Flush RAM) ═══
   function scheduleMidnightRestart() {
     const now = new Date();
-    const midnight = new Date();
-    midnight.setHours(24, 0, 0, 0); // Jam 00:00 keesokan harinya
-    const msUntilMidnight = midnight.getTime() - now.getTime();
+    const target = new Date(now);
     
-    console.log(`   🔄 Auto-restart dijadwalkan dalam ${Math.round(msUntilMidnight / 1000 / 60 / 60)} jam.`);
+    // Server berjalan di UTC. Jam 00:00 WIB (GMT+7) setara dengan jam 17:00 UTC.
+    if (now.getUTCHours() >= 17) {
+      target.setUTCDate(target.getUTCDate() + 1); // Jika sudah lewat jam 00:00 WIB, jadwalkan besok
+    }
+    
+    target.setUTCHours(17, 0, 0, 0); // 17:00 UTC == 00:00 WIB
+    
+    const msUntilMidnight = target.getTime() - now.getTime();
+    
+    console.log(`   🔄 Auto-restart dijadwalkan tepat jam 12 malam WIB (dalam ${Math.round(msUntilMidnight / 1000 / 60 / 60)} jam).`);
     
     setTimeout(() => {
       console.log('[SYSTEM] 🕛 Memulai Auto-Restart Tengah Malam (Flush Cache)...');
-      process.exit(0); // Memaksa tabung Railway mati, Railway akan seketika langsung menghidupkannya dengan tabung segar
+      process.exit(0); // Memaksa tabung mati agar di-restart segar oleh provider hosting
     }, msUntilMidnight);
   }
   
