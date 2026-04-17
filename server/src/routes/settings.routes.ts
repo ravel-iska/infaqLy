@@ -1,8 +1,8 @@
 import { Router, Request, Response } from 'express';
 import { requireAdmin } from '../middleware/auth.middleware.js';
 import { db } from '../config/database.js';
-import { settings } from '../db/schema.js';
-import { eq } from 'drizzle-orm';
+import { settings, campaigns, donations } from '../db/schema.js';
+import { eq, and, lt, inArray } from 'drizzle-orm';
 
 function maskSecret(val: string) {
   if (!val) return '';
@@ -69,6 +69,18 @@ router.put('/', requireAdmin, async (req: Request, res: Response) => {
   try {
     const data = req.body as Record<string, string>;
 
+    // Cek apakah admin sedang mengganti mode Midtrans (sandbox <-> production)
+    let envSwitched = false;
+    let newEnv = '';
+    if (data.midtrans_env) {
+      const [currentEnvRow] = await db.select().from(settings).where(eq(settings.key, 'midtrans_env')).limit(1);
+      const currentEnv = currentEnvRow?.value || 'sandbox';
+      if (currentEnv !== data.midtrans_env) {
+        envSwitched = true;
+        newEnv = data.midtrans_env;
+      }
+    }
+
     for (const [key, value] of Object.entries(data)) {
       // Skip untouched/masked passwords
       if (typeof value === 'string' && value.includes('********')) {
@@ -81,6 +93,29 @@ router.put('/', requireAdmin, async (req: Request, res: Response) => {
       } else {
         await db.insert(settings).values({ key, value: String(value) });
       }
+    }
+
+    // ═══ Auto-Reset Dana saat pindah mode ═══
+    if (envSwitched) {
+      if (newEnv === 'production') {
+        // Pindah ke PRODUCTION: reset dana terkumpul ke 0 (bersih, siap live)
+        await db.update(campaigns).set({ collected: 0, donors: 0, updatedAt: new Date() });
+        console.log('[Settings] Mode → PRODUCTION: Dana kampanye di-reset ke Rp 0');
+      } else {
+        // Pindah ke SANDBOX: reset dana ke 50.000.000 (testing)
+        await db.update(campaigns).set({ collected: 50_000_000, donors: 25, updatedAt: new Date() });
+        console.log('[Settings] Mode → SANDBOX: Dana kampanye di-reset ke Rp 50.000.000');
+      }
+
+      // Bersihkan donasi sandbox/test yang usang (pending/failed/expired > 24 jam)
+      const cutoff24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      await db.delete(donations).where(
+        and(
+          inArray(donations.paymentStatus, ['pending', 'failed', 'expired']),
+          lt(donations.createdAt, cutoff24h),
+        )
+      );
+      console.log('[Settings] Donasi usang (>24 jam) dibersihkan');
     }
 
     return res.json({ message: 'Settings berhasil disimpan' });
