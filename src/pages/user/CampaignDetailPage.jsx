@@ -111,10 +111,12 @@ export default function CampaignDetailPage() {
 
         // After popup closes, poll Midtrans for real status and update DB
         let finalStatus = snapResult.status;
+        let debugRes = null;
         if (data.orderId) {
           try {
             // Add a cache buster timestamp so the browser NEVER caches the API response
             const res = await api.get(`/payment/check-status/${data.orderId}?t=${Date.now()}`);
+            debugRes = res;
             finalStatus = res.status;
           } catch (e) {
             toast.error("Gagal verifikasi Sandbox: " + (e.message || "Unknown ERROR"));
@@ -125,6 +127,10 @@ export default function CampaignDetailPage() {
         if (finalStatus === 'success' || finalStatus === 'settlement' || finalStatus === 'capture') {
           setShowThankYou(true);
         } else if (finalStatus === 'pending' || finalStatus === 'closed') {
+          // DEBUGGING ALERT UNTUK PROF
+          if (debugRes) {
+            alert(`DEBUG: Hasil Cek Status = ${JSON.stringify(debugRes)}`);
+          }
           // If they closed popup without paying but order is pending/closed
           setPendingToken(data.token);
           setPendingOrderId(data.orderId);
