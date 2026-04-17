@@ -12,15 +12,18 @@ export default function WithdrawalsPage() {
   
   const [balancePending, setBalancePending] = useState(true);
   const [balance, setBalance] = useState({ settled: 0, withdrawn: 0, available: 0 });
+  const [campaignBalances, setCampaignBalances] = useState([]);
 
   const fetchData = async () => {
     try {
-      const [histRes, balRes] = await Promise.all([
+      const [histRes, balRes, campBalRes] = await Promise.all([
         api.get('/withdrawals'),
         api.get('/withdrawals/balance'),
+        api.get('/withdrawals/campaign-balances'),
       ]);
       setHistory(histRes.withdrawals || []);
       setBalance(balRes);
+      setCampaignBalances(campBalRes.balances || []);
     } catch (err) {
       toast.error('Gagal memuat data penarikan');
     } finally {
@@ -32,12 +35,15 @@ export default function WithdrawalsPage() {
     fetchData();
   }, []);
 
+  const eligibleCampaigns = campaignBalances.filter(c => c.eligible);
+
   const handleNewWithdrawal = async (data) => {
     try {
       const formData = new FormData();
       formData.append('amount', data.amount);
       formData.append('bankInfo', data.bankInfo);
       formData.append('note', data.note);
+      formData.append('campaignId', data.campaignId);
       if (data.evidenceFile) {
         formData.append('evidence', data.evidenceFile);
       }
@@ -66,18 +72,21 @@ export default function WithdrawalsPage() {
           <span className="material-symbols-outlined text-[28px] text-admin-text">payments</span>
           <h1 className="text-2xl font-bold text-admin-text tracking-tight">Penarikan Dana</h1>
         </div>
-        <button onClick={() => setShowModal(true)} className="btn-admin-primary px-6 flex items-center justify-center gap-2 w-full sm:w-auto shadow-sm">
+        <button
+          onClick={() => eligibleCampaigns.length > 0 ? setShowModal(true) : toast.error('Belum ada kampanye yang mencapai target dan memiliki saldo siap tarik.')}
+          className="btn-admin-primary px-6 flex items-center justify-center gap-2 w-full sm:w-auto shadow-sm"
+        >
           <span className="material-symbols-outlined text-[20px]">add</span> Tarik Dana Baru
         </button>
       </div>
 
-      {/* Balance Cards */}
+      {/* Global Balance Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="admin-card p-5 border border-admin-border relative overflow-hidden group">
           <div className="absolute right-0 top-0 w-24 h-24 bg-admin-accent/5 rounded-bl-[100px] -z-10 group-hover:bg-admin-accent/10 transition-colors"></div>
           <div className="flex items-center gap-3 mb-2">
             <span className="material-symbols-outlined text-admin-text-secondary text-[20px]">account_balance_wallet</span>
-            <p className="text-sm font-semibold text-admin-text-secondary">Saldo Total Terkumpul (Settled)</p>
+            <p className="text-sm font-semibold text-admin-text-secondary">Saldo Total Terkumpul</p>
           </div>
           <p className="text-2xl font-bold text-admin-text font-mono mt-1 tracking-tight">{formatCurrency(balance.settled)}</p>
         </div>
@@ -85,7 +94,7 @@ export default function WithdrawalsPage() {
            <div className="absolute right-0 top-0 w-24 h-24 bg-danger/5 rounded-bl-[100px] -z-10 group-hover:bg-danger/10 transition-colors"></div>
           <div className="flex items-center gap-3 mb-2">
             <span className="material-symbols-outlined text-danger text-[20px]">publish</span>
-            <p className="text-sm font-semibold text-admin-text-secondary">Total Dana Keluar / Ditarik</p>
+            <p className="text-sm font-semibold text-admin-text-secondary">Total Dana Keluar</p>
           </div>
           <p className="text-2xl font-bold text-danger font-mono mt-1 tracking-tight">{formatCurrency(balance.withdrawn)}</p>
         </div>
@@ -97,6 +106,58 @@ export default function WithdrawalsPage() {
           </div>
           <p className="text-2xl font-bold text-admin-accent-secondary font-mono mt-1 tracking-tight">{formatCurrency(balance.available)}</p>
         </div>
+      </div>
+
+      {/* Per-Campaign Balance Cards */}
+      <div className="admin-card overflow-hidden">
+        <div className="px-6 py-5 border-b border-admin-border flex items-center gap-2 bg-admin-bg-sidebar">
+          <span className="material-symbols-outlined text-admin-accent text-[20px]">campaign</span>
+          <h2 className="text-lg font-bold text-admin-text">Saldo Per Kampanye</h2>
+        </div>
+        {campaignBalances.length === 0 ? (
+          <div className="text-center py-10 text-admin-text-muted">
+            <span className="material-symbols-outlined text-4xl opacity-30 mb-2 block">campaign</span>
+            <p className="text-sm">Belum ada kampanye</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-admin-border">
+            {campaignBalances.map((c) => {
+              const progress = c.target > 0 ? Math.min(Math.round((c.collected / c.target) * 100), 100) : 0;
+              return (
+                <div key={c.campaignId} className="p-5 flex flex-col sm:flex-row sm:items-center gap-4 hover:bg-admin-bg-hover transition-colors">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <p className="text-sm font-bold text-admin-text truncate">{c.campaignTitle}</p>
+                      {c.reachedTarget ? (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-success/10 text-success border border-success/20 whitespace-nowrap flex items-center gap-1">
+                          <span className="material-symbols-outlined text-[12px]">check_circle</span> Target Tercapai
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-warning/10 text-warning border border-warning/20 whitespace-nowrap flex items-center gap-1">
+                          <span className="material-symbols-outlined text-[12px]">schedule</span> {progress}%
+                        </span>
+                      )}
+                    </div>
+                    <div className="h-1.5 rounded-full bg-admin-bg overflow-hidden border border-admin-border/50 mb-2">
+                      <div className={`h-full rounded-full ${c.reachedTarget ? 'bg-success' : 'bg-admin-accent-secondary'}`} style={{ width: `${progress}%` }}></div>
+                    </div>
+                    <div className="flex gap-4 text-xs text-admin-text-muted font-mono">
+                      <span>Target: {formatCurrency(c.target)}</span>
+                      <span>Terkumpul: {formatCurrency(c.totalDonated)}</span>
+                      <span>Ditarik: {formatCurrency(c.totalWithdrawn)}</span>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className={`text-lg font-bold font-mono tracking-tight ${c.available > 0 ? 'text-admin-accent-secondary' : 'text-admin-text-muted'}`}>
+                      {formatCurrency(c.available)}
+                    </p>
+                    <p className="text-[10px] text-admin-text-muted font-medium mt-0.5">Siap Cairkan</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* History */}
@@ -118,6 +179,7 @@ export default function WithdrawalsPage() {
               <thead>
                 <tr className="border-b border-admin-border bg-admin-bg-sidebar">
                   <th className="text-left px-6 py-4 text-admin-text-secondary font-semibold text-xs tracking-wider uppercase">Tanggal & Jam</th>
+                  <th className="text-left px-6 py-4 text-admin-text-secondary font-semibold text-xs tracking-wider uppercase">Kampanye</th>
                   <th className="text-left px-6 py-4 text-admin-text-secondary font-semibold text-xs tracking-wider uppercase">Nominal</th>
                   <th className="text-left px-6 py-4 text-admin-text-secondary font-semibold text-xs tracking-wider uppercase">Rekening Tujuan</th>
                   <th className="text-left px-6 py-4 text-admin-text-secondary font-semibold text-xs tracking-wider uppercase">Detail Penyaluran</th>
@@ -128,6 +190,9 @@ export default function WithdrawalsPage() {
                 {history.map((h) => (
                   <tr key={h.id} className="hover:bg-admin-bg-hover transition-colors">
                     <td className="px-6 py-4 text-admin-text-muted font-mono font-medium text-xs">{formatDateTime(h.createdAt)}</td>
+                    <td className="px-6 py-4">
+                      <span className="text-admin-text font-bold text-xs">{h.campaignTitle || 'Global (Legacy)'}</span>
+                    </td>
                     <td className="px-6 py-4 text-admin-text font-mono font-bold tracking-tight">{formatCurrency(h.amount)}</td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-admin-text font-medium">
@@ -159,7 +224,7 @@ export default function WithdrawalsPage() {
       {/* Withdrawal Modal */}
       {showModal && (
         <WithdrawalModal
-          available={balance.available}
+          eligibleCampaigns={eligibleCampaigns}
           onClose={() => setShowModal(false)}
           onSubmit={handleNewWithdrawal}
         />
@@ -182,7 +247,8 @@ export default function WithdrawalsPage() {
   );
 }
 
-function WithdrawalModal({ available, onClose, onSubmit }) {
+function WithdrawalModal({ eligibleCampaigns, onClose, onSubmit }) {
+  const [selectedCampaign, setSelectedCampaign] = useState(eligibleCampaigns[0] || null);
   const [amount, setAmount] = useState('');
   const [bank, setBank] = useState('');
   const [note, setNote] = useState('');
@@ -190,6 +256,14 @@ function WithdrawalModal({ available, onClose, onSubmit }) {
   const [evidenceFile, setEvidenceFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
+
+  const maxAmount = selectedCampaign?.available || 0;
+
+  const handleCampaignChange = (e) => {
+    const camp = eligibleCampaigns.find(c => c.campaignId === Number(e.target.value));
+    setSelectedCampaign(camp || null);
+    setAmount(''); // reset amount when switching campaign
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -230,12 +304,16 @@ function WithdrawalModal({ available, onClose, onSubmit }) {
   };
 
   const handleSubmit = async () => {
+    if (!selectedCampaign) {
+      toast.error('Pilih kampanye terlebih dahulu');
+      return;
+    }
     if (!amount || Number(amount) <= 0) {
       toast.error('Nominal penarikan harus diisi');
       return;
     }
-    if (Number(amount) > available) {
-      toast.error(`Saldo tidak cukup. Tersedia: ${formatCurrency(available)}`);
+    if (Number(amount) > maxAmount) {
+      toast.error(`Saldo tidak cukup. Tersedia: ${formatCurrency(maxAmount)}`);
       return;
     }
     if (!bank.trim()) {
@@ -257,6 +335,7 @@ function WithdrawalModal({ available, onClose, onSubmit }) {
       bankInfo: bank.trim(),
       note: note.trim(),
       evidenceFile: evidenceFile,
+      campaignId: selectedCampaign.campaignId,
     });
     setLoading(false);
   };
@@ -279,9 +358,32 @@ function WithdrawalModal({ available, onClose, onSubmit }) {
         </div>
 
         <div className="space-y-5">
+          {/* Campaign Selector */}
+          <div>
+            <label className="block text-sm font-semibold text-admin-text-secondary mb-2">Pilih Kampanye <span className="text-danger">*</span></label>
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-admin-text-muted text-[20px]">campaign</span>
+              <select
+                value={selectedCampaign?.campaignId || ''}
+                onChange={handleCampaignChange}
+                className="input-admin pl-12 font-medium appearance-none cursor-pointer"
+              >
+                {eligibleCampaigns.map((c) => (
+                  <option key={c.campaignId} value={c.campaignId}>
+                    {c.campaignTitle} — Saldo: {formatCurrency(c.available)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <p className="text-[11px] text-admin-text-muted mt-1.5 flex items-center gap-1">
+              <span className="material-symbols-outlined text-[12px]">info</span>
+              Hanya kampanye yang sudah mencapai target yang bisa ditarik dananya
+            </p>
+          </div>
+
           <div className="bg-admin-accent-secondary/5 border border-admin-accent-secondary/20 p-4 rounded-xl flex items-center justify-between">
               <span className="text-sm font-semibold text-admin-text-secondary">Plafon Maksimal</span>
-              <span className="text-lg font-bold text-admin-accent-secondary font-mono">{formatCurrency(available)}</span>
+              <span className="text-lg font-bold text-admin-accent-secondary font-mono">{formatCurrency(maxAmount)}</span>
           </div>
 
           <div>
@@ -295,6 +397,7 @@ function WithdrawalModal({ available, onClose, onSubmit }) {
                     placeholder="Nominal angka murni"
                     className="input-admin pl-10 font-mono tracking-wider font-bold text-lg"
                     min="0"
+                    max={maxAmount}
                 />
             </div>
           </div>

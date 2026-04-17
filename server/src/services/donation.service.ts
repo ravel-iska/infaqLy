@@ -1,25 +1,34 @@
 import { db } from '../config/database.js';
-import { donations, campaigns } from '../db/schema.js';
+import { donations, campaigns, settings } from '../db/schema.js';
 import { eq, desc, ilike, and, sql, lt } from 'drizzle-orm';
 
 /**
- * List all donations with filters
+ * Helper: Get current midtrans env from DB settings
+ */
+async function getCurrentEnv(): Promise<'sandbox' | 'production'> {
+  const [row] = await db.select().from(settings).where(eq(settings.key, 'midtrans_env')).limit(1);
+  const val = row?.value;
+  return (val === 'production' || val === 'sandbox') ? val : 'sandbox';
+}
+
+/**
+ * List all donations with filters — filtered by current env
  */
 export async function listDonations(filters?: { status?: string; search?: string; campaignId?: number }) {
-  const conditions = [];
+  const currentEnv = await getCurrentEnv();
+  const conditions = [eq(donations.env, currentEnv)];
   if (filters?.status) conditions.push(eq(donations.paymentStatus, filters.status as any));
   if (filters?.campaignId) conditions.push(eq(donations.campaignId, filters.campaignId));
   if (filters?.search) conditions.push(ilike(donations.donorName, `%${filters.search}%`));
 
-  return conditions.length > 0
-    ? db.select().from(donations).where(and(...conditions)).orderBy(desc(donations.createdAt))
-    : db.select().from(donations).orderBy(desc(donations.createdAt));
+  return db.select().from(donations).where(and(...conditions)).orderBy(desc(donations.createdAt));
 }
 
 /**
- * Get donations for a specific user
+ * Get donations for a specific user — filtered by current env
  */
 export async function getUserDonations(userId: string) {
+  const currentEnv = await getCurrentEnv();
   return db.select({
     id: donations.id,
     orderId: donations.orderId,
@@ -32,7 +41,7 @@ export async function getUserDonations(userId: string) {
     snapToken: donations.snapToken,
     paidAt: donations.paidAt,
     createdAt: donations.createdAt,
-  }).from(donations).where(eq(donations.userId, userId)).orderBy(desc(donations.createdAt));
+  }).from(donations).where(and(eq(donations.userId, userId), eq(donations.env, currentEnv))).orderBy(desc(donations.createdAt));
 }
 
 /**
@@ -45,6 +54,7 @@ export async function getDonationByOrderId(orderId: string) {
 
 /**
  * Create a new donation record (status: pending)
+ * Automatically stamps current midtrans env
  */
 export async function createDonation(data: {
   orderId: string; userId?: string; campaignId: number; donorName: string;
@@ -52,6 +62,7 @@ export async function createDonation(data: {
   isAnonymous?: boolean; snapToken?: string; snapRedirectUrl?: string;
   message?: string | null;
 }) {
+  const currentEnv = await getCurrentEnv();
   const [donation] = await db.insert(donations).values({
     orderId: data.orderId,
     userId: data.userId || null,
@@ -64,6 +75,7 @@ export async function createDonation(data: {
     snapToken: data.snapToken || null,
     snapRedirectUrl: data.snapRedirectUrl || null,
     paymentStatus: 'pending',
+    env: currentEnv,
   }).returning();
 
   return donation;
@@ -86,10 +98,11 @@ export async function updateDonationStatus(orderId: string, status: string, paym
 }
 
 /**
- * Get donation stats for admin dashboard
+ * Get donation stats for admin dashboard — filtered by current env
  */
 export async function getDonationStats() {
-  const all = await db.select().from(donations);
+  const currentEnv = await getCurrentEnv();
+  const all = await db.select().from(donations).where(eq(donations.env, currentEnv));
   const success = all.filter(d => d.paymentStatus === 'success');
   const pending = all.filter(d => d.paymentStatus === 'pending');
 
@@ -102,10 +115,11 @@ export async function getDonationStats() {
 }
 
 /**
- * Export donations as CSV string
+ * Export donations as CSV string — filtered by current env
  */
 export async function exportDonationsCsv() {
-  const all = await db.select().from(donations).orderBy(desc(donations.createdAt));
+  const currentEnv = await getCurrentEnv();
+  const all = await db.select().from(donations).where(eq(donations.env, currentEnv)).orderBy(desc(donations.createdAt));
   
   const header = 'Order ID,Nama Donatur,Email,Program ID,Nominal,Metode,Status,Tanggal\n';
   const rows = all.map(d =>
@@ -138,4 +152,3 @@ export async function expirePendingDonations(): Promise<number> {
 
   return expired.length;
 }
-

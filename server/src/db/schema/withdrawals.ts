@@ -1,10 +1,12 @@
-import { pgTable, serial, bigint, varchar, text, uuid, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, serial, integer, bigint, varchar, text, uuid, timestamp, pgEnum } from 'drizzle-orm/pg-core';
 import { users } from './users.js';
+import { campaigns } from './campaigns.js';
 
 export const withdrawalStatusEnum = pgEnum('withdrawal_status', ['pending', 'completed']);
 
 export const withdrawals = pgTable('withdrawals', {
   id: serial('id').primaryKey(),
+  campaignId: integer('campaign_id').references(() => campaigns.id, { onDelete: 'cascade' }),
   amount: bigint('amount', { mode: 'number' }).notNull(),
   bankInfo: varchar('bank_info', { length: 255 }).notNull(),
   note: text('note'),

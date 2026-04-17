@@ -19,6 +19,7 @@ export const donations = pgTable('donations', {
   snapRedirectUrl: text('snap_redirect_url'),
   isAnonymous: boolean('is_anonymous').notNull().default(false),
   midtransResponse: jsonb('midtrans_response'),
+  env: varchar('env', { length: 20 }).notNull().default('sandbox'),
   paidAt: timestamp('paid_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

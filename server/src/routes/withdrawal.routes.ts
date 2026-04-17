@@ -26,11 +26,22 @@ router.get('/balance', requireAdmin, async (_req: Request, res: Response) => {
   }
 });
 
+// GET /api/withdrawals/campaign-balances — per-campaign balances for crowdfunding UI
+router.get('/campaign-balances', requireAdmin, async (_req: Request, res: Response) => {
+  try {
+    const balances = await withdrawalService.getCampaignBalances();
+    return res.json({ balances });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/withdrawals
 router.post('/', requireAdmin, upload.single('evidence'), async (req: Request, res: Response) => {
   try {
-    const { amount, bankInfo, note } = req.body;
+    const { amount, bankInfo, note, campaignId } = req.body;
     if (!amount || !bankInfo) return res.status(400).json({ error: 'Nominal dan info rekening wajib diisi' });
+    if (!campaignId) return res.status(400).json({ error: 'Pilih kampanye yang ingin ditarik dananya' });
 
     let evidenceUrl: string | undefined = undefined;
     if (req.file) {
@@ -44,6 +55,7 @@ router.post('/', requireAdmin, upload.single('evidence'), async (req: Request, r
       note: note || undefined,
       evidenceUrl,
       createdBy: req.user!.id,
+      campaignId: Number(campaignId),
     });
 
     // Send WA notification to admin

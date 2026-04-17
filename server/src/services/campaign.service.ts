@@ -1,6 +1,15 @@
 import { db } from '../config/database.js';
-import { campaigns, donations } from '../db/schema.js';
+import { campaigns, donations, settings } from '../db/schema.js';
 import { eq, ilike, and, or, desc, sql } from 'drizzle-orm';
+
+/**
+ * Helper: Get current midtrans env from DB settings
+ */
+async function getCurrentEnv(): Promise<'sandbox' | 'production'> {
+  const [row] = await db.select().from(settings).where(eq(settings.key, 'midtrans_env')).limit(1);
+  const val = row?.value;
+  return (val === 'production' || val === 'sandbox') ? val : 'sandbox';
+}
 
 function slugify(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36);
@@ -41,6 +50,7 @@ export async function getCampaignById(id: number) {
  * Get recent donors for a campaign (public)
  */
 export async function getRecentDonors(campaignId: number, limit = 5) {
+  const currentEnv = await getCurrentEnv();
   return db.select({
     donorName: donations.donorName,
     amount: donations.amount,
@@ -48,7 +58,11 @@ export async function getRecentDonors(campaignId: number, limit = 5) {
     createdAt: donations.createdAt,
   })
     .from(donations)
-    .where(eq(donations.campaignId, campaignId))
+    .where(and(
+      eq(donations.campaignId, campaignId),
+      eq(donations.paymentStatus, 'success'),
+      eq(donations.env, currentEnv),
+    ))
     .orderBy(desc(donations.createdAt))
     .limit(limit);
 }
@@ -57,11 +71,12 @@ export async function getRecentDonors(campaignId: number, limit = 5) {
  * Get monthly donation stats for chart (last 6 months)
  */
 export async function getMonthlyStats() {
+  const currentEnv = await getCurrentEnv();
   const all = await db.select({
     amount: donations.amount,
     status: donations.paymentStatus,
     createdAt: donations.createdAt,
-  }).from(donations);
+  }).from(donations).where(eq(donations.env, currentEnv));
 
   const months: Record<string, { total: number; count: number }> = {};
   const now = new Date();
