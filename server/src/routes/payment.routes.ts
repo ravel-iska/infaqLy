@@ -94,7 +94,7 @@ router.post('/notification', async (req: Request, res: Response) => {
 // Only allowed for Admins to bypass Midtrans simulator
 router.post('/simulate-success/:orderId', requireAdmin, async (req: Request, res: Response) => {
   try {
-    const orderId = req.params.orderId;
+    const orderId = req.params.orderId as string;
     const result = await paymentService.simulateSuccess(orderId);
 
     // Send WA notification on simulated success
