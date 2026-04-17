@@ -127,10 +127,7 @@ export default function CampaignDetailPage() {
         if (finalStatus === 'success' || finalStatus === 'settlement' || finalStatus === 'capture') {
           setShowThankYou(true);
         } else if (finalStatus === 'pending' || finalStatus === 'closed') {
-          // DEBUGGING ALERT UNTUK PROF
-          if (debugRes) {
-            alert(`DEBUG: Hasil Cek Status = ${JSON.stringify(debugRes)}`);
-          }
+          // Debugging dihapus karena sudah berfungsi normal
           // If they closed popup without paying but order is pending/closed
           setPendingToken(data.token);
           setPendingOrderId(data.orderId);
