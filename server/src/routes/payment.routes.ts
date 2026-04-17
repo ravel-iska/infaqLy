@@ -123,7 +123,7 @@ router.get('/check-status/:orderId', requireAuth, async (req: Request, res: Resp
     // JANGAN tanya ke midtrans lagi, karena Midtrans pasti bilangnya "pending" dan akan me-reset statusnya!
     const localDonation = await donationService.getDonationByOrderId(orderId);
     if (localDonation && localDonation.paymentStatus === 'success') {
-      return res.json({ status: 'success', orderId });
+      return res.json({ status: 'success', data: { status: 'success' }, orderId });
     }
 
     const statusResult = await paymentService.checkTransactionStatus(orderId);
@@ -141,10 +141,10 @@ router.get('/check-status/:orderId', requireAuth, async (req: Request, res: Resp
         ).catch(() => {});
       }
       
-      return res.json({ status: result.status, orderId });
+      return res.json({ status: result.status, data: { status: result.status }, orderId });
     }
     
-    return res.json({ status: 'pending', orderId });
+    return res.json({ status: 'pending', data: { status: 'pending' }, orderId });
   } catch (err: any) {
     if (err.message && err.message.toLowerCase().includes('midtrans')) {
       sendErrorAlert(`GET /api/payment/check-status`, `Midtrans Polling Error: ${err.message}`).catch(() => {});
