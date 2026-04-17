@@ -114,6 +114,14 @@ async function createSession(userId: string, role: 'user' | 'admin' = 'user'): P
  * Remove sensitive fields from user object
  */
 export function sanitizeUser(user: typeof users.$inferSelect) {
-  const { passwordHash, ...safe } = user;
-  return safe;
+  // Remove sensitive data from API responses
+  return {
+    id: user.id,
+    username: user.username,
+    avatarUrl: user.avatarUrl,
+    isVerified: user.isVerified,
+    role: user.role,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
 }
