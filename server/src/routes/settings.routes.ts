@@ -18,7 +18,8 @@ const SENSITIVE_KEYS = [
   'midtrans_sandbox_client_key',
   'midtrans_prod_server_key',
   'midtrans_prod_client_key',
-  'fonnte_token'
+  'doku_sandbox_secret_key',
+  'doku_prod_secret_key'
 ];
 
 const router = Router();

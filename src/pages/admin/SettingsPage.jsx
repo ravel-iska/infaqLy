@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { testFonnteConnection } from '@/services/fonnte';
 import api from '@/services/api';
 import toast from 'react-hot-toast';
 
@@ -19,13 +18,16 @@ export default function SettingsPage() {
 
   const [maintenanceMode, setMaintenanceMode] = useState(false);
 
-  const [waToken, setWaToken] = useState('');
   const [adminPhone, setAdminPhone] = useState('');
   const [systemAlertPhone, setSystemAlertPhone] = useState('');
-  const [showWaToken, setShowWaToken] = useState(false);
-  const [testPhone, setTestPhone] = useState('');
-  const [testLoading, setTestLoading] = useState(false);
-  const [testResult, setTestResult] = useState(null);
+
+  const [dokuEnv, setDokuEnv] = useState('sandbox');
+  const [dokuSandboxClientId, setDokuSandboxClientId] = useState('');
+  const [dokuSandboxSecretKey, setDokuSandboxSecretKey] = useState('');
+  const [dokuProdClientId, setDokuProdClientId] = useState('');
+  const [dokuProdSecretKey, setDokuProdSecretKey] = useState('');
+  const [dokuTab, setDokuTab] = useState('sandbox');
+  const [showDokuSecret, setShowDokuSecret] = useState(false);
 
   const [hasPin, setHasPin] = useState(false);
   const [pinNew, setPinNew] = useState('');
@@ -63,7 +65,13 @@ export default function SettingsPage() {
         setProdServerKey(s.midtrans_prod_server_key || legacyServerKey);
         setProdClientKey(s.midtrans_prod_client_key || legacyClientKey);
 
-        setWaToken(s.fonnte_token || '');
+        setDokuEnv(s.doku_env || 'sandbox');
+        setDokuTab(s.doku_env || 'sandbox');
+        setDokuSandboxClientId(s.doku_sandbox_client_id || '');
+        setDokuSandboxSecretKey(s.doku_sandbox_secret_key || '');
+        setDokuProdClientId(s.doku_prod_client_id || '');
+        setDokuProdSecretKey(s.doku_prod_secret_key || '');
+
         setAdminPhone(s.fonnte_admin_phone || '');
         setSystemAlertPhone(s.system_alert_phone || '');
       } catch {}
@@ -145,12 +153,18 @@ export default function SettingsPage() {
     }
   };
 
-  const saveFonnteToken = async () => {
+  const saveDoku = async () => {
     try {
-      await api.put('/settings', { fonnte_token: waToken.trim() });
-      toast.success('Token WhatsApp tersimpan');
+      await api.put('/settings', {
+        doku_env: dokuEnv,
+        doku_sandbox_client_id: dokuSandboxClientId,
+        doku_sandbox_secret_key: dokuSandboxSecretKey,
+        doku_prod_client_id: dokuProdClientId,
+        doku_prod_secret_key: dokuProdSecretKey,
+      });
+      toast.success('Konfigurasi DOKU berhasil disimpan!');
     } catch (err) {
-      toast.error(err.message || 'Gagal menyimpan token');
+      toast.error(err.message || 'Gagal menyimpan konfigurasi DOKU');
     }
   };
 
@@ -178,26 +192,7 @@ export default function SettingsPage() {
     }
   };
 
-  const handleTestConnection = async () => {
-    const phone = testPhone.trim() || adminPhone.trim();
-    if (!phone) return toast.error('Masukkan nomor pengujian');
-    if (!waToken.trim()) return toast.error('Token Fonnte belum diisi');
-    
-    await saveFonnteToken();
-    setTestLoading(true);
-    setTestResult(null);
-    try {
-      const result = await testFonnteConnection(phone);
-      setTestResult(result);
-      if (result.success) toast.success('Test berhasil dikirim');
-      else toast.error(result.message);
-    } catch (err) {
-      setTestResult({ success: false, message: err.message });
-      toast.error('Gagal terhubung ke Fonnte');
-    } finally {
-      setTestLoading(false);
-    }
-  };
+
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
@@ -643,66 +638,123 @@ export default function SettingsPage() {
         )}
       </div>
 
-      {/* FONNTE WHATSAPP CONFIGURATION */}
-      <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8">
+      {/* DOKU PAYMENT GATEWAY */}
+      <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 border-l-4 border-l-info relative overflow-hidden">
+        <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl text-[11px] font-bold uppercase tracking-wider text-white shadow-sm ${dokuEnv === 'production' ? 'bg-success' : 'bg-info'}`}>
+          Active: {dokuEnv === 'production' ? 'Production' : 'Sandbox'}
+        </div>
+
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-base-200 pb-5">
           <div>
             <h2 className="text-lg font-semibold text-base-content flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">api</span> Fonnte API Gateway
+              <span className="material-symbols-outlined text-info">account_balance_wallet</span> DOKU API Gateway
             </h2>
-            <p className="text-sm text-base-content/60 mt-1">Layanan perpesanan alternatif / fallback provider</p>
+            <p className="text-sm text-base-content/60 mt-1">Layanan gateway pembayaran kedua / alternatif</p>
           </div>
-          <button onClick={saveFonnteToken} className="btn btn-primary flex items-center gap-2 px-6">
-            <span className="material-symbols-outlined text-[18px]">save</span> Simpan
+          <button onClick={saveDoku} className="btn btn-primary flex items-center gap-2 px-6">
+            <span className="material-symbols-outlined text-[18px]">save</span> Simpan DOKU
           </button>
         </div>
 
         <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-base-content/70 mb-2">Access Token</label>
-            <div className="relative">
-              <input
-                type={showWaToken ? 'text' : 'password'}
-                value={waToken}
-                onChange={(e) => setWaToken(e.target.value)}
-                className="input input-bordered w-full pr-12"
-              />
-              <button onClick={() => setShowWaToken(!showWaToken)} className="absolute right-4 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-base-content transition-colors">
-                <span className="material-symbols-outlined text-[20px]">{showWaToken ? 'visibility_off' : 'visibility'}</span>
-              </button>
-            </div>
+          <div className="bg-base-200 p-1 rounded-xl shadow-inner inline-flex">
+            <button
+              onClick={() => setDokuEnv('sandbox')}
+              className={`px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${
+                dokuEnv === 'sandbox' 
+                  ? 'bg-info text-white shadow-md' 
+                  : 'text-base-content/60 hover:text-base-content'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">science</span> Sandbox
+            </button>
+            <button
+              onClick={() => setDokuEnv('production')}
+              className={`px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${
+                dokuEnv === 'production' 
+                  ? 'bg-success text-white shadow-md' 
+                  : 'text-base-content/60 hover:text-base-content'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">rocket_launch</span> Production
+            </button>
           </div>
 
-          <div className="bg-base-200/50 rounded-xl p-5 border border-base-200">
-            <label className="block text-sm font-medium text-base-content/70 mb-3 flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[18px]">electric_bolt</span> Ping Infrastruktur Jaringan
-            </label>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input
-                type="text"
-                value={testPhone}
-                onChange={(e) => setTestPhone(e.target.value)}
-                placeholder="Nomor pengujian (kosong untuk default kontak)"
-                className="input input-bordered w-full sm:w-2/3"
-              />
-              <button
-                onClick={handleTestConnection}
-                disabled={testLoading}
-                className="btn btn-outline sm:w-1/3 flex justify-center items-center gap-2"
+          <div className="border border-base-200 rounded-xl mt-4">
+            <div className="flex border-b border-base-200 bg-base-200/50 rounded-t-xl overflow-hidden">
+              <button 
+                onClick={() => setDokuTab('sandbox')}
+                className={`flex-1 px-4 py-3 text-sm font-bold border-b-2 transition-colors ${dokuTab === 'sandbox' ? 'border-info text-info bg-base-100' : 'border-transparent text-base-content/60 hover:bg-base-200/50'}`}
               >
-                {testLoading ? <span className="loading loading-spinner text-[18px]"></span> : <span className="material-symbols-outlined text-[18px]">rss_feed</span>}
-                Kirim Ping
+                Kredensial Sandbox
+              </button>
+              <button 
+                onClick={() => setDokuTab('production')}
+                className={`flex-1 px-4 py-3 text-sm font-bold border-b-2 transition-colors ${dokuTab === 'production' ? 'border-success text-success bg-base-100' : 'border-transparent text-base-content/60 hover:bg-base-200/50'}`}
+              >
+                Kredensial Live Production
               </button>
             </div>
 
-            {testResult && (
-              <div className={`mt-4 p-3 rounded-xl text-sm font-medium border ${testResult.success ? 'bg-success/10 text-success border-success/20' : 'bg-error/10 text-error border-error/20'}`}>
-                <p className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[18px]">{testResult.success ? 'check_circle' : 'error'}</span> 
-                  {testResult.message}
-                </p>
-              </div>
-            )}
+            <div className="p-5 space-y-4 bg-base-200/30">
+              {dokuTab === 'sandbox' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-base-content/70 mb-2">Sandbox Client ID</label>
+                    <input
+                      type="text"
+                      value={dokuSandboxClientId}
+                      onChange={(e) => setDokuSandboxClientId(e.target.value)}
+                      placeholder="Client ID..."
+                      className="input input-bordered w-full border-info/30 focus:border-info"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-base-content/70 mb-2">Sandbox Secret Key</label>
+                    <div className="relative">
+                      <input
+                        type={showDokuSecret ? 'text' : 'password'}
+                        value={dokuSandboxSecretKey}
+                        onChange={(e) => setDokuSandboxSecretKey(e.target.value)}
+                        placeholder="Secret Key..."
+                        className="input input-bordered w-full pr-12 border-info/30 focus:border-info"
+                      />
+                      <button onClick={() => setShowDokuSecret(!showDokuSecret)} className="absolute right-4 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-base-content transition-colors">
+                        <span className="material-symbols-outlined text-[20px]">{showDokuSecret ? 'visibility_off' : 'visibility'}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-base-content/70 mb-2">Production Client ID</label>
+                    <input
+                      type="text"
+                      value={dokuProdClientId}
+                      onChange={(e) => setDokuProdClientId(e.target.value)}
+                      placeholder="Client ID..."
+                      className="input input-bordered w-full border-success/30 focus:border-success"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-base-content/70 mb-2">Production Secret Key</label>
+                    <div className="relative">
+                      <input
+                        type={showDokuSecret ? 'text' : 'password'}
+                        value={dokuProdSecretKey}
+                        onChange={(e) => setDokuProdSecretKey(e.target.value)}
+                        placeholder="Secret Key..."
+                        className="input input-bordered w-full pr-12 border-success/30 focus:border-success"
+                      />
+                      <button onClick={() => setShowDokuSecret(!showDokuSecret)} className="absolute right-4 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-base-content transition-colors">
+                        <span className="material-symbols-outlined text-[20px]">{showDokuSecret ? 'visibility_off' : 'visibility'}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
