@@ -78,15 +78,14 @@ export default function DashboardPage() {
 
   const activeCampaigns = campaigns.filter(c => c.status === 'active');
   const totalCollected = campaigns.reduce((s, c) => s + c.collected, 0);
+  const totalTarget = campaigns.reduce((s, c) => s + c.target, 0);
   const totalDonors = campaigns.reduce((s, c) => s + c.donors, 0);
-  const infaqTotal = campaigns.filter(c => c.category === 'infaq').reduce((s, c) => s + c.collected, 0);
-  const wakafTotal = campaigns.filter(c => c.category === 'wakaf').reduce((s, c) => s + c.collected, 0);
 
   const STATS = [
-    { icon: 'monetization_on', label: 'Total Infaq', value: infaqTotal, trend: '+12.5%', up: true, color: 'text-primary', bg: 'bg-primary/10' },
-    { icon: 'account_balance', label: 'Total Wakaf', value: wakafTotal, trend: '+8.3%', up: true, color: 'text-secondary', bg: 'bg-secondary/10' },
-    { icon: 'schedule', label: 'Program Aktif', value: activeCampaigns.length, trend: `${campaigns.length} total`, up: true, color: 'text-warning', bg: 'bg-warning/10' },
-    { icon: 'group', label: 'Donatur', value: totalDonors, trend: '+15%', up: true, color: 'text-primary', bg: 'bg-primary/10' },
+    { icon: 'account_balance_wallet', label: 'Total Dana Terkumpul', value: totalCollected, trend: 'Global Platform', up: true, color: 'text-primary', bg: 'bg-primary/10' },
+    { icon: 'flag', label: 'Total Target Dana', value: totalTarget, trend: 'Global Platform', up: true, color: 'text-secondary', bg: 'bg-secondary/10' },
+    { icon: 'local_fire_department', label: 'Program Aktif', value: activeCampaigns.length, trend: `Dari ${campaigns.length} total program`, up: true, color: 'text-warning', bg: 'bg-warning/10' },
+    { icon: 'group', label: 'Total Donatur', value: totalDonors, trend: 'Orang baik', up: true, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
   ];
 
   // Real visitor data fetched mapped to visitorData state
