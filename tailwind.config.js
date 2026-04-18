@@ -120,8 +120,8 @@ export default {
       },
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+          '0%': { opacity: '0', willChange: 'opacity' },
+          '100%': { opacity: '1', willChange: 'auto' },
         },
         slideUp: {
           '0%': { opacity: '0', transform: 'translateY(20px)' },

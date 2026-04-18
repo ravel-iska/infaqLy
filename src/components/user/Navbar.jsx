@@ -29,8 +29,17 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 10);
-    window.addEventListener('scroll', handleScroll);
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 10);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -81,7 +90,7 @@ export default function Navbar() {
         <div className="hidden md:flex flex-1 justify-end items-center gap-4 font-body text-sm tracking-tight">
           
           {/* Theme Toggle Button */}
-          <button onClick={toggleUserTheme} className="p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors">
+          <button onClick={toggleUserTheme} aria-label="Ganti tema gelap/terang" className="p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors">
             <span className="material-symbols-outlined">{isUserDark ? 'light_mode' : 'dark_mode'}</span>
           </button>
           {isAuthenticated ? (
@@ -139,12 +148,13 @@ export default function Navbar() {
         </div>
 
         <div className="flex gap-2">
-          <button onClick={toggleUserTheme} className="md:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <button onClick={toggleUserTheme} aria-label="Ganti tema gelap/terang" className="md:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
             <span className="material-symbols-outlined">{isUserDark ? 'light_mode' : 'dark_mode'}</span>
           </button>
           {/* Mobile hamburger */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Buka/tutup menu navigasi"
             className="md:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}

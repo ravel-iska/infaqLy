@@ -10,7 +10,7 @@ function TermsModal({ isOpen, onClose }) {
       <div className="bg-surface-container-lowest w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-slide-up relative">
         <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900 sticky top-0 z-10">
           <h3 className="font-headline text-xl font-bold text-on-surface dark:text-slate-100">Syarat & Ketentuan</h3>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
+          <button onClick={onClose} aria-label="Tutup" className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -48,7 +48,7 @@ function PrivacyModal({ isOpen, onClose }) {
       <div className="bg-surface-container-lowest w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-slide-up relative">
         <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900 sticky top-0 z-10">
           <h3 className="font-headline text-xl font-bold text-on-surface dark:text-slate-100">Kebijakan Privasi</h3>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
+          <button onClick={onClose} aria-label="Tutup" className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -104,7 +104,7 @@ function BugModal({ isOpen, onClose }) {
           <h3 className="font-headline text-xl font-bold text-on-surface dark:text-slate-100 flex items-center gap-2">
             <span className="material-symbols-outlined text-rose-500">bug_report</span> Lapor Bug / Kesalahan
           </h3>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
+          <button onClick={onClose} aria-label="Tutup" className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -160,6 +160,7 @@ export default function Footer() {
                 toast.success('Tautan disalin ke clipboard!');
               }}
               title="Bagikan Website"
+              aria-label="Bagikan Website"
               className="w-10 h-10 rounded-full bg-surface-container dark:bg-slate-800 flex items-center justify-center text-primary dark:text-emerald-400 cursor-pointer hover:bg-primary dark:hover:bg-emerald-500 hover:text-on-primary transition-all"
             >
               <span className="material-symbols-outlined text-sm">share</span>
@@ -167,6 +168,7 @@ export default function Footer() {
             <a 
               href="/"
               title="Kunjungi Website"
+              aria-label="Kunjungi Website"
               className="w-10 h-10 rounded-full bg-surface-container dark:bg-slate-800 flex items-center justify-center text-primary dark:text-emerald-400 cursor-pointer hover:bg-primary dark:hover:bg-emerald-500 hover:text-on-primary transition-all"
             >
               <span className="material-symbols-outlined text-sm">language</span>
