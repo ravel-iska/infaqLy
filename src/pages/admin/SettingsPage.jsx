@@ -207,7 +207,7 @@ export default function SettingsPage() {
   const webhookUrl = `${window.location.origin}/api/midtrans/notification`;
 
   return (
-    <div className="animate-fade-in space-y-6 max-w-4xl pb-12">
+    <div className="animate-fade-in space-y-6">
       <div className="flex items-center gap-2 mb-6">
         <span className="material-symbols-outlined text-[28px] text-base-content">settings</span>
         <h1 className="text-2xl font-bold text-base-content tracking-tight">Setelan Sistem</h1>

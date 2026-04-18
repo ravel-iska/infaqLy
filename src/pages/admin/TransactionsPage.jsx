@@ -12,7 +12,7 @@ export default function TransactionsPage() {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   // Reset page when filters change
   useEffect(() => {
@@ -122,7 +122,7 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="animate-fade-in space-y-6 pb-12">
+    <div className="animate-fade-in space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-[28px] text-base-content">receipt_long</span>
@@ -277,6 +277,7 @@ export default function TransactionsPage() {
                 onChange={(e) => setItemsPerPage(e.target.value)}
                 className="select select-bordered select-sm w-24 font-mono text-sm shadow-sm"
               >
+                <option value={5}>5</option>
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={50}>50</option>
