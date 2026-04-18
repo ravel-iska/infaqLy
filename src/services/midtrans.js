@@ -5,7 +5,7 @@
  * The backend reads Midtrans keys from the database (admin settings).
  * 
  * Flow:
- * 1. Frontend calls /api/payment/create-token → Backend creates Snap Token
+ * 1. Frontend calls /api/midtrans/create-token → Backend creates Snap Token
  * 2. Frontend receives token → opens Snap popup
  * 3. User pays → Midtrans sends webhook to backend
  * 4. Backend updates transaction status in DB
@@ -22,7 +22,7 @@ import api from './api.js';
  */
 export async function createTransaction({ orderId, amount, donorName, donorEmail, donorPhone, programName, campaignId, isAnonymous }) {
   // Use the backend endpoint which reads keys from DB
-  const data = await api.post('/payment/create-token', {
+  const data = await api.post('/midtrans/create-token', {
     campaignId,
     amount,
     isAnonymous,
@@ -46,7 +46,7 @@ export async function loadSnapScript(forceReload = false) {
   snapLoadPromise = (async () => {
     try {
       // Get client key and env from backend (reads from DB)
-      const config = await api.get('/payment/client-config');
+      const config = await api.get('/midtrans/client-config');
       
       if (!config.clientKey) {
         console.warn('[Midtrans] Client Key belum dikonfigurasi');

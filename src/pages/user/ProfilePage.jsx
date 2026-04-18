@@ -114,7 +114,7 @@ function DonationCard({ tx, user, onPaymentSuccess }) {
       if (tx.orderId) {
         try {
           // No-cache
-          await api.get(`/payment/check-status/${tx.orderId}?t=${Date.now()}`);
+          await api.get(`/midtrans/check-status/${tx.orderId}?t=${Date.now()}`);
         } catch {}
       }
       // Always reload donations list

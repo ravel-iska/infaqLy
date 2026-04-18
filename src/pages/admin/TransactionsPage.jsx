@@ -31,7 +31,7 @@ export default function TransactionsPage() {
 
     // Fetch Midtrans env separately so it never blocks transactions
     try {
-      const configRes = await api.get(`/payment/client-config?t=${Date.now()}`);
+      const configRes = await api.get(`/midtrans/client-config?t=${Date.now()}`);
       console.log('[TransactionsPage] configRes:', configRes);
       setMidtransEnv(configRes.env || 'production');
     } catch (err) {
@@ -45,7 +45,7 @@ export default function TransactionsPage() {
     if (!sandboxOrderId.trim()) return toast.error('Masukkan Order ID!');
     setSandboxLoading(true);
     try {
-      await api.post(`/payment/simulate-success/${sandboxOrderId.trim()}`);
+      await api.post(`/midtrans/simulate-success/${sandboxOrderId.trim()}`);
       toast.success('Simulasi Pembayaran Berhasil!');
       setSandboxOrderId('');
       setShowSandbox(false);

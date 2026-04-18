@@ -87,7 +87,7 @@ export default function CampaignDetailPage() {
     setPayLoading(true);
     try {
       // Backend creates Snap token + saves donation to DB (status: pending)
-      const data = await api.post('/payment/create-token', {
+      const data = await api.post('/midtrans/create-token', {
         campaignId: campaign.id,
         amount: value,
         isAnonymous,
@@ -115,7 +115,7 @@ export default function CampaignDetailPage() {
         if (data.orderId) {
           try {
             // Add a cache buster timestamp so the browser NEVER caches the API response
-            const res = await api.get(`/payment/check-status/${data.orderId}?t=${Date.now()}`);
+            const res = await api.get(`/midtrans/check-status/${data.orderId}?t=${Date.now()}`);
             debugRes = res;
             finalStatus = res.status;
           } catch (e) {
@@ -160,7 +160,7 @@ export default function CampaignDetailPage() {
       let finalStatus = snapResult.status;
       if (pendingOrderId) {
         try {
-          const res = await api.get(`/payment/check-status/${pendingOrderId}?t=${Date.now()}`);
+          const res = await api.get(`/midtrans/check-status/${pendingOrderId}?t=${Date.now()}`);
           finalStatus = res.status;
         } catch {}
       }
