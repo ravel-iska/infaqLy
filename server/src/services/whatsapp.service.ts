@@ -161,6 +161,30 @@ export async function sendWithdrawalNotification(amount: number, bank: string, n
   return sendWhatsApp(adminPhone, `💸 *infaqLy — Penarikan Dana*\n\n• Nominal: Rp ${fmt}\n• Rekening: ${bank}\n• Keterangan: ${note}\n• Waktu: ${new Date().toLocaleString('id-ID')}\n\n_Pesan otomatis dari infaqLy_`);
 }
 
+/** Transaction update notification to admin */
+export async function sendAdminTransactionUpdate(orderId: string, status: string, amount: number, donorName: string, program: string) {
+  let adminPhone = '';
+  try {
+    const [row] = await db.select().from(settings).where(eq(settings.key, 'system_alert_phone')).limit(1);
+    adminPhone = row?.value || '';
+  } catch {}
+  if (!adminPhone) adminPhone = env.FONNTE_ADMIN_PHONE || '';
+  if (!adminPhone) return { success: false, message: 'Admin phone not set' };
+
+  const fmt = new Intl.NumberFormat('id-ID').format(amount);
+  
+  let idStatus = status;
+  let icon = '🔄';
+  if (status === 'success') { idStatus = 'Berhasil'; icon = '✅'; }
+  else if (status === 'pending') { idStatus = 'Menunggu Pembayaran'; icon = '⏳'; }
+  else if (status === 'failed') { idStatus = 'Gagal'; icon = '❌'; }
+  else if (status === 'expired') { idStatus = 'Kedaluwarsa'; icon = '⏱️'; }
+
+  const msg = `${icon} *infaqLy Admin — Update Transaksi*\n\nBerlaku perubahan status pada transaksi donasi:\n\n• Order ID: ${orderId}\n• Program: ${program}\n• Donatur: ${donorName}\n• Nominal: Rp ${fmt}\n• Status Baru: *${idStatus}*\n\nSilakan pantau halaman Transaksi di Admin Panel secara detail.\n\n_Sistem Notifikasi infaqLy_`;
+  
+  return sendWhatsApp(adminPhone, msg);
+}
+
 /** Error / Crash Alert to admin */
 export async function sendErrorAlert(endpoint: string, errorMessage: string) {
   let adminPhone = '';

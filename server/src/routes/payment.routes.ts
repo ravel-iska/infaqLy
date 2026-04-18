@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import * as paymentService from '../services/payment.service.js';
 import * as donationService from '../services/donation.service.js';
 import * as campaignService from '../services/campaign.service.js';
-import { sendDonationNotification, sendErrorAlert } from '../services/whatsapp.service.js';
+import { sendDonationNotification, sendErrorAlert, sendAdminTransactionUpdate } from '../services/whatsapp.service.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.middleware.js';
 
 const router = Router();
@@ -73,12 +73,27 @@ router.post('/notification', async (req: Request, res: Response) => {
   try {
     const result = await paymentService.handleNotification(req.body);
 
-    // Send WA notification on newly completed successful transaction
+    // Fetch campaign title for use in notifications
+    let programTitle = 'Program Donasi InfaqLy';
+    if (result.donation) {
+      const campaign = await campaignService.getCampaignById(result.donation.campaignId);
+      if (campaign) programTitle = campaign.title;
+
+      // 1. ADMIN NOTIFICATION: Send to admin on ANY status update from Midtrans
+      sendAdminTransactionUpdate(
+        result.orderId, 
+        result.status, 
+        result.donation.amount, 
+        result.donation.donorName, 
+        programTitle
+      ).catch(() => {});
+    }
+
+    // 2. DONOR NOTIFICATION: Send WA to the donor ONLY on newly completed successful transaction
     if (result.status === 'success' && result.isNewSuccess && result.donation) {
       const d = result.donation;
-      const campaign = await campaignService.getCampaignById(d.campaignId);
       sendDonationNotification(
-        d.donorName, d.donorPhone || '', campaign?.title || '', d.amount, d.orderId
+        d.donorName, d.donorPhone || '', programTitle, d.amount, d.orderId
       ).catch(() => {});
     }
 
