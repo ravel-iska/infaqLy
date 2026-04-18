@@ -25,18 +25,47 @@
 
   <br />
 
+  [Tampilan Antarmuka](#-galeri-antarmuka-uiux) • 
   [Fitur Utama](#-katalis-penggalangan-dana) • 
   [Instalasi Lokal](#-panduan-instalasi-lokal) • 
-  [Cloud Deployment](#%EF%B8%8F-panduan-cloud-deployment) • 
-  [Sistem Keamanan](#-keamanan-kelas-berlian)
-
+  [Cloud Deployment](#%EF%B8%8F-panduan-cloud-deployment)
 </div>
 
 <hr />
 
 ## 📖 Tentang Aplikasi Crowdfunding Jaringan Umat
 
-Berbeda dengan platform konvensional, **InfaqLy** dirancang secara spesifik sebagai jembatan **Crowdfunding Syariah**. Setiap dana yang digalang dari *Crowd* (masyarakat luas) secara langsung dipetakan demi mendukung kampanye sosial, pembangunan masjid, kesehatan, atau santunan yatim dengan pembukuan real-time. Tidak ada lagi kotak amal kayu yang tak transparan; selamat datang di kotak amal dunia digital.
+Berbeda dengan platform konvensional, **InfaqLy** dirancang secara spesifik sebagai jembatan **Crowdfunding Syariah**. Setiap dana yang digalang dari *Crowd* (masyarakat luas) secara langsung dipetakan demi mendukung kampanye sosial, pembangunan masjid, kesehatan, atau santunan yatim dengan pembukuan real-time. Tidak ada lagi kotak amal kayu yang tak transparan; selamat datang di ekosistem digital filantropi Islam modern.
+
+<br />
+
+## 📸 Galeri Antarmuka (UI/UX)
+
+Sistem didesain dengan prinsip UI sekalas *Startup Fintech* untuk membangun kepercayaan penuh setiap donatur. 
+
+### 1. Halaman Utama (Beranda / Landing Page)
+<div align="center">
+  <img src="docs/images/1_homepage.png" alt="Homepage InfaqLy" width="800" style="border-radius:10px; border:1px solid #ccc;" />
+  <p><i>Dirancang menggunakan teknik komposisi warna elegan yang ramah, dilengkapi dengan visual pemantik yang menggugah penderma.</i></p>
+</div>
+
+### 2. Eksplorator & Detail Kampanye
+<div align="center">
+  <img src="docs/images/2_detail.png" alt="Detail Kampanye InfaqLy" width="800" style="border-radius:10px; border:1px solid #ccc;" />
+  <p><i>Kalkulasi live-tracking donasi. Pendonator bisa memonitor jejak uang sedekahnya kapanpun.</i></p>
+</div>
+
+### 3. Ekosistem Registrasi Tahan Banting (Anti-Spam)
+<div align="center">
+  <img src="docs/images/3_register.png" alt="Halaman Register" width="800" style="border-radius:10px; border:1px solid #ccc;" />
+  <p><i>Verifikasi ganda integrasi WhatsApp API memblokir otomatis pendaftaran nomor seluler fiktif.</i></p>
+</div>
+
+### 4. Pusat Kendali Administrator (Dasbor)
+<div align="center">
+  <img src="docs/images/4_admin.png" alt="Admin Dashboard" width="800" style="border-radius:10px; border:1px solid #ccc;" />
+  <p><i>Sang pengurus (Admin) dibekali dasbor komposit arsitektur Bento-Box (Papan Kartu) untuk menginspeksi segala transaksi Midtrans secara absolut.</i></p>
+</div>
 
 <br />
 
@@ -137,38 +166,27 @@ Sistem mengudara, cek kanal-kanal ini di browser kesayangan Anda:
 
 Menciptakan situs penggalangan berskala massal tidak pernah semudah melempar batu. InfaqLy sangat kompatibel dengan kontainer nir-server *(Serverless)* dari [Railway.app](https://railway.app/).
 
-<details>
-<summary><b>Lihat Panduan Singkat Railway (7 Langkah)</b></summary>
-<br/>
-
-1. 📂 **Ambulans GitHub**: Dorong (`git push`) *update* proyek sempurna ini ke rumah GitHub Pribadi Anda terlebih dahulu.
+1. 📂 **Ambulans GitHub**: Dorong (`git push`) *update* proyek ke repositori pribadi.
 2. 🚉 **Terminal Railway**: Registrasi ke Platform Railway, lakukan `New Project` > `Deploy from GitHub repo`, temukan *"infaqLy"*.
-3. 🗄️ **Pusat Logistik Data**: Jangan langsung tekan Deploy! Ke beranda proyek Railway Anda, klik logo `+ / Create` > `Database` > pilih `Add PostgreSQL`.
-4. 🔗 **Injeksi Nadi Database**:
-   - Ketuk pilar layanan **Web App (infaqLy)** Anda.
-   - Pelesir ke tab **Variables**.
-   - Pilih **Reference Variable**, tujuannya adalah menyambungkan nilai URL dengan kotak penyedia data PostgreSQL.
-5. 🔐 **Variabel Spesifik Produksi**: Anda cuma perlu menginput ini:
+3. 🗄️ **Pusat Logistik Data**: Klik logo `+ / Create` > `Database` > pilih `Add PostgreSQL`.
+4. 🔐 **Variabel Spesifik Produksi**: Anda cuma perlu menginput ini:
+   - `DATABASE_URL` (Reference Variable dari PostgreSQL)
    - `JWT_SECRET` (Karangan Password Liar)
    - `PORT` (Isi `5000`)
    - `NODE_ENV` (Isi `production`)
-   *(Terkait **API MIDTRANS** dan **FONNTE OTP*, tak perlu ditaruh ke sini! Sang Komandan bisa mengisi nilainya super gampang secara *live* di Menu Sentral Admin Website Nanti!)*
-6. 🏗️ **Puncak Menara Build**: Railway secara senyap mendeteksi skrip `npm run build` dan `npm start`. Anda tak perlu ngapa-ngapain selain menyiapkan secangkir kopi selagi robot (*Nixpacks*) merakit kode.
-7. 🌍 **Tembakkan ke Dunia Nyata**: Pergi ke **Settings** layanan Web, temukan blok *Networking*, letuskan tembakan pamungkas dengan menekan tombol `Generate Domain`.
-</details>
+5. 🌍 **Aksi Penembakan**: Mesin Railway akan merakit skrip `npm run build` dan `npm start`. Set domain, maka aplikasi Anda siap membumi! 
 
 <br />
 
-## 🛡️ Keamanan Kelas Berlian
+## 🛡️ Keamanan Sistem
 
-Meminta dan mengamankan dana publik adalah tanggung jawab raksasa.
-* **Midtrans Webhook Anti-Spoofing:** Setipis algoritma finansial sekelas VISA, setiap kilasan lunas yang masuk ke server ditolak jika tiada sandi rahasia validasi murni `SHA-512`.
-* **SQL Injection Parimeter:** Kode operasi menabur kueri menggunakan `drizzle-orm sql`, menangkis peretas yang mencoba mengekstrak angka mutasi.
-* **WhatsApp API Rate-Limit Armor:** Ada perlindungan selang detik antrean basis data ketika ada peretas jahat ingin mengirimi *BOT DOS* ke nomor ponsel.
+* **Midtrans Webhook Anti-Spoofing:** Semua notifikasi pembayaran hanya dapat ditangkap jika membawa SHA-512 Signature Key asli perbankan.
+* **B-Tree SQL Indexes:** Seluruh tabel sentral diinjeksi arsitektur _Indexing_ guna menekan lag (bottleneck lag free architecture).
+* **GZIP Vacuum Compression:** Ukuran perpadian data lintas jaringan diringkas sampai 70% secara serentak demi _bandwidth_ irit di ponsel jamaah.
 
 <br />
 
 <div align="center">
-<b>Menembus Masa Depan Crowdfunding dengan 0% Kehilangan Data</b><br>
-Hak Cipta © 2026. Dikembangkan untuk Kehebatan Tugas Akhir & Skripsi. <br>All Rights Reserved.
+<b>Menembus Masa Depan Crowdfunding dengan Amal Jariyah</b><br>
+Hak Cipta © 2026. Dikembangkan sebagai Artefak Karya Akademis (Skripsi). <br>All Rights Reserved.
 </div>
