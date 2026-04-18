@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { formatCurrency, formatCurrencyShort } from '@/utils/formatCurrency';
 import { getActiveCampaigns, daysRemaining } from '@/services/campaignService';
@@ -74,7 +74,7 @@ export default function ExplorePage() {
               placeholder="Cari nama program..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-14 pr-6 py-4 rounded-full border border-outline-variant/30 dark:border-slate-600 bg-surface-container-lowest dark:bg-slate-900 text-on-surface dark:text-slate-100 placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary dark:focus:border-emerald-500 focus:ring-2 focus:ring-primary/20 transition-all font-medium text-sm md:text-base"
+              className="w-full pl-14 pr-6 py-4 rounded-full border border-outline-variant/30 dark:border-slate-600 bg-surface-container-lowest dark:bg-slate-900 text-on-surface dark:text-slate-100 placeholder:text-on-surface-variant focus:outline-none focus:border-primary dark:focus:border-emerald-500 focus:ring-2 focus:ring-primary/20 transition-all font-medium text-sm md:text-base"
             />
           </div>
 
@@ -131,7 +131,7 @@ export default function ExplorePage() {
         ) : filtered.length === 0 ? (
           <div className="text-center py-32 bg-surface-container-lowest dark:bg-slate-800 rounded-[3rem] border border-white/20 dark:border-slate-700 ambient-shadow">
             <div className="w-24 h-24 mx-auto bg-surface-container dark:bg-slate-700 rounded-full flex items-center justify-center mb-6">
-              <span className="material-symbols-outlined text-5xl text-on-surface-variant/50 dark:text-slate-500">
+              <span className="material-symbols-outlined text-5xl text-on-surface-variant dark:text-slate-500">
                 search_off
               </span>
             </div>

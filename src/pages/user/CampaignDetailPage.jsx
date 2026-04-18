@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatCurrency';
@@ -191,7 +191,7 @@ export default function CampaignDetailPage() {
     <div className="animate-fade-in pt-28 pb-12">
       <main className="max-w-7xl mx-auto px-4 md:px-8">
         {/* Breadcrumb */}
-        <nav className="flex items-center space-x-2 text-xs font-medium text-on-surface-variant/60 dark:text-slate-500 mb-6 uppercase tracking-widest">
+        <nav className="flex items-center space-x-2 text-xs font-medium text-on-surface-variant dark:text-slate-500 mb-6 uppercase tracking-widest">
           <Link to="/explore" className="hover:text-primary dark:hover:text-emerald-400 transition-colors">Program</Link>
           <span className="material-symbols-outlined text-[10px]">chevron_right</span>
           <span className="dark:text-slate-400">{categoryLabel}</span>
@@ -418,7 +418,7 @@ export default function CampaignDetailPage() {
           </div>
         </div>
 
-        {/* Latest Donors Section — outside grid so it always appears after payment panel on mobile */}
+        {/* Latest Donors Section â€” outside grid so it always appears after payment panel on mobile */}
         <section className="space-y-6 mt-10 max-w-7xl">
           <div className="flex justify-between items-end">
             <h2 className="text-2xl font-extrabold tracking-tight font-headline dark:text-white">Donatur Terbaru</h2>
@@ -446,7 +446,7 @@ export default function CampaignDetailPage() {
                     </h4>
                     <p className="text-xs text-on-surface-variant dark:text-slate-400">Donasi <span className="font-semibold text-primary dark:text-emerald-400">{formatCurrency(donor.amount)}</span></p>
                   </div>
-                  <div className="text-[10px] text-on-surface-variant/60 dark:text-slate-500 font-medium whitespace-nowrap">
+                  <div className="text-[10px] text-on-surface-variant dark:text-slate-500 font-medium whitespace-nowrap">
                     {formatTimeAgo(donor.createdAt)}
                   </div>
                 </div>

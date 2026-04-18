@@ -58,7 +58,7 @@ export default function HomePage() {
             <h1 className="font-headline text-5xl md:text-6xl font-extrabold text-on-surface dark:text-slate-50 leading-tight mb-8 tracking-tight">
               Berbagi Kebaikan Lewat <br className="hidden lg:block"/><span className="text-primary dark:text-emerald-400 italic">Infaq & Wakaf</span> Digital
             </h1>
-            <p className="text-lg text-on-surface-variant/80 dark:text-slate-300 mb-10 max-w-lg leading-relaxed">
+            <p className="text-lg text-on-surface-variant dark:text-slate-300 mb-10 max-w-lg leading-relaxed">
               Platform amanah untuk menyalurkan kepedulian Anda. Ubah masa depan mereka dengan kontribusi nyata yang berkelanjutan.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -80,6 +80,8 @@ export default function HomePage() {
                 decoding="async"
                 width="600"
                 height="750"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                srcSet="https://lh3.googleusercontent.com/aida-public/AB6AXuCtvLNhQLwSvJ39x5VIL3RdjIq7aIRowq59uuy8WHLxJLbsuJYRQb-wnxUfKG4QpoHhYNp1hgH0UtFv9-coaYSyRKtyWkaLuWPWCjHM9dhtslpu8Z2wk_8tH30MyMs89oljB-QbX6YydPjoQ4rv_hW-xMW0QJwzwaRrTgqTAurVy2pWuNmHX6Sumk9OWOlN5oRlehvw9XQZkIxq5pF0L36j_RXkloIbGT5T3joE9knYsdg0fOgz-hMkkpULym054L3WtPu9j4RPPa0=s400 400w, https://lh3.googleusercontent.com/aida-public/AB6AXuCtvLNhQLwSvJ39x5VIL3RdjIq7aIRowq59uuy8WHLxJLbsuJYRQb-wnxUfKG4QpoHhYNp1hgH0UtFv9-coaYSyRKtyWkaLuWPWCjHM9dhtslpu8Z2wk_8tH30MyMs89oljB-QbX6YydPjoQ4rv_hW-xMW0QJwzwaRrTgqTAurVy2pWuNmHX6Sumk9OWOlN5oRlehvw9XQZkIxq5pF0L36j_RXkloIbGT5T3joE9knYsdg0fOgz-hMkkpULym054L3WtPu9j4RPPa0=s800 800w"
                 className="w-full h-full object-cover" 
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtvLNhQLwSvJ39x5VIL3RdjIq7aIRowq59uuy8WHLxJLbsuJYRQb-wnxUfKG4QpoHhYNp1hgH0UtFv9-coaYSyRKtyWkaLuWPWCjHM9dhtslpu8Z2wk_8tH30MyMs89oljB-QbX6YydPjoQ4rv_hW-xMW0QJwzwaRrTgqTAurVy2pWuNmHX6Sumk9OWOlN5oRlehvw9XQZkIxq5pF0L36j_RXkloIbGT5T3joE9knYsdg0fOgz-hMkkpULym054L3WtPu9j4RPPa0=rw"
               />
