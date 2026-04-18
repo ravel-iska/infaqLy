@@ -336,10 +336,6 @@ export default function SettingsPage() {
 
       {/* MIDTRANS CONFIGURATION */}
       <div className={`bg-base-100 shadow rounded-2xl p-6 sm:p-8 border-l-4 relative overflow-hidden transition-all duration-300 ${activePaymentGateway === 'midtrans' ? 'border-l-primary ring-2 ring-primary/20' : 'border-l-base-300 opacity-60'}`}>
-        {/* Dynamic Badge indicating ACTIVE mode */}
-        <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl text-[11px] font-bold uppercase tracking-wider text-white shadow-sm ${env === 'production' ? 'bg-success' : 'bg-primary'}`}>
-          Active: {env === 'production' ? 'Production' : 'Sandbox'}
-        </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-base-200 pb-5">
           <div>
@@ -504,9 +500,6 @@ export default function SettingsPage() {
 
       {/* DOKU PAYMENT GATEWAY */}
       <div className={`bg-base-100 shadow rounded-2xl p-6 sm:p-8 border-l-4 relative overflow-hidden mt-8 transition-all duration-300 ${activePaymentGateway === 'doku' ? 'border-l-info ring-2 ring-info/20' : 'border-l-base-300 opacity-60'}`}>
-        <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl text-[11px] font-bold uppercase tracking-wider text-white shadow-sm ${dokuEnv === 'production' ? 'bg-success' : 'bg-info'}`}>
-          Active: {dokuEnv === 'production' ? 'Production' : 'Sandbox'}
-        </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-base-200 pb-5">
           <div>
