@@ -335,7 +335,7 @@ export default function SettingsPage() {
       </div>
 
       {/* MIDTRANS CONFIGURATION */}
-      <div className={`bg-base-100 shadow rounded-2xl p-6 sm:p-8 border-l-4 relative overflow-hidden transition-all duration-300 ${activePaymentGateway === 'midtrans' ? 'border-l-primary ring-2 ring-primary/20' : 'border-l-base-300 opacity-60'}`}>
+      <div className={`bg-base-100 shadow rounded-2xl p-6 sm:p-8 relative overflow-hidden transition-all duration-300 ${activePaymentGateway === 'midtrans' ? 'ring-1 ring-primary/30 shadow-primary/10' : 'opacity-50'}`}>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-base-200 pb-5">
           <div>
@@ -499,7 +499,7 @@ export default function SettingsPage() {
       </div>
 
       {/* DOKU PAYMENT GATEWAY */}
-      <div className={`bg-base-100 shadow rounded-2xl p-6 sm:p-8 border-l-4 relative overflow-hidden mt-8 transition-all duration-300 ${activePaymentGateway === 'doku' ? 'border-l-info ring-2 ring-info/20' : 'border-l-base-300 opacity-60'}`}>
+      <div className={`bg-base-100 shadow rounded-2xl p-6 sm:p-8 relative overflow-hidden mt-8 transition-all duration-300 ${activePaymentGateway === 'doku' ? 'ring-1 ring-info/30 shadow-info/10' : 'opacity-50'}`}>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-base-200 pb-5">
           <div>
