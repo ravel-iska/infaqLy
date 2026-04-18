@@ -58,27 +58,27 @@ function AdminGuestOnly({ children }) {
 
 function LoadingScreen() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center user-bg relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-surface dark:bg-slate-900 relative overflow-hidden transition-colors duration-300">
       {/* Subtle Glow Background */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-user-accent/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-primary/5 dark:bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none" />
 
       {/* Spinner Container */}
       <div className="relative flex justify-center items-center mb-8 z-10">
         {/* Outer Static Track */}
-        <div className="absolute inset-0 w-16 h-16 rounded-full border-[3px] border-user-border/30" />
+        <div className="absolute inset-0 w-16 h-16 rounded-full border-[3px] border-outline-variant/30 dark:border-slate-700" />
         
         {/* Fast Inner Ring */}
-        <div className="absolute w-10 h-10 rounded-full border-[3px] border-transparent border-t-user-accent animate-spin" style={{ animationDuration: '0.8s' }} />
+        <div className="absolute w-10 h-10 rounded-full border-[3px] border-transparent border-t-primary dark:border-t-emerald-400 animate-spin" style={{ animationDuration: '0.8s' }} />
         
         {/* Slow Outer Ring */}
-        <div className="w-16 h-16 rounded-full border-[3px] border-transparent border-b-user-accent animate-[spin_1.5s_linear_infinite_reverse]" />
+        <div className="w-16 h-16 rounded-full border-[3px] border-transparent border-b-primary dark:border-b-emerald-400 animate-[spin_1.5s_linear_infinite_reverse]" />
       </div>
 
       {/* Brand Text */}
-      <h2 className="text-xl font-extrabold text-user-text tracking-tight mb-2 z-10">
-        infaq<span className="text-user-accent">Ly</span>
+      <h2 className="text-xl font-extrabold text-on-surface dark:text-white tracking-tight mb-2 z-10 font-headline">
+        infaq<span className="text-primary dark:text-emerald-400">Ly</span>
       </h2>
-      <p className="text-sm font-medium text-user-text-muted animate-pulse z-10">
+      <p className="text-sm font-medium text-slate-500 dark:text-slate-400 animate-pulse z-10">
         Mempersiapkan data...
       </p>
     </div>
