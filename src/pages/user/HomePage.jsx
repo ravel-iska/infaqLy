@@ -79,12 +79,10 @@ export default function HomePage() {
                 loading="eager"
                 fetchpriority="high"
                 decoding="async"
-                width="600"
-                height="750"
-                sizes="(max-width: 768px) 100vw, 50vw"
-                srcSet="https://lh3.googleusercontent.com/aida-public/AB6AXuCtvLNhQLwSvJ39x5VIL3RdjIq7aIRowq59uuy8WHLxJLbsuJYRQb-wnxUfKG4QpoHhYNp1hgH0UtFv9-coaYSyRKtyWkaLuWPWCjHM9dhtslpu8Z2wk_8tH30MyMs89oljB-QbX6YydPjoQ4rv_hW-xMW0QJwzwaRrTgqTAurVy2pWuNmHX6Sumk9OWOlN5oRlehvw9XQZkIxq5pF0L36j_RXkloIbGT5T3joE9knYsdg0fOgz-hMkkpULym054L3WtPu9j4RPPa0=s400 400w, https://lh3.googleusercontent.com/aida-public/AB6AXuCtvLNhQLwSvJ39x5VIL3RdjIq7aIRowq59uuy8WHLxJLbsuJYRQb-wnxUfKG4QpoHhYNp1hgH0UtFv9-coaYSyRKtyWkaLuWPWCjHM9dhtslpu8Z2wk_8tH30MyMs89oljB-QbX6YydPjoQ4rv_hW-xMW0QJwzwaRrTgqTAurVy2pWuNmHX6Sumk9OWOlN5oRlehvw9XQZkIxq5pF0L36j_RXkloIbGT5T3joE9knYsdg0fOgz-hMkkpULym054L3WtPu9j4RPPa0=s800 800w"
+                width="400"
+                height="500"
                 className="w-full h-full object-cover" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtvLNhQLwSvJ39x5VIL3RdjIq7aIRowq59uuy8WHLxJLbsuJYRQb-wnxUfKG4QpoHhYNp1hgH0UtFv9-coaYSyRKtyWkaLuWPWCjHM9dhtslpu8Z2wk_8tH30MyMs89oljB-QbX6YydPjoQ4rv_hW-xMW0QJwzwaRrTgqTAurVy2pWuNmHX6Sumk9OWOlN5oRlehvw9XQZkIxq5pF0L36j_RXkloIbGT5T3joE9knYsdg0fOgz-hMkkpULym054L3WtPu9j4RPPa0=rw"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtvLNhQLwSvJ39x5VIL3RdjIq7aIRowq59uuy8WHLxJLbsuJYRQb-wnxUfKG4QpoHhYNp1hgH0UtFv9-coaYSyRKtyWkaLuWPWCjHM9dhtslpu8Z2wk_8tH30MyMs89oljB-QbX6YydPjoQ4rv_hW-xMW0QJwzwaRrTgqTAurVy2pWuNmHX6Sumk9OWOlN5oRlehvw9XQZkIxq5pF0L36j_RXkloIbGT5T3joE9knYsdg0fOgz-hMkkpULym054L3WtPu9j4RPPa0=s400"
               />
             </div>
             <div className="absolute -bottom-8 -left-8 bg-surface-container-lowest dark:bg-slate-800 p-6 rounded-2xl shadow-2xl max-w-xs border border-white/50 dark:border-slate-700 backdrop-blur-sm hidden sm:block">
@@ -132,7 +130,7 @@ export default function HomePage() {
             <h2 className="font-headline text-4xl font-bold mb-4 dark:text-white">Program Unggulan</h2>
             <p className="text-on-surface-variant dark:text-slate-300 text-lg">Pilih program yang paling sesuai dengan kepedulian Anda dan mulailah menebar manfaat hari ini.</p>
           </div>
-          <Link to="/explore" className="flex items-center gap-2 text-primary dark:text-emerald-400 font-bold hover:gap-3 transition-all">
+          <Link to="/explore" className="flex items-center gap-2 text-primary dark:text-emerald-400 font-bold hover:gap-3 transition-[gap]">
             Lihat Semua <span className="material-symbols-outlined">arrow_forward</span>
           </Link>
         </div>
@@ -174,7 +172,7 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             <div className="relative group text-center">
-              <div className="w-20 h-20 bg-surface-container dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6 text-primary dark:text-emerald-400 transition-all group-hover:bg-primary dark:group-hover:bg-emerald-500 group-hover:text-white ambient-shadow border border-slate-100 dark:border-slate-700">
+              <div className="w-20 h-20 bg-surface-container dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6 text-primary dark:text-emerald-400 transition-colors group-hover:bg-primary dark:group-hover:bg-emerald-500 group-hover:text-white ambient-shadow border border-slate-100 dark:border-slate-700">
                 <span className="material-symbols-outlined text-4xl">search</span>
               </div>
               <h4 className="font-bold text-lg mb-2 dark:text-white">Pilih Program</h4>
@@ -184,7 +182,7 @@ export default function HomePage() {
               </div>
             </div>
             <div className="relative group text-center">
-              <div className="w-20 h-20 bg-surface-container dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6 text-primary dark:text-emerald-400 transition-all group-hover:bg-primary dark:group-hover:bg-emerald-500 group-hover:text-white ambient-shadow border border-slate-100 dark:border-slate-700">
+              <div className="w-20 h-20 bg-surface-container dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6 text-primary dark:text-emerald-400 transition-colors group-hover:bg-primary dark:group-hover:bg-emerald-500 group-hover:text-white ambient-shadow border border-slate-100 dark:border-slate-700">
                 <span className="material-symbols-outlined text-4xl">credit_score</span>
               </div>
               <h4 className="font-bold text-lg mb-2 dark:text-white">Pilih Nominal</h4>
@@ -194,7 +192,7 @@ export default function HomePage() {
               </div>
             </div>
             <div className="relative group text-center">
-              <div className="w-20 h-20 bg-surface-container dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6 text-primary dark:text-emerald-400 transition-all group-hover:bg-primary dark:group-hover:bg-emerald-500 group-hover:text-white ambient-shadow border border-slate-100 dark:border-slate-700">
+              <div className="w-20 h-20 bg-surface-container dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6 text-primary dark:text-emerald-400 transition-colors group-hover:bg-primary dark:group-hover:bg-emerald-500 group-hover:text-white ambient-shadow border border-slate-100 dark:border-slate-700">
                 <span className="material-symbols-outlined text-4xl">payments</span>
               </div>
               <h4 className="font-bold text-lg mb-2 dark:text-white">Bayar Donasi</h4>
@@ -204,7 +202,7 @@ export default function HomePage() {
               </div>
             </div>
             <div className="group text-center">
-              <div className="w-20 h-20 bg-surface-container dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6 text-primary dark:text-emerald-400 transition-all group-hover:bg-primary dark:group-hover:bg-emerald-500 group-hover:text-white ambient-shadow border border-slate-100 dark:border-slate-700">
+              <div className="w-20 h-20 bg-surface-container dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6 text-primary dark:text-emerald-400 transition-colors group-hover:bg-primary dark:group-hover:bg-emerald-500 group-hover:text-white ambient-shadow border border-slate-100 dark:border-slate-700">
                 <span className="material-symbols-outlined text-4xl">receipt_long</span>
               </div>
               <h4 className="font-bold text-lg mb-2 dark:text-white">Terima Laporan</h4>
