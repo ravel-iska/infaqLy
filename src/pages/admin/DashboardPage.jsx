@@ -102,10 +102,10 @@ export default function DashboardPage() {
   const urgentCampaigns = activeWithTarget.filter(c => (c.collected / c.target) < 0.3).length;
 
   const STATS = [
-    { icon: 'analytics', label: 'Indeks Ketercapaian', value: `${avgProgress}%`, trend: 'Distribusi target tercapai', up: true, color: 'text-primary', bg: 'bg-primary/10' },
-    { icon: 'loyalty', label: 'Kategori Terfavorit', value: topCategoryLabel, trend: `${topCategoryDonors} donatur memilih jalur ini`, up: true, color: 'text-secondary', bg: 'bg-secondary/10' },
-    { icon: 'donut_large', label: 'Rata-rata Infaq / User', value: formatCurrencyShort(avgDonation), trend: 'Tingkat kemurahan hati donatur', up: true, color: 'text-info', bg: 'bg-info/10' },
-    { icon: 'notification_important', label: 'Program Mendesak', value: urgentCampaigns, trend: 'Butuh atensi (Target < 30%)', up: false, color: 'text-error', bg: 'bg-error/10' },
+    { icon: 'analytics', label: 'Indeks Ketercapaian', value: `${avgProgress}%`, trend: 'Target Global', up: true, color: 'text-primary', bg: 'bg-primary/10' },
+    { icon: 'loyalty', label: 'Kategori Terfavorit', value: topCategoryLabel, trend: `${topCategoryDonors} Donatur`, up: true, color: 'text-secondary', bg: 'bg-secondary/10' },
+    { icon: 'donut_large', label: 'Rata-rata Infaq', value: formatCurrencyShort(avgDonation), trend: 'Per Transaksi', up: true, color: 'text-info', bg: 'bg-info/10' },
+    { icon: 'notification_important', label: 'Program Mendesak', value: urgentCampaigns, trend: 'Target < 30%', up: false, color: 'text-error', bg: 'bg-error/10' },
   ];
 
   // Real visitor data fetched mapped to visitorData state
@@ -148,13 +148,13 @@ export default function DashboardPage() {
                     <span className="material-symbols-outlined text-[14px]">
                       {stat.up ? 'trending_up' : 'trending_down'}
                     </span>
+                    {stat.trend}
                   </span>
                 </div>
                 <p className="text-sm font-medium text-base-content/60">{stat.label}</p>
                 <p className="text-3xl font-bold text-base-content mt-1 font-headline tracking-tight">
                   {typeof stat.value === 'string' ? stat.value : (typeof stat.value === 'number' && stat.value > 9999 ? formatCurrencyShort(stat.value) : (stat.value || 0).toLocaleString('id-ID'))}
                 </p>
-                <p className="text-xs font-medium text-base-content/50 mt-1 opacity-80">{stat.trend}</p>
               </div>
             ))}
       </div>
