@@ -56,7 +56,7 @@ export async function getCampaignBalances() {
     const totalWithdrawn = withdrawalRows.reduce((s, w) => s + w.amount, 0);
 
     const available = totalDonated - totalWithdrawn;
-    const reachedTarget = campaign.collected >= campaign.target && campaign.target > 0;
+    const reachedTarget = totalDonated >= campaign.target && campaign.target > 0;
 
     return {
       campaignId: campaign.id,
@@ -103,12 +103,7 @@ export async function createWithdrawal(data: {
   const [campaign] = await db.select().from(campaigns).where(eq(campaigns.id, data.campaignId)).limit(1);
   if (!campaign) throw new Error('Kampanye tidak ditemukan.');
 
-  // Check if campaign has reached target
-  if (campaign.collected < campaign.target) {
-    throw new Error(`Penarikan ditolak: Kampanye "${campaign.title}" belum mencapai target (${campaign.collected}/${campaign.target}).`);
-  }
-
-  // Calculate available balance for this campaign
+  // Calculate available balance for this campaign from actual donations
   const currentEnv = await getCurrentEnv();
   const donationRows = await db.select({ amount: donations.amount })
     .from(donations)
@@ -118,6 +113,11 @@ export async function createWithdrawal(data: {
       eq(donations.env, currentEnv),
     ));
   const totalDonated = donationRows.reduce((s, d) => s + d.amount, 0);
+
+  // Check if campaign has reached target based on actual donations
+  if (totalDonated < campaign.target) {
+    throw new Error(`Penarikan ditolak: Kampanye "${campaign.title}" belum mencapai target (${totalDonated}/${campaign.target}).`);
+  }
 
   const withdrawalRows = await db.select({ amount: withdrawals.amount })
     .from(withdrawals)

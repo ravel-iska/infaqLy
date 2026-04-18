@@ -52,9 +52,9 @@ export default function UserLayout() {
   const { isUserDark } = useTheme();
 
   return (
-    <div className={`min-h-screen flex flex-col user-bg dark:bg-slate-900 transition-colors duration-300 ${isUserDark ? 'dark' : ''}`}>
+    <div className={`min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900 transition-colors duration-300 ${isUserDark ? 'dark' : ''}`}>
       <Navbar />
-      <main className="flex-1">
+      <main className="flex-1 w-full relative">
         <Outlet />
       </main>
       <Footer />

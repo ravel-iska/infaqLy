@@ -176,7 +176,7 @@ export default function CampaignDetailPage() {
   };
 
   return (
-    <div className="animate-fade-in py-6">
+    <div className="animate-fade-in pt-28 pb-12">
       <main className="max-w-7xl mx-auto px-4 md:px-8">
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-xs font-medium text-on-surface-variant/60 dark:text-slate-500 mb-6 uppercase tracking-widest">

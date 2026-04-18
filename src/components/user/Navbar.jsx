@@ -116,13 +116,6 @@ export default function Navbar() {
                     <User size={16} />
                     Profil Saya
                   </Link>
-                  <button 
-                    onClick={toggleUserTheme}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-300 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-slate-700 transition-colors font-medium"
-                  >
-                    <span className="material-symbols-outlined">{isUserDark ? 'light_mode' : 'dark_mode'}</span>
-                    {isUserDark ? 'Mode Terang' : 'Mode Gelap'}
-                  </button>
                   <button
                     onClick={handleLogout}
                     className="flex items-center gap-2 w-full px-4 py-3 text-sm text-danger hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
