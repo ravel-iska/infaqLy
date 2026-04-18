@@ -3,6 +3,7 @@ import { requireAdmin } from '../middleware/auth.middleware.js';
 import { db } from '../config/database.js';
 import { settings, campaigns, donations } from '../db/schema.js';
 import { eq, and, lt, inArray } from 'drizzle-orm';
+import { invalidateEnvCache } from '../services/campaign.service.js';
 
 function maskSecret(val: string) {
   if (!val) return '';
@@ -121,6 +122,9 @@ router.put('/', requireAdmin, async (req: Request, res: Response) => {
     return res.json({ message: 'Settings berhasil disimpan' });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
+  } finally {
+    // Always invalidate env cache after settings change
+    invalidateEnvCache();
   }
 });
 

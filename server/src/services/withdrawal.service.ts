@@ -2,13 +2,18 @@ import { db } from '../config/database.js';
 import { withdrawals, campaigns, donations, settings } from '../db/schema.js';
 import { desc, eq, and, sql } from 'drizzle-orm';
 
-/**
- * Helper: Get current midtrans env from DB settings
- */
+// ═══ Cached env (same pattern as campaign.service) ═══
+let cachedEnv: 'sandbox' | 'production' | null = null;
+let cachedEnvAt = 0;
+const ENV_CACHE_TTL = 30_000;
+
 async function getCurrentEnv(): Promise<'sandbox' | 'production'> {
+  if (cachedEnv && Date.now() - cachedEnvAt < ENV_CACHE_TTL) return cachedEnv;
   const [row] = await db.select().from(settings).where(eq(settings.key, 'midtrans_env')).limit(1);
   const val = row?.value;
-  return (val === 'production' || val === 'sandbox') ? val : 'sandbox';
+  cachedEnv = (val === 'production' || val === 'sandbox') ? val : 'sandbox';
+  cachedEnvAt = Date.now();
+  return cachedEnv;
 }
 
 /**
@@ -17,44 +22,45 @@ async function getCurrentEnv(): Promise<'sandbox' | 'production'> {
 export async function listWithdrawals() {
   const allWithdrawals = await db.select().from(withdrawals).orderBy(desc(withdrawals.createdAt));
   
-  // Enrich with campaign title
-  const enriched = await Promise.all(allWithdrawals.map(async (w) => {
-    let campaignTitle = 'Global (Legacy)';
-    if (w.campaignId) {
-      const [camp] = await db.select({ title: campaigns.title }).from(campaigns).where(eq(campaigns.id, w.campaignId)).limit(1);
-      if (camp) campaignTitle = camp.title;
-    }
-    return { ...w, campaignTitle };
-  }));
+  // Get all campaign titles in one query
+  const allCampaigns = await db.select({ id: campaigns.id, title: campaigns.title }).from(campaigns);
+  const campMap = new Map(allCampaigns.map(c => [c.id, c.title]));
 
-  return enriched;
+  return allWithdrawals.map(w => ({
+    ...w,
+    campaignTitle: (w.campaignId && campMap.get(w.campaignId)) || 'Global (Legacy)',
+  }));
 }
 
 /**
- * Get balance summary per campaign (for crowdfunding withdrawal)
- * Only campaigns that have reached their target are eligible for withdrawal
+ * Get balance summary per campaign — uses aggregated queries (no N+1)
  */
 export async function getCampaignBalances() {
   const currentEnv = await getCurrentEnv();
   const allCampaigns = await db.select().from(campaigns);
-  
-  const balances = await Promise.all(allCampaigns.map(async (campaign) => {
-    // Total successful donations for this campaign in current env
-    const donationRows = await db.select({ amount: donations.amount })
-      .from(donations)
-      .where(and(
-        eq(donations.campaignId, campaign.id),
-        eq(donations.paymentStatus, 'success'),
-        eq(donations.env, currentEnv),
-      ));
-    const totalDonated = donationRows.reduce((s, d) => s + d.amount, 0);
 
-    // Total already withdrawn from this campaign
-    const withdrawalRows = await db.select({ amount: withdrawals.amount })
-      .from(withdrawals)
-      .where(eq(withdrawals.campaignId, campaign.id));
-    const totalWithdrawn = withdrawalRows.reduce((s, w) => s + w.amount, 0);
+  // Aggregated donations per campaign in ONE query
+  const donationAgg = await db.select({
+    campaignId: donations.campaignId,
+    total: sql<number>`COALESCE(SUM(${donations.amount}), 0)`.as('total'),
+  })
+    .from(donations)
+    .where(and(eq(donations.paymentStatus, 'success'), eq(donations.env, currentEnv as any)))
+    .groupBy(donations.campaignId);
+  const donMap = new Map(donationAgg.map(d => [d.campaignId, Number(d.total)]));
 
+  // Aggregated withdrawals per campaign in ONE query
+  const withdrawalAgg = await db.select({
+    campaignId: withdrawals.campaignId,
+    total: sql<number>`COALESCE(SUM(${withdrawals.amount}), 0)`.as('total'),
+  })
+    .from(withdrawals)
+    .groupBy(withdrawals.campaignId);
+  const wdMap = new Map(withdrawalAgg.map(w => [w.campaignId!, Number(w.total)]));
+
+  return allCampaigns.map((campaign) => {
+    const totalDonated = donMap.get(campaign.id) || 0;
+    const totalWithdrawn = wdMap.get(campaign.id) || 0;
     const available = totalDonated - totalWithdrawn;
     const reachedTarget = totalDonated >= campaign.target && campaign.target > 0;
 
@@ -69,9 +75,7 @@ export async function getCampaignBalances() {
       reachedTarget,
       eligible: reachedTarget && available > 0,
     };
-  }));
-
-  return balances;
+  });
 }
 
 /**
@@ -105,24 +109,28 @@ export async function createWithdrawal(data: {
 
   // Calculate available balance for this campaign from actual donations
   const currentEnv = await getCurrentEnv();
-  const donationRows = await db.select({ amount: donations.amount })
+  const [donAgg] = await db.select({
+    total: sql<number>`COALESCE(SUM(${donations.amount}), 0)`.as('total'),
+  })
     .from(donations)
     .where(and(
       eq(donations.campaignId, data.campaignId),
       eq(donations.paymentStatus, 'success'),
-      eq(donations.env, currentEnv),
+      eq(donations.env, currentEnv as any),
     ));
-  const totalDonated = donationRows.reduce((s, d) => s + d.amount, 0);
+  const totalDonated = Number(donAgg?.total ?? 0);
 
   // Check if campaign has reached target based on actual donations
   if (totalDonated < campaign.target) {
     throw new Error(`Penarikan ditolak: Kampanye "${campaign.title}" belum mencapai target (${totalDonated}/${campaign.target}).`);
   }
 
-  const withdrawalRows = await db.select({ amount: withdrawals.amount })
+  const [wdAgg] = await db.select({
+    total: sql<number>`COALESCE(SUM(${withdrawals.amount}), 0)`.as('total'),
+  })
     .from(withdrawals)
     .where(eq(withdrawals.campaignId, data.campaignId));
-  const totalWithdrawn = withdrawalRows.reduce((s, w) => s + w.amount, 0);
+  const totalWithdrawn = Number(wdAgg?.total ?? 0);
 
   const available = totalDonated - totalWithdrawn;
   if (data.amount > available) {

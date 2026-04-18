@@ -2,21 +2,53 @@ import { db } from '../config/database.js';
 import { campaigns, donations, settings } from '../db/schema.js';
 import { eq, ilike, and, or, desc, sql } from 'drizzle-orm';
 
+// ═══ Cached env to avoid querying DB on every single function call ═══
+let cachedEnv: 'sandbox' | 'production' | null = null;
+let cachedEnvAt = 0;
+const ENV_CACHE_TTL = 30_000; // 30 seconds
+
 /**
- * Helper: Get current midtrans env from DB settings
+ * Helper: Get current midtrans env from DB settings (cached 30s)
  */
 async function getCurrentEnv(): Promise<'sandbox' | 'production'> {
+  if (cachedEnv && Date.now() - cachedEnvAt < ENV_CACHE_TTL) return cachedEnv;
   const [row] = await db.select().from(settings).where(eq(settings.key, 'midtrans_env')).limit(1);
   const val = row?.value;
-  return (val === 'production' || val === 'sandbox') ? val : 'sandbox';
+  cachedEnv = (val === 'production' || val === 'sandbox') ? val : 'sandbox';
+  cachedEnvAt = Date.now();
+  return cachedEnv;
 }
+
+/** Invalidate env cache (called when admin changes settings) */
+export function invalidateEnvCache() { cachedEnv = null; }
 
 function slugify(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36);
 }
 
 /**
+ * Helper: Get donation aggregates per campaign in a SINGLE query (kills N+1)
+ */
+async function getDonationAggregates(currentEnv: string): Promise<Map<number, { collected: number; donors: number }>> {
+  const rows = await db.select({
+    campaignId: donations.campaignId,
+    total: sql<number>`COALESCE(SUM(${donations.amount}), 0)`.as('total'),
+    count: sql<number>`COUNT(*)`.as('count'),
+  })
+    .from(donations)
+    .where(and(eq(donations.paymentStatus, 'success'), eq(donations.env, currentEnv as any)))
+    .groupBy(donations.campaignId);
+
+  const map = new Map<number, { collected: number; donors: number }>();
+  for (const r of rows) {
+    map.set(r.campaignId, { collected: Number(r.total), donors: Number(r.count) });
+  }
+  return map;
+}
+
+/**
  * List campaigns with optional filters
+ * Uses a single aggregated query instead of N+1
  */
 export async function listCampaigns(filters?: { status?: string; category?: string; search?: string }) {
   const conditions = [];
@@ -28,28 +60,29 @@ export async function listCampaigns(filters?: { status?: string; category?: stri
     ? db.select().from(campaigns).where(and(...conditions)).orderBy(desc(campaigns.createdAt))
     : db.select().from(campaigns).orderBy(desc(campaigns.createdAt));
 
-  const allCampaigns = await query;
-  const currentEnv = await getCurrentEnv();
+  const [allCampaigns, currentEnv] = await Promise.all([query, getCurrentEnv()]);
+  const aggregates = await getDonationAggregates(currentEnv);
 
-  return Promise.all(allCampaigns.map(async (c) => {
-    const rows = await db.select({ amount: donations.amount }).from(donations).where(and(eq(donations.campaignId, c.id), eq(donations.paymentStatus, 'success'), eq(donations.env, currentEnv)));
-    const totalDonated = rows.reduce((s, d) => s + d.amount, 0);
-    return { ...c, collected: totalDonated, donors: rows.length };
-  }));
+  return allCampaigns.map((c) => {
+    const agg = aggregates.get(c.id) || { collected: 0, donors: 0 };
+    return { ...c, collected: agg.collected, donors: agg.donors };
+  });
 }
 
 /**
  * Get active campaigns only (for user-facing pages)
  */
 export async function getActiveCampaigns() {
-  const allCampaigns = await db.select().from(campaigns).where(eq(campaigns.status, 'active')).orderBy(desc(campaigns.createdAt));
-  const currentEnv = await getCurrentEnv();
+  const [allCampaigns, currentEnv] = await Promise.all([
+    db.select().from(campaigns).where(eq(campaigns.status, 'active')).orderBy(desc(campaigns.createdAt)),
+    getCurrentEnv(),
+  ]);
+  const aggregates = await getDonationAggregates(currentEnv);
 
-  return Promise.all(allCampaigns.map(async (c) => {
-    const rows = await db.select({ amount: donations.amount }).from(donations).where(and(eq(donations.campaignId, c.id), eq(donations.paymentStatus, 'success'), eq(donations.env, currentEnv)));
-    const totalDonated = rows.reduce((s, d) => s + d.amount, 0);
-    return { ...c, collected: totalDonated, donors: rows.length };
-  }));
+  return allCampaigns.map((c) => {
+    const agg = aggregates.get(c.id) || { collected: 0, donors: 0 };
+    return { ...c, collected: agg.collected, donors: agg.donors };
+  });
 }
 
 /**
@@ -59,9 +92,16 @@ export async function getCampaignById(id: number) {
   const [campaign] = await db.select().from(campaigns).where(eq(campaigns.id, id)).limit(1);
   if (!campaign) return null;
   const currentEnv = await getCurrentEnv();
-  const rows = await db.select({ amount: donations.amount }).from(donations).where(and(eq(donations.campaignId, campaign.id), eq(donations.paymentStatus, 'success'), eq(donations.env, currentEnv)));
-  const totalDonated = rows.reduce((s, d) => s + d.amount, 0);
-  return { ...campaign, collected: totalDonated, donors: rows.length };
+
+  // Single campaign — single query is fine here
+  const [agg] = await db.select({
+    total: sql<number>`COALESCE(SUM(${donations.amount}), 0)`.as('total'),
+    count: sql<number>`COUNT(*)`.as('count'),
+  })
+    .from(donations)
+    .where(and(eq(donations.campaignId, campaign.id), eq(donations.paymentStatus, 'success'), eq(donations.env, currentEnv as any)));
+
+  return { ...campaign, collected: Number(agg?.total ?? 0), donors: Number(agg?.count ?? 0) };
 }
 
 /**
@@ -79,7 +119,7 @@ export async function getRecentDonors(campaignId: number, limit = 5) {
     .where(and(
       eq(donations.campaignId, campaignId),
       eq(donations.paymentStatus, 'success'),
-      eq(donations.env, currentEnv),
+      eq(donations.env, currentEnv as any),
     ))
     .orderBy(desc(donations.createdAt))
     .limit(limit);
@@ -94,7 +134,7 @@ export async function getMonthlyStats() {
     amount: donations.amount,
     status: donations.paymentStatus,
     createdAt: donations.createdAt,
-  }).from(donations).where(eq(donations.env, currentEnv));
+  }).from(donations).where(eq(donations.env, currentEnv as any));
 
   const months: Record<string, { total: number; count: number }> = {};
   const now = new Date();
@@ -175,18 +215,25 @@ export async function deleteCampaign(id: number) {
 }
 
 /**
- * Get campaign stats for dashboard
+ * Get campaign stats for dashboard — single aggregated query
  */
 export async function getCampaignStats() {
-  const all = await db.select().from(campaigns);
-  const active = all.filter(c => c.status === 'active');
-  
-  const currentEnv = await getCurrentEnv();
-  const successDonations = await db.select({ amount: donations.amount }).from(donations).where(and(eq(donations.paymentStatus, 'success'), eq(donations.env, currentEnv)));
-  
-  const totalCollected = successDonations.reduce((s, d) => s + d.amount, 0);
-  const totalDonors = successDonations.length;
+  const [allCampaigns, currentEnv] = await Promise.all([
+    db.select().from(campaigns),
+    getCurrentEnv(),
+  ]);
+  const active = allCampaigns.filter(c => c.status === 'active');
+
+  const [agg] = await db.select({
+    total: sql<number>`COALESCE(SUM(${donations.amount}), 0)`.as('total'),
+    count: sql<number>`COUNT(*)`.as('count'),
+  })
+    .from(donations)
+    .where(and(eq(donations.paymentStatus, 'success'), eq(donations.env, currentEnv as any)));
+
+  const totalCollected = Number(agg?.total ?? 0);
+  const totalDonors = Number(agg?.count ?? 0);
   const totalTarget = active.reduce((s, c) => s + c.target, 0);
 
-  return { total: all.length, active: active.length, totalCollected, totalDonors, totalTarget };
+  return { total: allCampaigns.length, active: active.length, totalCollected, totalDonors, totalTarget };
 }
