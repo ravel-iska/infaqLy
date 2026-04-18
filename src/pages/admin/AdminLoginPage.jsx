@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, Lock, ShieldCheck, ArrowLeft, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { adminLogin } from '@/services/authService';
 import api from '@/services/api';
@@ -37,6 +36,14 @@ export default function AdminLoginPage() {
         } catch {}
       }
     })();
+  }, []);
+
+  // Set page title for SEO
+  useEffect(() => {
+    document.title = 'Admin Panel — infaqLy Console';
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.setAttribute('content', 'Panel administrasi infaqLy untuk mengelola kampanye donasi, transaksi, dan pengaturan platform.');
+    return () => { document.title = 'infaqLy — Platform Donasi Infaq & Wakaf Digital'; };
   }, []);
 
   // Auto-show PIN mode if PIN is set AND we have cached admin (session expired)
@@ -92,7 +99,7 @@ export default function AdminLoginPage() {
           <div className="admin-card p-8">
             <div className="text-center mb-8">
               <div className="w-14 h-14 mx-auto mb-4 rounded-admin bg-admin-accent/20 flex items-center justify-center">
-                <ShieldCheck size={28} className="text-admin-accent" />
+                <span className="material-symbols-outlined text-[28px] text-admin-accent">verified_user</span>
               </div>
               <h1 className="text-xl font-bold text-admin-text">Selamat Datang Kembali</h1>
               <p className="text-sm text-admin-text-muted mt-1">
@@ -102,8 +109,9 @@ export default function AdminLoginPage() {
 
             <form onSubmit={handlePinLogin} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-admin-text-secondary mb-1.5">PIN Keamanan</label>
+                <label htmlFor="pin-input" className="block text-sm font-medium text-admin-text-secondary mb-1.5">PIN Keamanan</label>
                 <input
+                  id="pin-input"
                   type="password"
                   inputMode="numeric"
                   maxLength={8}
@@ -118,7 +126,7 @@ export default function AdminLoginPage() {
                 </p>
               </div>
               <button type="submit" disabled={loading || pinInput.length < 4} className="btn-admin-primary w-full py-3.5">
-                {loading ? <><Loader2 size={18} className="animate-spin" /> Memverifikasi...</> : <><ShieldCheck size={18} /> Masuk dengan PIN</>}
+                {loading ? <><span className="material-symbols-outlined text-[18px] animate-spin">sync</span> Memverifikasi...</> : <><span className="material-symbols-outlined text-[18px]">verified_user</span> Masuk dengan PIN</>}
               </button>
             </form>
 
@@ -126,7 +134,7 @@ export default function AdminLoginPage() {
               onClick={() => setShowPinMode(false)}
               className="mt-4 w-full flex items-center justify-center gap-2 text-sm text-admin-text-muted hover:text-admin-text-secondary transition-colors py-2"
             >
-              <ArrowLeft size={14} />
+              <span className="material-symbols-outlined text-[14px]">arrow_back</span>
               Masuk dengan Password
             </button>
           </div>
@@ -142,7 +150,7 @@ export default function AdminLoginPage() {
         <div className="admin-card p-8">
           <div className="text-center mb-8">
             <div className="w-14 h-14 mx-auto mb-4 rounded-admin bg-admin-accent/20 flex items-center justify-center">
-              <Lock size={28} className="text-admin-accent" />
+              <span className="material-symbols-outlined text-[28px] text-admin-accent">lock</span>
             </div>
             <h1 className="text-xl font-bold text-admin-text">Admin Panel</h1>
             <p className="text-sm text-admin-text-muted font-mono">infaqLy Console</p>
@@ -150,8 +158,9 @@ export default function AdminLoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-admin-text-secondary mb-1.5">Username</label>
+              <label htmlFor="admin-username" className="block text-sm font-medium text-admin-text-secondary mb-1.5">Username</label>
               <input
+                id="admin-username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -161,9 +170,10 @@ export default function AdminLoginPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-admin-text-secondary mb-1.5">Password</label>
+              <label htmlFor="admin-password" className="block text-sm font-medium text-admin-text-secondary mb-1.5">Password</label>
               <div className="relative">
                 <input
+                  id="admin-password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -174,13 +184,14 @@ export default function AdminLoginPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-admin-text-muted hover:text-admin-text transition-colors"
+                  aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  <span className="material-symbols-outlined text-[18px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
                 </button>
               </div>
             </div>
             <button type="submit" disabled={loading} className="btn-admin-primary w-full py-3.5">
-              {loading ? <><Loader2 size={18} className="animate-spin" /> Sedang Masuk...</> : <><Lock size={18} /> Sign In</>}
+              {loading ? <><span className="material-symbols-outlined text-[18px] animate-spin">sync</span> Sedang Masuk...</> : <><span className="material-symbols-outlined text-[18px]">lock</span> Sign In</>}
             </button>
           </form>
 
@@ -190,7 +201,7 @@ export default function AdminLoginPage() {
               onClick={() => setShowPinMode(true)}
               className="mt-4 w-full flex items-center justify-center gap-2 text-sm text-admin-accent hover:text-admin-accent/80 transition-colors py-2.5 rounded-admin hover:bg-admin-accent/5"
             >
-              <ShieldCheck size={16} />
+              <span className="material-symbols-outlined text-[16px]">verified_user</span>
               Masuk dengan PIN ({cachedAdmin.username})
             </button>
           )}
