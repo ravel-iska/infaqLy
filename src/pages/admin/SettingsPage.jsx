@@ -446,6 +446,127 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      {/* DOKU PAYMENT GATEWAY */}
+      <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 border-l-4 border-l-info relative overflow-hidden">
+        <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl text-[11px] font-bold uppercase tracking-wider text-white shadow-sm ${dokuEnv === 'production' ? 'bg-success' : 'bg-info'}`}>
+          Active: {dokuEnv === 'production' ? 'Production' : 'Sandbox'}
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-base-200 pb-5">
+          <div>
+            <h2 className="text-lg font-semibold text-base-content flex items-center gap-2">
+              <span className="material-symbols-outlined text-info">account_balance_wallet</span> DOKU API Gateway
+            </h2>
+            <p className="text-sm text-base-content/60 mt-1">Layanan gateway pembayaran kedua / alternatif</p>
+          </div>
+          <button onClick={saveDoku} className="btn btn-primary flex items-center gap-2 px-6">
+            <span className="material-symbols-outlined text-[18px]">save</span> Simpan DOKU
+          </button>
+        </div>
+
+        <div className="space-y-6">
+          <div className="bg-base-200 p-1 rounded-xl shadow-inner inline-flex">
+            <button
+              onClick={() => setDokuEnv('sandbox')}
+              className={`px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${
+                dokuEnv === 'sandbox' 
+                  ? 'bg-info text-white shadow-md' 
+                  : 'text-base-content/60 hover:text-base-content'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">science</span> Sandbox
+            </button>
+            <button
+              onClick={() => setDokuEnv('production')}
+              className={`px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${
+                dokuEnv === 'production' 
+                  ? 'bg-success text-white shadow-md' 
+                  : 'text-base-content/60 hover:text-base-content'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">rocket_launch</span> Production
+            </button>
+          </div>
+
+          <div className="border border-base-200 rounded-xl mt-4">
+            <div className="flex border-b border-base-200 bg-base-200/50 rounded-t-xl overflow-hidden">
+              <button 
+                onClick={() => setDokuTab('sandbox')}
+                className={`flex-1 px-4 py-3 text-sm font-bold border-b-2 transition-colors ${dokuTab === 'sandbox' ? 'border-info text-info bg-base-100' : 'border-transparent text-base-content/60 hover:bg-base-200/50'}`}
+              >
+                Kredensial Sandbox
+              </button>
+              <button 
+                onClick={() => setDokuTab('production')}
+                className={`flex-1 px-4 py-3 text-sm font-bold border-b-2 transition-colors ${dokuTab === 'production' ? 'border-success text-success bg-base-100' : 'border-transparent text-base-content/60 hover:bg-base-200/50'}`}
+              >
+                Kredensial Live Production
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4 bg-base-200/30">
+              {dokuTab === 'sandbox' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-base-content/70 mb-2">Sandbox Client ID</label>
+                    <input
+                      type="text"
+                      value={dokuSandboxClientId}
+                      onChange={(e) => setDokuSandboxClientId(e.target.value)}
+                      placeholder="Client ID..."
+                      className="input input-bordered w-full border-info/30 focus:border-info"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-base-content/70 mb-2">Sandbox Secret Key</label>
+                    <div className="relative">
+                      <input
+                        type={showDokuSecret ? 'text' : 'password'}
+                        value={dokuSandboxSecretKey}
+                        onChange={(e) => setDokuSandboxSecretKey(e.target.value)}
+                        placeholder="Secret Key..."
+                        className="input input-bordered w-full pr-12 border-info/30 focus:border-info"
+                      />
+                      <button onClick={() => setShowDokuSecret(!showDokuSecret)} className="absolute right-4 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-base-content transition-colors">
+                        <span className="material-symbols-outlined text-[20px]">{showDokuSecret ? 'visibility_off' : 'visibility'}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-base-content/70 mb-2">Production Client ID</label>
+                    <input
+                      type="text"
+                      value={dokuProdClientId}
+                      onChange={(e) => setDokuProdClientId(e.target.value)}
+                      placeholder="Client ID..."
+                      className="input input-bordered w-full border-success/30 focus:border-success"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-base-content/70 mb-2">Production Secret Key</label>
+                    <div className="relative">
+                      <input
+                        type={showDokuSecret ? 'text' : 'password'}
+                        value={dokuProdSecretKey}
+                        onChange={(e) => setDokuProdSecretKey(e.target.value)}
+                        placeholder="Secret Key..."
+                        className="input input-bordered w-full pr-12 border-success/30 focus:border-success"
+                      />
+                      <button onClick={() => setShowDokuSecret(!showDokuSecret)} className="absolute right-4 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-base-content transition-colors">
+                        <span className="material-symbols-outlined text-[20px]">{showDokuSecret ? 'visibility_off' : 'visibility'}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* PUSAT BANTUAN & INFO KONTAK ADMIN */}
       <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-base-200 pb-5">
@@ -638,126 +759,7 @@ export default function SettingsPage() {
         )}
       </div>
 
-      {/* DOKU PAYMENT GATEWAY */}
-      <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 border-l-4 border-l-info relative overflow-hidden">
-        <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl text-[11px] font-bold uppercase tracking-wider text-white shadow-sm ${dokuEnv === 'production' ? 'bg-success' : 'bg-info'}`}>
-          Active: {dokuEnv === 'production' ? 'Production' : 'Sandbox'}
-        </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-base-200 pb-5">
-          <div>
-            <h2 className="text-lg font-semibold text-base-content flex items-center gap-2">
-              <span className="material-symbols-outlined text-info">account_balance_wallet</span> DOKU API Gateway
-            </h2>
-            <p className="text-sm text-base-content/60 mt-1">Layanan gateway pembayaran kedua / alternatif</p>
-          </div>
-          <button onClick={saveDoku} className="btn btn-primary flex items-center gap-2 px-6">
-            <span className="material-symbols-outlined text-[18px]">save</span> Simpan DOKU
-          </button>
-        </div>
-
-        <div className="space-y-6">
-          <div className="bg-base-200 p-1 rounded-xl shadow-inner inline-flex">
-            <button
-              onClick={() => setDokuEnv('sandbox')}
-              className={`px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${
-                dokuEnv === 'sandbox' 
-                  ? 'bg-info text-white shadow-md' 
-                  : 'text-base-content/60 hover:text-base-content'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[18px]">science</span> Sandbox
-            </button>
-            <button
-              onClick={() => setDokuEnv('production')}
-              className={`px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${
-                dokuEnv === 'production' 
-                  ? 'bg-success text-white shadow-md' 
-                  : 'text-base-content/60 hover:text-base-content'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[18px]">rocket_launch</span> Production
-            </button>
-          </div>
-
-          <div className="border border-base-200 rounded-xl mt-4">
-            <div className="flex border-b border-base-200 bg-base-200/50 rounded-t-xl overflow-hidden">
-              <button 
-                onClick={() => setDokuTab('sandbox')}
-                className={`flex-1 px-4 py-3 text-sm font-bold border-b-2 transition-colors ${dokuTab === 'sandbox' ? 'border-info text-info bg-base-100' : 'border-transparent text-base-content/60 hover:bg-base-200/50'}`}
-              >
-                Kredensial Sandbox
-              </button>
-              <button 
-                onClick={() => setDokuTab('production')}
-                className={`flex-1 px-4 py-3 text-sm font-bold border-b-2 transition-colors ${dokuTab === 'production' ? 'border-success text-success bg-base-100' : 'border-transparent text-base-content/60 hover:bg-base-200/50'}`}
-              >
-                Kredensial Live Production
-              </button>
-            </div>
-
-            <div className="p-5 space-y-4 bg-base-200/30">
-              {dokuTab === 'sandbox' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-base-content/70 mb-2">Sandbox Client ID</label>
-                    <input
-                      type="text"
-                      value={dokuSandboxClientId}
-                      onChange={(e) => setDokuSandboxClientId(e.target.value)}
-                      placeholder="Client ID..."
-                      className="input input-bordered w-full border-info/30 focus:border-info"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-base-content/70 mb-2">Sandbox Secret Key</label>
-                    <div className="relative">
-                      <input
-                        type={showDokuSecret ? 'text' : 'password'}
-                        value={dokuSandboxSecretKey}
-                        onChange={(e) => setDokuSandboxSecretKey(e.target.value)}
-                        placeholder="Secret Key..."
-                        className="input input-bordered w-full pr-12 border-info/30 focus:border-info"
-                      />
-                      <button onClick={() => setShowDokuSecret(!showDokuSecret)} className="absolute right-4 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-base-content transition-colors">
-                        <span className="material-symbols-outlined text-[20px]">{showDokuSecret ? 'visibility_off' : 'visibility'}</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-base-content/70 mb-2">Production Client ID</label>
-                    <input
-                      type="text"
-                      value={dokuProdClientId}
-                      onChange={(e) => setDokuProdClientId(e.target.value)}
-                      placeholder="Client ID..."
-                      className="input input-bordered w-full border-success/30 focus:border-success"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-base-content/70 mb-2">Production Secret Key</label>
-                    <div className="relative">
-                      <input
-                        type={showDokuSecret ? 'text' : 'password'}
-                        value={dokuProdSecretKey}
-                        onChange={(e) => setDokuProdSecretKey(e.target.value)}
-                        placeholder="Secret Key..."
-                        className="input input-bordered w-full pr-12 border-success/30 focus:border-success"
-                      />
-                      <button onClick={() => setShowDokuSecret(!showDokuSecret)} className="absolute right-4 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-base-content transition-colors">
-                        <span className="material-symbols-outlined text-[20px]">{showDokuSecret ? 'visibility_off' : 'visibility'}</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
 
     </div>
   );
