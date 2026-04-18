@@ -92,21 +92,31 @@ function AppRoutes() {
   const location = useLocation();
 
   useEffect(() => {
-    (async () => {
+    const checkMaintenance = async () => {
       try {
         const res = await fetch('/api/settings/public');
         if (res.ok) {
           const data = await res.json();
           if (data.settings?.maintenance_mode === 'true' || data.settings?.maintenance_mode === true) {
             setIsMaintenance(true);
+          } else {
+            setIsMaintenance(false);
           }
         }
       } catch (e) {
-        // Abaikan error agar app tetap fallback ke mode normal jika timeout/error
+        // Abaikan error
       } finally {
         setCheckingMaintenance(false);
       }
-    })();
+    };
+
+    // Cek di awal render
+    checkMaintenance();
+
+    // Polling otomatis tiap 15 detik agar sinkron real-time untuk semua HP/PC
+    const interval = setInterval(checkMaintenance, 15000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // Visitor Tracking (Anti-Spam Refresh)
