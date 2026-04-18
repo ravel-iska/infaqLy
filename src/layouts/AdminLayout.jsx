@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from '@/components/admin/Sidebar';
 import Topbar from '@/components/admin/Topbar';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function AdminLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(window.innerWidth < 768);
   const location = useLocation();
+  const { isDark } = useTheme();
 
   useEffect(() => {
     const handleResize = () => {
@@ -23,7 +25,7 @@ export default function AdminLayout() {
   }, [location.pathname]);
 
   return (
-    <div className="bg-base-200 text-base-content min-h-screen flex w-full overflow-hidden">
+    <div data-theme={isDark ? "dark" : "light"} className={`bg-base-200 text-base-content min-h-screen flex w-full overflow-hidden ${isDark ? 'dark' : ''}`}>
       {/* Overlay for mobile */}
       {!sidebarCollapsed && (
         <div 

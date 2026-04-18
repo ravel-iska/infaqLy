@@ -16,15 +16,11 @@ export function ThemeProvider({ children }) {
   });
 
   useEffect(() => {
-    // Add or remove dark class on <html>
-    const htmlEl = document.documentElement;
+    // Only save preference to localStorage, do not mutate global document.documentElement
+    // The AdminLayout will enforce the theme locally via data-theme attribute.
     if (isDark) {
-      htmlEl.classList.add('dark');
-      htmlEl.setAttribute('data-theme', 'dark');
       localStorage.setItem('infaqly_theme', 'dark');
     } else {
-      htmlEl.classList.remove('dark');
-      htmlEl.setAttribute('data-theme', 'light');
       localStorage.setItem('infaqly_theme', 'light');
     }
   }, [isDark]);
