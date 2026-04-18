@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, text, bigint, integer, date, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, text, bigint, integer, date, timestamp, pgEnum, index } from 'drizzle-orm/pg-core';
 
 export const campaignStatusEnum = pgEnum('campaign_status', ['draft', 'active', 'completed', 'archived']);
 
@@ -16,6 +16,10 @@ export const campaigns = pgTable('campaigns', {
   endDate: date('end_date'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => {
+  return {
+    statusIdx: index('campaigns_status_idx').on(table.status)
+  };
 });
 
 export type Campaign = typeof campaigns.$inferSelect;

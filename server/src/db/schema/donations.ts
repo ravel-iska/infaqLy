@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, text, bigint, boolean, timestamp, jsonb, uuid, integer, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, text, bigint, boolean, timestamp, jsonb, uuid, integer, pgEnum, index } from 'drizzle-orm/pg-core';
 import { users } from './users.js';
 import { campaigns } from './campaigns.js';
 
@@ -23,6 +23,12 @@ export const donations = pgTable('donations', {
   paidAt: timestamp('paid_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => {
+  return {
+    campaignIdx: index('donations_campaign_id_idx').on(table.campaignId),
+    userIdx: index('donations_user_id_idx').on(table.userId),
+    statusIdx: index('donations_payment_status_idx').on(table.paymentStatus)
+  };
 });
 
 export type Donation = typeof donations.$inferSelect;

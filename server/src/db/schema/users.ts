@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, text, timestamp, pgEnum, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, timestamp, pgEnum, boolean, index } from 'drizzle-orm/pg-core';
 
 export const roleEnum = pgEnum('user_role', ['user', 'admin']);
 
@@ -21,6 +21,10 @@ export const sessions = pgTable('sessions', {
   token: varchar('token', { length: 500 }).notNull().unique(),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => {
+  return {
+    userIdx: index('sessions_user_id_idx').on(table.userId)
+  };
 });
 
 export type User = typeof users.$inferSelect;

@@ -3,6 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import compression from 'compression';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -36,6 +37,7 @@ app.use(cors({
   credentials: true,
 }));
 app.use(morgan('dev'));
+app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -118,25 +120,23 @@ app.listen(env.PORT, () => {
   // ═══ WhatsApp Bot: Auto-start ═══
   startBot().catch((err) => console.error('[WABot] Auto-start error:', err));
   console.log('   📱 WABot: Baileys self-hosted (untuk OTP)\n');
+});
 
-  // ═══ Auto-Restart Harian (Tengah Malam) ═══
-  function scheduleMidnightRestart() {
-    const now = new Date();
-    const nextMidnight = new Date(now);
-    nextMidnight.setHours(24, 0, 0, 0); // Di-set jam 00:00:00 (Tengah malam besoknya)
-    
-    const msUntilMidnight = nextMidnight.getTime() - now.getTime();
-    
-    console.log(`   🔄 Auto-restart dijadwalkan pada 00:00 (Tengah Malam) - Dalam ${(msUntilMidnight / 1000 / 60 / 60).toFixed(2)} jam.`);
-    
-    setTimeout(() => {
-      console.log('[SYSTEM] 🕛 Memulai Auto-Restart Harian (Maintenance Pembersihan Cache)...');
-      process.exit(0); // Memaksa server mati agar di-restart segar oleh Railway
-    }, msUntilMidnight);
-  }
-  
-  scheduleMidnightRestart();
+// ═══ Graceful Shutdown (Railway & PM2) ═══
+const gracefulShutdown = (signal: string) => {
+  console.log(`\n[SYSTEM] Received ${signal}, shutting down gracefully...`);
+  // Cleanup logic here (like closing DB conns) if necessary
+  process.exit(0);
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('uncaughtException', (err) => {
+  console.error('[SYSTEM] Uncaught Exception:', err);
+  process.exit(1);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[SYSTEM] Unhandled Rejection:', reason);
 });
 
 export default app;
-

@@ -1,4 +1,4 @@
-import { pgTable, serial, integer, bigint, varchar, text, uuid, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, serial, integer, bigint, varchar, text, uuid, timestamp, pgEnum, index } from 'drizzle-orm/pg-core';
 import { users } from './users.js';
 import { campaigns } from './campaigns.js';
 
@@ -14,6 +14,10 @@ export const withdrawals = pgTable('withdrawals', {
   status: withdrawalStatusEnum('status').notNull().default('completed'),
   createdBy: uuid('created_by').notNull().references(() => users.id),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => {
+  return {
+    campaignIdx: index('withdrawals_campaign_id_idx').on(table.campaignId)
+  };
 });
 
 export type Withdrawal = typeof withdrawals.$inferSelect;
