@@ -10,6 +10,15 @@ export default function TransactionsPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, statusFilter, itemsPerPage]);
+
   // Sandbox Modal State
   const [showSandbox, setShowSandbox] = useState(false);
   const [sandboxOrderId, setSandboxOrderId] = useState('');
@@ -72,6 +81,13 @@ export default function TransactionsPage() {
   const successCount = filtered.filter(t => t.paymentStatus === 'success').length;
   const pendingCount = filtered.filter(t => t.paymentStatus === 'pending').length;
   const expiredCount = filtered.filter(t => t.paymentStatus === 'expired' || t.paymentStatus === 'failed').length;
+
+  // Pagination Logic
+  const startIndex = (currentPage - 1) * (itemsPerPage === 'all' ? filtered.length : Number(itemsPerPage));
+  const paginatedTransactions = itemsPerPage === 'all' 
+    ? filtered 
+    : filtered.slice(startIndex, startIndex + Number(itemsPerPage));
+  const totalPages = itemsPerPage === 'all' ? 1 : Math.ceil(filtered.length / Number(itemsPerPage));
 
   const exportCSV = async () => {
     try {
@@ -204,7 +220,7 @@ export default function TransactionsPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((tx) => {
+                {paginatedTransactions.map((tx) => {
                   // Hitung sisa waktu sebelum auto-expire via Midtrans (24 jam)
                   const createdMs = new Date(tx.createdAt).getTime();
                   const expireMs = createdMs + 24 * 60 * 60 * 1000;
@@ -250,6 +266,46 @@ export default function TransactionsPage() {
             </table>
           </div>
         )}
+
+        {/* Pagination Controls */}
+        {!loading && filtered.length > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-base-200 bg-base-100 gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-base-content/70">Tampilkan:</span>
+              <select 
+                value={itemsPerPage} 
+                onChange={(e) => setItemsPerPage(e.target.value)}
+                className="select select-bordered select-sm w-24 font-mono text-sm shadow-sm"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value="all">Semua</option>
+              </select>
+            </div>
+            
+            {itemsPerPage !== 'all' && totalPages > 1 && (
+              <div className="join shadow-sm">
+                <button 
+                  className="join-item btn btn-sm btn-outline hover:bg-base-200 hover:text-base-content" 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                >
+                  <span className="material-symbols-outlined text-[18px]">chevron_left</span> Prev
+                </button>
+                <span className="join-item btn btn-sm btn-disabled bg-base-200/50 text-base-content font-medium">Halaman {currentPage} dari {totalPages}</span>
+                <button 
+                  className="join-item btn btn-sm btn-outline hover:bg-base-200 hover:text-base-content" 
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Summary bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-base-200 bg-base-200/50 text-sm">
           <span className="text-base-content/60 font-medium">Total Perputaran: <strong className="text-base-content font-mono tracking-tight ml-1">{formatCurrency(total)}</strong> ({filtered.length} transaksi)</span>
