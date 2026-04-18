@@ -195,7 +195,7 @@ export default function CampaignDetailPage() {
               <img 
                 className="w-full h-full object-cover" 
                 alt={campaign.title} 
-                src={campaign.image || 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=800&h=400&fit=crop'}
+                src={campaign.image || 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=800&h=400&fit=crop&auto=format&fm=webp'}
               />
               <div className="absolute bottom-6 left-6 flex flex-wrap gap-2">
                 <span className="px-4 py-2 bg-white/20 backdrop-blur-md text-white text-xs font-bold rounded-full border border-white/30">
