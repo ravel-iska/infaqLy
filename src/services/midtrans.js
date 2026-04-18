@@ -37,9 +37,10 @@ export async function createTransaction({ orderId, amount, donorName, donorEmail
  */
 let snapLoaded = false;
 let snapLoadPromise = null;
+let currentEnv = null;
+let currentClientKey = null;
 
-export async function loadSnapScript() {
-  if (snapLoaded && window.snap) return;
+export async function loadSnapScript(forceReload = false) {
   if (snapLoadPromise) return snapLoadPromise;
 
   snapLoadPromise = (async () => {
@@ -49,24 +50,44 @@ export async function loadSnapScript() {
       
       if (!config.clientKey) {
         console.warn('[Midtrans] Client Key belum dikonfigurasi');
+        snapLoadPromise = null;
         return;
       }
+
+      // Check if we need to reload
+      if (!forceReload && snapLoaded && window.snap && currentEnv === config.env && currentClientKey === config.clientKey) {
+         snapLoadPromise = null;
+         return;
+      }
+
+      console.log(`[Midtrans] Loading Snap Script for: ${config.env}`);
+      currentEnv = config.env;
+      currentClientKey = config.clientKey;
 
       const scriptUrl = config.env === 'production'
         ? 'https://app.midtrans.com/snap/snap.js'
         : 'https://app.sandbox.midtrans.com/snap/snap.js';
 
-      // Remove existing script if any
+      // Remove existing script and window.snap object
       const existing = document.querySelector('script[data-snap]');
       if (existing) existing.remove();
+      if (window.snap) delete window.snap;
+      snapLoaded = false;
 
       await new Promise((resolve, reject) => {
         const script = document.createElement('script');
         script.src = scriptUrl;
         script.setAttribute('data-client-key', config.clientKey);
         script.setAttribute('data-snap', 'true');
-        script.onload = () => { snapLoaded = true; resolve(); };
-        script.onerror = () => reject(new Error('Gagal memuat Midtrans Snap'));
+        script.onload = () => { 
+          snapLoaded = true; 
+          snapLoadPromise = null;
+          resolve(); 
+        };
+        script.onerror = () => {
+          snapLoadPromise = null;
+          reject(new Error('Gagal memuat Midtrans Snap'));
+        };
         document.head.appendChild(script);
       });
     } catch (err) {
