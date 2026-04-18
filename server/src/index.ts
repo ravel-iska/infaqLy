@@ -22,6 +22,7 @@ import whatsappRoutes from './routes/whatsapp.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import settingsRoutes from './routes/settings.routes.js';
 import wabotRoutes from './routes/wabot.routes.js';
+import bugsRoutes from './routes/bugs.routes.js';
 import { startBot } from './services/wabot.service.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -50,11 +51,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/campaigns', campaignRoutes);
 app.use('/api/donations', donationRoutes);
-app.use('/api/payment', paymentRoutes);
 app.use('/api/withdrawals', withdrawalRoutes);
 app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/bugs', bugsRoutes);
+app.use('/api/midtrans', paymentRoutes);
 app.use('/api/wabot', wabotRoutes);
 
 // Health check

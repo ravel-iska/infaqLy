@@ -23,7 +23,7 @@ export default function AdminLayout() {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen admin-bg admin-grid-bg flex w-full overflow-hidden">
+    <div className="bg-base-200 text-base-content min-h-screen flex w-full overflow-hidden">
       {/* Overlay for mobile */}
       {!sidebarCollapsed && (
         <div 

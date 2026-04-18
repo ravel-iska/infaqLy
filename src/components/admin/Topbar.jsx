@@ -2,10 +2,13 @@ import { Bell, Menu, ChevronDown, LogOut, X } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Sun, Moon } from 'lucide-react';
 import api from '@/services/api';
 
 export default function Topbar({ onToggleSidebar }) {
   const { admin, logoutAdmin } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -81,7 +84,7 @@ export default function Topbar({ onToggleSidebar }) {
   };
 
   return (
-    <header className="h-16 bg-admin-bg-card/80 backdrop-blur-md border-b border-admin-border flex items-center justify-between px-6 sticky top-0 z-30">
+    <header className="h-16 bg-base-100 border-b border-base-200/50 flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
       {/* Left */}
       <div className="flex items-center gap-4">
         <button
@@ -94,6 +97,15 @@ export default function Topbar({ onToggleSidebar }) {
 
       {/* Right */}
       <div className="flex items-center gap-4">
+        {/* Theme Toggle */}
+        <button
+          onClick={toggleTheme}
+          className="btn btn-ghost btn-circle btn-sm text-base-content/70 hover:text-base-content"
+          aria-label="Toggle Theme"
+        >
+          {isDark ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
+
         {/* Notifications */}
         <div className="relative" ref={notifRef}>
           <button
@@ -110,9 +122,9 @@ export default function Topbar({ onToggleSidebar }) {
 
           {/* Notification Dropdown */}
           {notifOpen && (
-            <div className="absolute -right-12 sm:right-0 mt-2 w-[280px] sm:w-80 bg-admin-bg-card rounded-xl border border-admin-border shadow-admin-lg animate-slide-down overflow-hidden z-50">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-admin-border">
-                <h3 className="text-sm font-semibold text-admin-text">🔔 Notifikasi</h3>
+            <div className="absolute -right-12 sm:right-0 mt-2 w-[280px] sm:w-80 bg-base-100 rounded-xl border border-base-200 shadow-xl animate-slide-down overflow-hidden z-50">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-base-200">
+                <h3 className="text-sm font-semibold text-base-content">🔔 Notifikasi</h3>
                 <div className="flex items-center gap-2">
                   {unreadCount > 0 && (
                     <button onClick={markAllRead} className="text-xs text-admin-accent hover:underline">
@@ -176,10 +188,10 @@ export default function Topbar({ onToggleSidebar }) {
           </button>
 
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-admin-bg-card rounded-admin border border-admin-border shadow-admin animate-slide-down">
+            <div className="absolute right-0 mt-2 w-48 bg-base-100 rounded-lg border border-base-200 shadow-xl animate-slide-down overflow-hidden z-50">
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 w-full px-4 py-3 text-sm text-danger hover:bg-admin-bg-hover rounded-admin transition-colors"
+                className="flex items-center gap-2 w-full px-4 py-3 text-sm text-error hover:bg-base-200 transition-colors"
               >
                 <LogOut size={16} />
                 Keluar

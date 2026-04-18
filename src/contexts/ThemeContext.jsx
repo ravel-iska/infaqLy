@@ -17,11 +17,14 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     // Add or remove dark class on <html>
+    const htmlEl = document.documentElement;
     if (isDark) {
-      document.documentElement.classList.add('dark');
+      htmlEl.classList.add('dark');
+      htmlEl.setAttribute('data-theme', 'dark');
       localStorage.setItem('infaqly_theme', 'dark');
     } else {
-      document.documentElement.classList.remove('dark');
+      htmlEl.classList.remove('dark');
+      htmlEl.setAttribute('data-theme', 'light');
       localStorage.setItem('infaqly_theme', 'light');
     }
   }, [isDark]);

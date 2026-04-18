@@ -103,42 +103,42 @@ export default function TransactionsPage() {
     <div className="animate-fade-in space-y-6 pb-12">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[28px] text-admin-text">receipt_long</span>
-          <h1 className="text-2xl font-bold text-admin-text tracking-tight">Log Transaksi</h1>
+          <span className="material-symbols-outlined text-[28px] text-base-content">receipt_long</span>
+          <h1 className="text-2xl font-bold text-base-content tracking-tight">Log Transaksi</h1>
         </div>
         <div className="flex flex-wrap gap-3">
-          <button onClick={loadTransactions} className="btn-admin-ghost flex items-center justify-center gap-1.5 px-4 bg-admin-bg hover:bg-admin-bg-hover text-admin-text-secondary hover:text-admin-text border border-admin-border" disabled={loading}>
-            <span className={`material-symbols-outlined text-[18px] ${loading ? 'animate-spin' : ''}`}>sync</span> Refresh
+          <button onClick={loadTransactions} className="btn btn-outline" disabled={loading}>
+            <span className={`material-symbols-outlined text-[18px] mr-1 ${loading ? 'animate-spin' : ''}`}>sync</span> Refresh
           </button>
-          <button onClick={exportCSV} className="btn-admin-primary flex items-center justify-center gap-1.5 px-6">
-            <span className="material-symbols-outlined text-[18px]">download</span> Export CSV
+          <button onClick={exportCSV} className="btn btn-primary">
+            <span className="material-symbols-outlined text-[18px] mr-1">download</span> Export CSV
           </button>
           {midtransEnv === 'sandbox' && (
-            <button onClick={() => setShowSandbox(true)} className="btn-admin-ghost flex items-center justify-center gap-1.5 px-4 bg-admin-bg border border-admin-border hover:border-admin-accent hover:text-admin-accent transition-colors font-mono tracking-tight" title="Developer Sandbox Mode">
-              <span className="material-symbols-outlined text-[18px]">bug_report</span> Sandbox
+            <button onClick={() => setShowSandbox(true)} className="btn btn-ghost font-mono tracking-tight" title="Developer Sandbox Mode">
+              <span className="material-symbols-outlined text-[18px] mr-1">bug_report</span> Sandbox
             </button>
           )}
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 bg-admin-bg-sidebar p-4 rounded-2xl border border-admin-border">
+      <div className="flex flex-col sm:flex-row gap-4 bg-base-100 p-4 rounded-2xl border border-base-200">
         <div className="relative flex-1">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-admin-text-muted text-[20px]">search</span>
+          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-base-content/50 text-[20px]">search</span>
           <input
             type="text"
             placeholder="Cari Order ID atau nama donatur..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="input-admin pl-12 font-medium"
+            className="input input-bordered w-full pl-12 font-medium"
           />
         </div>
         <div className="relative">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-admin-text-muted text-[20px]">filter_list</span>
+          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-base-content/50 text-[20px]">filter_list</span>
           <select 
             value={statusFilter} 
             onChange={(e) => setStatusFilter(e.target.value)} 
-            className="input-admin pl-12 sm:w-56 font-medium appearance-none"
+            className="select select-bordered pl-12 sm:w-56 font-medium"
           >
             <option value="all">Semua Status (All)</option>
             <option value="success">Berhasil (Success)</option>
@@ -146,37 +146,36 @@ export default function TransactionsPage() {
             <option value="expired">Kedaluwarsa (Expired)</option>
             <option value="failed">Gagal (Failed)</option>
           </select>
-          <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-admin-text-muted pointer-events-none text-[20px]">expand_more</span>
         </div>
       </div>
 
       {/* Table */}
-      <div className="admin-card overflow-hidden">
+      <div className="bg-base-100 shadow rounded-2xl overflow-hidden">
         {loading ? (
-          <div className="text-center py-16 text-admin-text-muted flex flex-col items-center">
-            <span className="material-symbols-outlined text-4xl animate-spin mb-4 text-admin-accent">sync</span>
-            <p className="text-lg font-bold text-admin-text">Memuat transaksi...</p>
+          <div className="text-center py-16 text-base-content/50 flex flex-col items-center">
+            <span className="material-symbols-outlined text-4xl animate-spin mb-4 text-primary">sync</span>
+            <p className="text-lg font-bold text-base-content">Memuat transaksi...</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16 text-admin-text-muted flex flex-col items-center">
+          <div className="text-center py-16 text-base-content/50 flex flex-col items-center">
             <span className="material-symbols-outlined text-6xl opacity-30 mb-4">receipt_long</span>
-            <p className="text-lg font-bold text-admin-text">Belum ada transaksi</p>
+            <p className="text-lg font-bold text-base-content">Belum ada transaksi</p>
             <p className="text-sm mt-1">Tidak ada data untuk ditampilkan pada filter ini.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+            <table className="table table-zebra table-md w-full">
               <thead>
-                <tr className="border-b border-admin-border bg-admin-bg-sidebar">
-                  <th className="text-left px-6 py-4 text-admin-text-secondary font-semibold text-xs tracking-wider uppercase">Order ID</th>
-                  <th className="text-left px-6 py-4 text-admin-text-secondary font-semibold text-xs tracking-wider uppercase">Donatur</th>
-                  <th className="text-left px-6 py-4 text-admin-text-secondary font-semibold text-xs tracking-wider uppercase">Nominal</th>
-                  <th className="text-left px-6 py-4 text-admin-text-secondary font-semibold text-xs tracking-wider uppercase">Metode</th>
-                  <th className="text-center px-6 py-4 text-admin-text-secondary font-semibold text-xs tracking-wider uppercase">Status</th>
-                  <th className="text-left px-6 py-4 text-admin-text-secondary font-semibold text-xs tracking-wider uppercase">Tanggal Waktu</th>
+                <tr>
+                  <th className="bg-base-200">Order ID</th>
+                  <th className="bg-base-200">Donatur</th>
+                  <th className="bg-base-200">Nominal</th>
+                  <th className="bg-base-200">Metode</th>
+                  <th className="bg-base-200 text-center">Status</th>
+                  <th className="bg-base-200 text-left">Tanggal Waktu</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-admin-border">
+              <tbody>
                 {filtered.map((tx) => {
                   // Hitung sisa waktu sebelum auto-expire via Midtrans (24 jam)
                   const createdMs = new Date(tx.createdAt).getTime();
@@ -187,32 +186,35 @@ export default function TransactionsPage() {
                   const isOverdue = remainMs <= 0;
 
                   return (
-                    <tr key={tx.id || tx.orderId} className="hover:bg-admin-bg-hover transition-colors">
-                      <td className="px-6 py-4 text-admin-accent font-mono text-xs font-bold tracking-wider">{tx.orderId}</td>
-                      <td className="px-6 py-4 text-admin-text font-bold">{tx.donorName}</td>
-                      <td className="px-6 py-4 text-admin-text font-mono font-bold tracking-tight">{formatCurrency(tx.amount)}</td>
-                      <td className="px-6 py-4 text-admin-text-secondary">
-                        <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-admin-bg rounded text-xs border border-admin-border font-medium">
+                    <tr key={tx.id || tx.orderId}>
+                      <td className="text-primary font-mono text-xs font-bold tracking-wider">{tx.orderId}</td>
+                      <td className="font-bold">{tx.donorName}</td>
+                      <td className="font-mono font-bold tracking-tight">{formatCurrency(tx.amount)}</td>
+                      <td>
+                        <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-base-200 rounded text-xs border border-base-300 font-medium">
                           <span className="material-symbols-outlined text-[14px]">account_balance_wallet</span>
                           {tx.paymentMethod || '-'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="text-center">
                         <div className="flex flex-col items-center gap-1.5">
-                          <span className={`px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded inline-flex items-center gap-1.5 ${statusBadge(tx.paymentStatus)}`}>
+                          <span className={`badge badge-sm badge-outline gap-1 p-3 ${
+                            tx.paymentStatus === 'success' ? 'badge-success' :
+                            tx.paymentStatus === 'pending' ? 'badge-warning' : 'badge-error'
+                          }`}>
                             {tx.paymentStatus === 'success' ? <span className="material-symbols-outlined text-[12px]">check_circle</span> :
                              tx.paymentStatus === 'pending' ? <span className="material-symbols-outlined text-[12px]">schedule</span> :
                              <span className="material-symbols-outlined text-[12px]">cancel</span>}
                             {statusLabel(tx.paymentStatus)}
                           </span>
                           {tx.paymentStatus === 'pending' && (
-                            <span className={`text-[10px] font-medium px-2 py-0.5 rounded ${isOverdue ? 'bg-danger/10 text-danger' : 'bg-admin-bg-sidebar text-admin-text-muted border border-admin-border'}`}>
+                            <span className={`text-[10px] font-medium px-2 py-0.5 rounded ${isOverdue ? 'bg-error/10 text-error' : 'bg-base-200 text-base-content/60 border border-base-300'}`}>
                               {isOverdue ? '! Menunggu Webhook API' : `Auto-expire: ${remainHours}j ${remainMins}m`}
                             </span>
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-admin-text-muted font-mono text-xs">{formatDateTime(tx.createdAt)}</td>
+                      <td className="text-base-content/60 font-mono text-xs">{formatDateTime(tx.createdAt)}</td>
                     </tr>
                   );
                 })}
@@ -221,12 +223,12 @@ export default function TransactionsPage() {
           </div>
         )}
         {/* Summary bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-admin-border bg-admin-bg text-sm">
-          <span className="text-admin-text-muted font-medium">Total Perputaran: <strong className="text-admin-text font-mono tracking-tight ml-1">{formatCurrency(total)}</strong> ({filtered.length} transaksi)</span>
-          <div className="flex gap-4 text-xs font-bold font-mono bg-admin-bg-sidebar px-4 py-2 rounded-lg border border-admin-border mt-3 sm:mt-0">
+        <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-base-200 bg-base-200/50 text-sm">
+          <span className="text-base-content/60 font-medium">Total Perputaran: <strong className="text-base-content font-mono tracking-tight ml-1">{formatCurrency(total)}</strong> ({filtered.length} transaksi)</span>
+          <div className="flex gap-4 text-xs font-bold font-mono bg-base-100 px-4 py-2 rounded-lg border border-base-200 mt-3 sm:mt-0 shadow-sm">
             <span className="text-success flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">check_circle</span> {successCount}</span>
             <span className="text-warning flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">schedule</span> {pendingCount}</span>
-            <span className="text-danger flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">cancel</span> {expiredCount}</span>
+            <span className="text-error flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">cancel</span> {expiredCount}</span>
           </div>
         </div>
       </div>
@@ -234,43 +236,43 @@ export default function TransactionsPage() {
       {/* Sandbox Simulator Modal */}
       {showSandbox && (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-admin-bg border border-admin-border rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-slide-up">
-            <div className="p-6 border-b border-admin-border flex justify-between items-center bg-admin-bg-sidebar">
-              <h3 className="text-lg font-bold text-admin-text flex items-center gap-2">
-                <span className="material-symbols-outlined text-admin-accent">bug_report</span>
+          <div className="bg-base-100 border border-base-200 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-slide-up">
+            <div className="p-6 border-b border-base-200 flex justify-between items-center bg-base-200/50">
+              <h3 className="text-lg font-bold text-base-content flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary">bug_report</span>
                 Developer Sandbox
               </h3>
-              <button onClick={() => setShowSandbox(false)} className="text-admin-text-muted hover:text-danger transition-colors">
+              <button onClick={() => setShowSandbox(false)} className="text-base-content/50 hover:text-error transition-colors">
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
             <form onSubmit={handleSandboxSimulate} className="p-6">
               <div className="bg-warning/10 border border-warning/20 p-4 rounded-xl mb-6 flex items-start gap-3">
                 <span className="material-symbols-outlined text-warning shrink-0 mt-0.5">warning</span>
-                <p className="text-sm text-admin-text-secondary leading-relaxed">
-                  <strong className="text-admin-text block mb-1">Peringatan Mode Dev:</strong>
-                  Ini melompati Midtrans sepenuhnya dan akan mengubah database langsung menjadi "Success". Uang tidak benar-benar ditarik dari rekening manapun.
+                <p className="text-sm text-base-content/80 leading-relaxed">
+                  <strong className="text-base-content block mb-1">Peringatan Mode Dev:</strong>
+                  Ini melompati Midtrans sepenuhnya dan akan mengubah database langsung menjadi "Success".
                 </p>
               </div>
 
               <div className="space-y-2 mb-8">
-                <label className="text-sm font-bold text-admin-text">Order ID Target</label>
+                <label className="text-sm font-bold text-base-content">Order ID Target</label>
                 <input
                   type="text"
                   placeholder="Misal: INF-XXXXXX"
                   value={sandboxOrderId}
                   onChange={(e) => setSandboxOrderId(e.target.value)}
-                  className="input-admin w-full font-mono font-bold tracking-wider text-admin-accent bg-admin-bg-sidebar"
+                  className="input input-bordered w-full font-mono font-bold tracking-wider text-primary"
                   required
                 />
               </div>
 
               <div className="flex justify-end gap-3">
-                <button type="button" onClick={() => setShowSandbox(false)} className="btn-admin-ghost border border-admin-border">
+                <button type="button" onClick={() => setShowSandbox(false)} className="btn btn-ghost border border-base-300">
                   Batal
                 </button>
-                <button type="submit" disabled={sandboxLoading} className="btn-admin-primary">
-                  {sandboxLoading ? 'Menyimulasikan...' : 'Paksa Sukses Sekarang'}
+                <button type="submit" disabled={sandboxLoading} className="btn btn-primary">
+                  {sandboxLoading ? <span className="loading loading-spinner"></span> : 'Paksa Sukses Sekarang'}
                 </button>
               </div>
             </form>

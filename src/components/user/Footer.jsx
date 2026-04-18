@@ -73,12 +73,68 @@ function PrivacyModal({ isOpen, onClose }) {
       </div>
     </div>
   );
+function BugModal({ isOpen, onClose }) {
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await api.post('/bugs', { userName, userEmail, message, path: window.location.pathname });
+      toast.success('Laporan berhasil dikirim, terima kasih!');
+      onClose();
+      setMessage('');
+    } catch (err) {
+      toast.error('Gagal mengirim laporan.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+      <div className="bg-surface-container-lowest w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-slide-up relative">
+        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900 sticky top-0 z-10">
+          <h3 className="font-headline text-xl font-bold text-on-surface dark:text-slate-100 flex items-center gap-2">
+            <span className="material-symbols-outlined text-rose-500">bug_report</span> Lapor Bug / Kesalahan
+          </h3>
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto font-body text-slate-600 dark:text-slate-300 text-sm space-y-4 shadow-inner dark:bg-slate-900">
+          <p>Jika antarmuka bermasalah atau Anda menemukan celah keamanan, laporkan agar segera kami perbaiki!</p>
+          <div>
+            <label className="block text-xs font-bold mb-1 opacity-70">Nama</label>
+            <input required type="text" value={userName} onChange={e=>setUserName(e.target.value)} className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800" placeholder="Nama Anda" />
+          </div>
+          <div>
+            <label className="block text-xs font-bold mb-1 opacity-70">Email</label>
+            <input required type="email" value={userEmail} onChange={e=>setUserEmail(e.target.value)} className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800" placeholder="Email Anda" />
+          </div>
+          <div>
+            <label className="block text-xs font-bold mb-1 opacity-70">Pesan Laporan</label>
+            <textarea required rows={4} value={message} onChange={e=>setMessage(e.target.value)} className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 resize-none text-sm" placeholder="Ceritakan bagian mana yang macet..."></textarea>
+          </div>
+          <button disabled={loading} type="submit" className="w-full py-3 mt-4 bg-rose-500 text-white font-bold rounded-xl hover:bg-rose-600 transition-colors shadow-sm flex justify-center items-center gap-2">
+            {loading ? <span className="material-symbols-outlined animate-spin text-[18px]">sync</span> : <span className="material-symbols-outlined text-[18px]">send</span>}
+            Kirim Laporan
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 }
 
 export default function Footer() {
   const [hasWa, setHasWa] = useState(false);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+  const [isBugOpen, setIsBugOpen] = useState(false);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -146,6 +202,11 @@ export default function Footer() {
               </a>
             </li>
             <li><Link to="/cara-donasi" className="hover:text-emerald-500 transition-colors">Cara Donasi</Link></li>
+            <li>
+              <button onClick={() => setIsBugOpen(true)} className="hover:text-rose-500 transition-colors flex items-center gap-1.5 font-medium">
+                <span className="material-symbols-outlined text-[16px]">bug_report</span> Lapor Bug Panel
+              </button>
+            </li>
           </ul>
         </div>
         
@@ -182,6 +243,7 @@ export default function Footer() {
 
       <TermsModal isOpen={isTermsOpen} onClose={() => setIsTermsOpen(false)} />
       <PrivacyModal isOpen={isPrivacyOpen} onClose={() => setIsPrivacyOpen(false)} />
+      <BugModal isOpen={isBugOpen} onClose={() => setIsBugOpen(false)} />
     </footer>
   );
 }

@@ -5,6 +5,7 @@ export { donations, paymentStatusEnum } from './schema/donations.js';
 export { withdrawals, withdrawalStatusEnum } from './schema/withdrawals.js';
 export { otpCodes, otpTypeEnum } from './schema/otp.js';
 export { settings } from './schema/settings.js';
+export { bugReports } from './schema/bug_reports.js';
 
 // Re-export types
 export type { User, NewUser, Session } from './schema/users.js';

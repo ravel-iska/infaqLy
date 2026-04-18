@@ -148,9 +148,9 @@ export default {
   },
   plugins: [require("daisyui")],
   daisyui: {
-    themes: false,
-    base: false,
+    themes: ["light", "dark"],
+    base: true,
     styled: true,
     utils: true,
   },
-}
+};
