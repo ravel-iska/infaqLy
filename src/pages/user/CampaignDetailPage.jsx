@@ -53,7 +53,7 @@ export default function CampaignDetailPage() {
         const donorsData = await api.get(`/campaigns/${campaignId}/donors`);
         setRecentDonors(donorsData.donors || []);
       } catch {}
-    }, 10000);
+    }, 30000);
 
     return () => clearInterval(interval);
   }, [campaignId]);

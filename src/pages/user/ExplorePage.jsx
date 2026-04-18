@@ -30,7 +30,7 @@ export default function ExplorePage() {
     
     const interval = setInterval(() => {
       loadData();
-    }, 10000);
+    }, 30000);
 
     return () => {
       window.removeEventListener('focus', handleFocus);

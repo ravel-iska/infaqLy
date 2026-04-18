@@ -27,10 +27,10 @@ export default function HomePage() {
     const handleFocus = () => loadData();
     window.addEventListener('focus', handleFocus);
     
-    // Background polling for mobile/real-time updates (every 10 seconds)
+    // Background polling for mobile/real-time updates (every 30 seconds)
     const interval = setInterval(() => {
       loadData();
-    }, 10000);
+    }, 30000);
 
     return () => {
       window.removeEventListener('focus', handleFocus);
@@ -75,7 +75,8 @@ export default function HomePage() {
             <div className="aspect-[4/5] rounded-[2.5rem] overflow-hidden ambient-shadow rotate-3 scale-95 md:scale-100">
               <img 
                 alt="Donasi InfaqLy" 
-                loading="lazy"
+                loading="eager"
+                fetchpriority="high"
                 decoding="async"
                 className="w-full h-full object-cover" 
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtvLNhQLwSvJ39x5VIL3RdjIq7aIRowq59uuy8WHLxJLbsuJYRQb-wnxUfKG4QpoHhYNp1hgH0UtFv9-coaYSyRKtyWkaLuWPWCjHM9dhtslpu8Z2wk_8tH30MyMs89oljB-QbX6YydPjoQ4rv_hW-xMW0QJwzwaRrTgqTAurVy2pWuNmHX6Sumk9OWOlN5oRlehvw9XQZkIxq5pF0L36j_RXkloIbGT5T3joE9knYsdg0fOgz-hMkkpULym054L3WtPu9j4RPPa0=rw"
