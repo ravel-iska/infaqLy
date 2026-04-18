@@ -1,8 +1,10 @@
 import express from 'express';
-import { db } from '../db/index.js';
-import { bugReports } from '../db/schema/bug_reports.js';
+import { db } from '../config/database.js';
+import { bugReports } from '../db/schema.js';
 import { eq, desc } from 'drizzle-orm';
-import { sendFonnteMessage } from '../services/fonnte.js';
+import { settings } from '../db/schema.js';
+import { sendWhatsApp } from '../services/whatsapp.service.js';
+import { env } from '../config/env.js';
 
 const router = express.Router();
 
@@ -26,7 +28,14 @@ router.post('/', async (req, res) => {
     const alertMessage = `🚨 *Laporan Bug Baru [InfaqLy]*\n\n*Pelapor:* ${userName} (${userEmail})\n*URL:* ${path}\n*Keluhan:*\n${message}\n\nMohon segera diperiksa di Admin Panel.`;
     
     try {
-      await sendFonnteMessage('SYSTEM_ALERT', alertMessage);
+      let adminPhone = '';
+      const [row] = await db.select().from(settings).where(eq(settings.key, 'system_alert_phone')).limit(1);
+      adminPhone = row?.value || '';
+      if (!adminPhone) adminPhone = env.FONNTE_ADMIN_PHONE || '';
+
+      if (adminPhone) {
+        await sendWhatsApp(adminPhone, alertMessage);
+      }
     } catch (e) {
       console.error('Failed to send WA report', e);
     }
