@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { formatCurrency, formatCurrencyShort } from '@/utils/formatCurrency';
 import { getActiveCampaigns, daysRemaining } from '@/services/campaignService';
+import { optimizeImageUrl } from '@/utils/optimizeImage';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function HomePage() {
@@ -251,7 +252,7 @@ function CampaignCardHome({ campaign, idx }) {
     <Link to={`/explore/${campaign.id}`} className="group bg-surface-container-lowest dark:bg-slate-800 rounded-[2rem] overflow-hidden ambient-shadow border border-slate-100 dark:border-slate-700 transition-all hover:-translate-y-2 block">
       <div className="relative h-64 overflow-hidden">
         <img 
-          src={campaign.imageUrl || campaign.image || 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=400&h=250&fit=crop&auto=format&fm=webp'} 
+          src={optimizeImageUrl(campaign.imageUrl || campaign.image, 400) || 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=400&h=250&fit=crop&fm=webp&q=75'} 
           alt={campaign.title} 
           loading="lazy"
           decoding="async"

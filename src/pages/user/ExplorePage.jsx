@@ -1,7 +1,8 @@
-﻿import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { formatCurrency, formatCurrencyShort } from '@/utils/formatCurrency';
 import { getActiveCampaigns, daysRemaining } from '@/services/campaignService';
+import { optimizeImageUrl } from '@/utils/optimizeImage';
 
 export default function ExplorePage() {
   const [campaigns, setCampaigns] = useState([]);
@@ -165,7 +166,7 @@ function CampaignListCard({ campaign, idx }) {
     <Link to={`/explore/${campaign.id}`} className="group bg-surface-container-lowest dark:bg-slate-800 rounded-[2rem] overflow-hidden ambient-shadow border border-slate-100 dark:border-slate-700 transition-all hover:-translate-y-2 block h-full">
       <div className="relative h-64 overflow-hidden">
         <img 
-          src={campaign.imageUrl || campaign.image || 'https://lh3.googleusercontent.com/aida-public/AB6AXuCtvLNhQLwSvJ39x5VIL3RdjIq7aIRowq59uuy8WHLxJLbsuJYRQb-wnxUfKG4QpoHhYNp1hgH0UtFv9-coaYSyRKtyWkaLuWPWCjHM9dhtslpu8Z2wk_8tH30MyMs89oljB-QbX6YydPjoQ4rv_hW-xMW0QJwzwaRrTgqTAurVy2pWuNmHX6Sumk9OWOlN5oRlehvw9XQZkIxq5pF0L36j_RXkloIbGT5T3joE9knYsdg0fOgz-hMkkpULym054L3WtPu9j4RPPa0'} 
+          src={optimizeImageUrl(campaign.imageUrl || campaign.image, 400) || 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=400&h=250&fit=crop&fm=webp&q=75'} 
           alt={campaign.title} 
           loading="lazy"
           decoding="async"
