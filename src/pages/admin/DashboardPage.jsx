@@ -5,7 +5,7 @@ import { formatTimeAgo } from '@/utils/formatDate';
 import { Link } from 'react-router-dom';
 import { getAllCampaigns } from '@/services/campaignService';
 import api from '@/services/api';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as LineTooltip, ResponsiveContainer, PieChart, Pie, Cell, Tooltip as PieTooltip, Legend } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as LineTooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 export default function DashboardPage() {
   const [campaigns, setCampaigns] = useState([]);
@@ -73,11 +73,16 @@ export default function DashboardPage() {
     { icon: 'group', label: 'Donatur', value: totalDonors, trend: '+15%', up: true, color: 'text-primary', bg: 'bg-primary/10' },
   ];
 
-  const pieData = [
-    { name: 'Infaq', value: infaqTotal, color: '#10B981' },
-    { name: 'Wakaf', value: wakafTotal, color: '#F59E0B' },
-  ].filter(d => d.value > 0);
-  if (pieData.length === 0) pieData.push({ name: 'Belum Ada', value: 1, color: '#334155' });
+  // Fake weekly visitor data for presentation purposes
+  const visitorData = [
+    { day: 'Sen', visitors: 420 },
+    { day: 'Sel', visitors: 580 },
+    { day: 'Rab', visitors: 390 },
+    { day: 'Kam', visitors: 610 },
+    { day: 'Jum', visitors: 1250 }, 
+    { day: 'Sab', visitors: 850 },
+    { day: 'Min', visitors: 940 },
+  ];
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -194,52 +199,59 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Pie Chart / Distribusi Kategori */}
+        {/* Visitor Traffic (Replaces Pie Chart) */}
         <div className="lg:col-span-2 bg-base-100 shadow rounded-2xl p-6 flex flex-col">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="material-symbols-outlined text-secondary">pie_chart</span>
-            <h2 className="text-lg font-bold text-base-content">Distribusi Dana</h2>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-secondary">group</span>
+              <h2 className="text-lg font-bold text-base-content">Trafik Pengunjung</h2>
+            </div>
+            <div className="badge badge-success badge-sm badge-outline gap-1 leading-none shadow-sm pb-[1px]">
+              7 Hari Terakhir
+            </div>
           </div>
-          <div className="flex-1 flex items-center justify-center">
+          
+          <div className="flex-1 flex flex-col justify-end mt-2">
             {isLoading ? (
-              <div className="w-48 h-48 rounded-full border-[10px] border-base-200 animate-pulse"></div>
+              <div className="w-full h-full rounded-xl bg-base-200 animate-pulse min-h-[200px]"></div>
             ) : (
-              <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <PieTooltip 
-                      contentStyle={{ backgroundColor: '#1E293B', borderColor: '#334155', borderRadius: '8px', border: 'none' }}
-                      itemStyle={{ color: '#fff', fontWeight: 'bold' }}
-                      formatter={(value, name) => {
-                        if (name === 'Belum Ada') return ['Rp 0', name];
-                        return [formatCurrency(value), name];
-                      }}
-                    />
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={5}
-                      dataKey="value"
-                      animationDuration={1500}
-                      animationEasing="ease-out"
-                      stroke="none"
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Legend 
-                      verticalAlign="bottom" 
-                      height={36} 
-                      iconType="circle"
-                      formatter={(value) => <span className="text-sm font-semibold text-base-content/80 ml-1">{value}</span>}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+              <>
+                <div className="mb-6">
+                  <p className="text-4xl font-headline font-black text-base-content tracking-tight">5.040</p>
+                  <p className="text-sm font-medium text-base-content/60 mt-1 flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-success text-[18px]">trending_up</span>
+                    Jangkauan naik <span className="text-success font-bold">18%</span> dari minggu lalu
+                  </p>
+                </div>
+                
+                <div className="h-44 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={visitorData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                      <XAxis 
+                        dataKey="day" 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: '#94A3B8', fontSize: 12, fontWeight: 600 }}
+                        dy={5}
+                      />
+                      <LineTooltip 
+                        cursor={{ fill: 'rgba(51, 65, 89, 0.1)' }} 
+                        contentStyle={{ backgroundColor: '#1E293B', borderColor: '#334155', borderRadius: '12px', padding: '8px 12px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+                        itemStyle={{ color: '#F59E0B', fontWeight: '800' }}
+                        labelStyle={{ display: 'none' }}
+                        formatter={(value) => [value, 'Kunjungan']}
+                      />
+                      <Bar 
+                        dataKey="visitors" 
+                        fill="#F59E0B" 
+                        radius={[8, 8, 8, 8]} 
+                        barSize={28} 
+                        animationDuration={1500} 
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </>
             )}
           </div>
         </div>
