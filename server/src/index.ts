@@ -119,26 +119,19 @@ app.listen(env.PORT, () => {
   startBot().catch((err) => console.error('[WABot] Auto-start error:', err));
   console.log('   📱 WABot: Baileys self-hosted (untuk OTP)\n');
 
-  // ═══ Auto-Restart Harian (Tengah Malam WIB) ═══
-  function scheduleDailyRestart() {
-    const now = new Date();
-    // Calculate next midnight WIB (UTC+7)
-    const wibOffset = 7 * 60 * 60 * 1000;
-    const nowWIB = new Date(now.getTime() + wibOffset);
-    const tomorrowMidnight = new Date(nowWIB);
-    tomorrowMidnight.setHours(24, 0, 0, 0); // Next midnight
-    const msUntilRestart = tomorrowMidnight.getTime() - nowWIB.getTime();
-    const hoursUntil = Math.round(msUntilRestart / (60 * 60 * 1000));
-
-    console.log(`   🔄 Auto-restart dijadwalkan tepat jam 12 malam WIB (dalam ${hoursUntil} jam).`);
-
+  // ═══ Auto-Restart (Mode Testing) ═══
+  function scheduleRestartTesting() {
+    const msUntilRestart = 10 * 60 * 1000; // 10 Menit dari sekarang
+    
+    console.log(`   🔄 Auto-restart dijadwalkan ulang untuk testing (dalam 10 menit).`);
+    
     setTimeout(() => {
-      console.log('[SYSTEM] 🕛 Memulai Auto-Restart Harian (Tengah Malam WIB)...');
-      process.exit(0);
+      console.log('[SYSTEM] 🕛 Memulai Auto-Restart Testing (10 Menit setelah nyala)...');
+      process.exit(0); // Memaksa tabung mati agar di-restart segar oleh provider hosting
     }, msUntilRestart);
   }
-
-  scheduleDailyRestart();
+  
+  scheduleRestartTesting();
 });
 
 export default app;

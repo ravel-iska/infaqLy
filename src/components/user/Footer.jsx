@@ -173,7 +173,7 @@ export default function Footer() {
       </div>
       
       <div className="max-w-7xl mx-auto px-8 lg:px-12 pb-8 border-t border-slate-200 dark:border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-baseline gap-4 text-slate-400 dark:text-slate-500 text-xs">
-        <p>© {new Date().getFullYear()} Infaqly Philanthropy. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} Infaqly Philanthropy. All rights reserved. <br className="md:hidden mt-1" /><span className="hidden md:inline"> | </span>Dibuat dengan <span className="text-red-500">♥</span> oleh <span className="font-bold text-emerald-600 dark:text-emerald-400">Bagus Priambudi</span></p>
         <div className="flex items-baseline gap-6 font-medium">
           <button onClick={() => setIsPrivacyOpen(true)} className="hover:text-emerald-500 transition-colors">Kebijakan Privasi</button>
           <button onClick={() => setIsTermsOpen(true)} className="hover:text-emerald-500 transition-colors">Syarat & Ketentuan</button>
