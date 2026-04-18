@@ -3,7 +3,6 @@ import { formatCurrency } from '@/utils/formatCurrency';
 import { formatDateTime } from '@/utils/formatDate';
 import api from '@/services/api';
 import toast from 'react-hot-toast';
-import { Loader2 } from 'lucide-react';
 
 export default function WithdrawalsPage() {
   const [history, setHistory] = useState([]);

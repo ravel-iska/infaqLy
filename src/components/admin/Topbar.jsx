@@ -1,9 +1,7 @@
-import { Bell, Menu, ChevronDown, LogOut, X } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Sun, Moon } from 'lucide-react';
 import api from '@/services/api';
 
 export default function Topbar({ onToggleSidebar }) {
@@ -91,7 +89,7 @@ export default function Topbar({ onToggleSidebar }) {
           onClick={onToggleSidebar}
           className="p-2 rounded-admin text-admin-text-secondary hover:bg-admin-bg-hover hover:text-admin-text transition-colors lg:hidden"
         >
-          <Menu size={20} />
+          <span className="material-symbols-outlined">menu</span>
         </button>
       </div>
 
@@ -103,7 +101,7 @@ export default function Topbar({ onToggleSidebar }) {
           className="btn btn-ghost btn-circle btn-sm text-base-content/70 hover:text-base-content"
           aria-label="Toggle Theme"
         >
-          {isAdminDark ? <Sun size={20} /> : <Moon size={20} />}
+          {isAdminDark ? <span className="material-symbols-outlined">light_mode</span> : <span className="material-symbols-outlined">dark_mode</span>}
         </button>
 
         {/* Notifications */}
@@ -112,7 +110,7 @@ export default function Topbar({ onToggleSidebar }) {
             onClick={() => { setNotifOpen(!notifOpen); setDropdownOpen(false); }}
             className="relative p-2 rounded-admin text-admin-text-secondary hover:bg-admin-bg-hover hover:text-admin-text transition-colors"
           >
-            <Bell size={20} />
+            <span className="material-symbols-outlined">notifications</span>
             {unreadCount > 0 && (
               <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
                 {unreadCount}
@@ -132,7 +130,7 @@ export default function Topbar({ onToggleSidebar }) {
                     </button>
                   )}
                   <button onClick={() => setNotifOpen(false)} className="text-admin-text-muted hover:text-admin-text">
-                    <X size={14} />
+                    <span className="material-symbols-outlined">close</span>
                   </button>
                 </div>
               </div>
@@ -184,7 +182,7 @@ export default function Topbar({ onToggleSidebar }) {
                 {admin?.username || 'Admin'}
               </span>
             </div>
-            <ChevronDown size={14} className={`text-admin-text-muted transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+            <span className="material-symbols-outlined">expand_more</span>
           </button>
 
           {dropdownOpen && (
@@ -193,7 +191,7 @@ export default function Topbar({ onToggleSidebar }) {
                 onClick={handleLogout}
                 className="flex items-center gap-2 w-full px-4 py-3 text-sm text-error hover:bg-base-200 transition-colors"
               >
-                <LogOut size={16} />
+                <span className="material-symbols-outlined ml-2 text-[18px]">logout</span>
                 Keluar
               </button>
             </div>

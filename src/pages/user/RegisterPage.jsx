@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { register } from '@/services/authService';
 import api from '@/services/api';
@@ -145,7 +144,7 @@ export default function RegisterPage() {
                 disabled={verifying || otp.length !== 6}
                 className="w-full bg-primary hover:bg-primary/90 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2"
               >
-                {verifying ? <Loader2 size={18} className="animate-spin" /> : <span className="material-symbols-outlined text-[18px]">verified</span>}
+                {verifying ? <span className="material-symbols-outlined text-[18px] animate-spin">sync</span> : <span className="material-symbols-outlined text-[18px]">verified</span>}
                 {verifying ? 'Memverifikasi...' : 'Konfirmasi OTP'}
               </button>
             </form>
@@ -219,7 +218,7 @@ export default function RegisterPage() {
           </div>
 
           <button type="submit" disabled={loading} className="w-full bg-primary dark:bg-emerald-600 hover:bg-primary/90 dark:hover:bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 mt-4">
-            {loading ? <><Loader2 size={20} className="animate-spin" /> Memproses pendaftaran...</> : <>
+            {loading ? <><span className="material-symbols-outlined text-[18px] animate-spin">sync</span> Memproses pendaftaran...</> : <>
               <span>Buat Akun Anda</span>
               <span className="material-symbols-outlined text-[20px]">person_add</span>
             </>}

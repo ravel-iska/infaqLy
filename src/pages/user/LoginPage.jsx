@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { login } from '@/services/authService';
 import toast from 'react-hot-toast';
@@ -94,7 +93,7 @@ export default function LoginPage() {
             className="w-full bg-primary dark:bg-emerald-600 hover:bg-primary/90 dark:hover:bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 mt-2"
           >
             {loading ? (
-              <><Loader2 size={20} className="animate-spin" /> Memverifikasi login...</>
+              <><span className="material-symbols-outlined text-[18px] animate-spin">sync</span> Memverifikasi login...</>
             ) : (
               <>
                 <span>Masuk Sekarang</span>

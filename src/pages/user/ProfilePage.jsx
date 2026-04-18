@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { formatDateShort } from '@/utils/formatDate';
@@ -167,7 +166,7 @@ function DonationCard({ tx, user, onPaymentSuccess }) {
           >
             {downloading ? (
               <>
-                <Loader2 size={14} className="animate-spin" />
+                <span className="material-symbols-outlined text-[18px] animate-spin">sync</span>
                 Membuka...
               </>
             ) : (
@@ -185,7 +184,7 @@ function DonationCard({ tx, user, onPaymentSuccess }) {
           >
             {paying ? (
               <>
-                <Loader2 size={14} className="animate-spin" />
+                <span className="material-symbols-outlined text-[18px] animate-spin">sync</span>
                 Memuat...
               </>
             ) : (
@@ -299,7 +298,7 @@ export default function ProfilePage() {
                 disabled={verifying || otp.length !== 6}
                 className="w-full bg-primary hover:bg-primary/90 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2"
               >
-                {verifying ? <Loader2 size={18} className="animate-spin" /> : <span className="material-symbols-outlined text-[18px]">verified</span>}
+                {verifying ? <span className="material-symbols-outlined text-[18px] animate-spin">sync</span> : <span className="material-symbols-outlined text-[18px]">verified</span>}
                 {verifying ? 'Memverifikasi...' : 'Konfirmasi OTP'}
               </button>
             </form>
@@ -704,7 +703,7 @@ function EditProfileModal({ user, onClose, onSave }) {
             Batal
           </button>
           <button onClick={handleSave} disabled={loading} className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary dark:bg-emerald-600 hover:bg-primary/90 dark:hover:bg-emerald-500 text-white font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5">
-            {loading ? <><Loader2 size={18} className="animate-spin" /> Menyiapkan...</> : <><span className="material-symbols-outlined text-[18px]">save</span> Simpan Perubahan</>}
+            {loading ? <><span className="material-symbols-outlined text-[18px] animate-spin">sync</span> Menyiapkan...</> : <><span className="material-symbols-outlined text-[18px]">save</span> Simpan Perubahan</>}
           </button>
         </div>
       </div>

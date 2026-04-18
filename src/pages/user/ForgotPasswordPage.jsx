@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
 import api from '@/services/api';
 import toast from 'react-hot-toast';
 
@@ -150,7 +149,7 @@ export default function ForgotPasswordPage() {
                 />
               </div>
               <button onClick={handleFindAccount} disabled={loading} className="w-full bg-primary dark:bg-emerald-600 hover:bg-primary/90 dark:hover:bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
-                {loading ? <><Loader2 size={20} className="animate-spin" /> Mencari Data...</> : <>
+                {loading ? <><span className="material-symbols-outlined text-[18px] animate-spin">sync</span> Mencari Data...</> : <>
                   <span>Kirim Kode OTP</span>
                   <span className="material-symbols-outlined text-[18px]">send</span>
                 </>}
@@ -261,7 +260,7 @@ export default function ForgotPasswordPage() {
                 )}
               </div>
               <button onClick={handleResetPassword} disabled={loading} className="w-full bg-primary dark:bg-emerald-600 hover:bg-primary/90 dark:hover:bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 mt-4">
-                {loading ? <><Loader2 size={18} className="animate-spin" /> Menyimpan Sandi...</> : <>
+                {loading ? <><span className="material-symbols-outlined text-[18px] animate-spin">sync</span> Menyimpan Sandi...</> : <>
                   <span>Simpan Password</span>
                   <span className="material-symbols-outlined text-[18px]">save</span>
                 </>}
