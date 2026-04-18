@@ -27,7 +27,15 @@ export default function ExplorePage() {
   useEffect(() => {
     const handleFocus = () => loadData();
     window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
+    
+    const interval = setInterval(() => {
+      loadData();
+    }, 10000);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(interval);
+    };
   }, [loadData]);
 
   const filtered = campaigns

@@ -44,6 +44,18 @@ export default function CampaignDetailPage() {
     load();
     // Pre-load Snap.js (client key fetched from DB via backend)
     loadSnapScript();
+
+    // Background polling for real-time updates on mobile & desktop (every 10s)
+    const interval = setInterval(async () => {
+      try {
+        const data = await getCampaignById(campaignId);
+        if (data) setCampaign(data);
+        const donorsData = await api.get(`/campaigns/${campaignId}/donors`);
+        setRecentDonors(donorsData.donors || []);
+      } catch {}
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, [campaignId]);
 
   if (loading) {

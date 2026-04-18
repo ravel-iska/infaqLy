@@ -26,7 +26,16 @@ export default function HomePage() {
   useEffect(() => {
     const handleFocus = () => loadData();
     window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
+    
+    // Background polling for mobile/real-time updates (every 10 seconds)
+    const interval = setInterval(() => {
+      loadData();
+    }, 10000);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(interval);
+    };
   }, [loadData]);
 
   // Jika data belum ada dari backend, gunakan fallback/dummy stats seperti di desain awal
