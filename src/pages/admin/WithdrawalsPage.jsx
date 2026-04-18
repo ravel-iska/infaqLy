@@ -122,7 +122,7 @@ export default function WithdrawalsPage() {
         ) : (
           <div className="divide-y divide-base-200">
             {campaignBalances.map((c) => {
-              const progress = c.target > 0 ? Math.min(Math.round((c.collected / c.target) * 100), 100) : 0;
+              const progress = c.target > 0 ? Math.min(Math.round((c.totalDonated / c.target) * 100), 100) : 0;
               return (
                 <div key={c.campaignId} className="p-5 flex flex-col sm:flex-row sm:items-center gap-4 hover:bg-base-200/50 transition-colors">
                   <div className="flex-1 min-w-0">

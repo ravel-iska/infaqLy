@@ -28,14 +28,28 @@ export async function listCampaigns(filters?: { status?: string; category?: stri
     ? db.select().from(campaigns).where(and(...conditions)).orderBy(desc(campaigns.createdAt))
     : db.select().from(campaigns).orderBy(desc(campaigns.createdAt));
 
-  return query;
+  const allCampaigns = await query;
+  const currentEnv = await getCurrentEnv();
+
+  return Promise.all(allCampaigns.map(async (c) => {
+    const rows = await db.select({ amount: donations.amount }).from(donations).where(and(eq(donations.campaignId, c.id), eq(donations.paymentStatus, 'success'), eq(donations.env, currentEnv)));
+    const totalDonated = rows.reduce((s, d) => s + d.amount, 0);
+    return { ...c, collected: totalDonated, donors: rows.length };
+  }));
 }
 
 /**
  * Get active campaigns only (for user-facing pages)
  */
 export async function getActiveCampaigns() {
-  return db.select().from(campaigns).where(eq(campaigns.status, 'active')).orderBy(desc(campaigns.createdAt));
+  const allCampaigns = await db.select().from(campaigns).where(eq(campaigns.status, 'active')).orderBy(desc(campaigns.createdAt));
+  const currentEnv = await getCurrentEnv();
+
+  return Promise.all(allCampaigns.map(async (c) => {
+    const rows = await db.select({ amount: donations.amount }).from(donations).where(and(eq(donations.campaignId, c.id), eq(donations.paymentStatus, 'success'), eq(donations.env, currentEnv)));
+    const totalDonated = rows.reduce((s, d) => s + d.amount, 0);
+    return { ...c, collected: totalDonated, donors: rows.length };
+  }));
 }
 
 /**
@@ -43,7 +57,11 @@ export async function getActiveCampaigns() {
  */
 export async function getCampaignById(id: number) {
   const [campaign] = await db.select().from(campaigns).where(eq(campaigns.id, id)).limit(1);
-  return campaign || null;
+  if (!campaign) return null;
+  const currentEnv = await getCurrentEnv();
+  const rows = await db.select({ amount: donations.amount }).from(donations).where(and(eq(donations.campaignId, campaign.id), eq(donations.paymentStatus, 'success'), eq(donations.env, currentEnv)));
+  const totalDonated = rows.reduce((s, d) => s + d.amount, 0);
+  return { ...campaign, collected: totalDonated, donors: rows.length };
 }
 
 /**
@@ -162,8 +180,12 @@ export async function deleteCampaign(id: number) {
 export async function getCampaignStats() {
   const all = await db.select().from(campaigns);
   const active = all.filter(c => c.status === 'active');
-  const totalCollected = all.reduce((s, c) => s + c.collected, 0);
-  const totalDonors = all.reduce((s, c) => s + c.donors, 0);
+  
+  const currentEnv = await getCurrentEnv();
+  const successDonations = await db.select({ amount: donations.amount }).from(donations).where(and(eq(donations.paymentStatus, 'success'), eq(donations.env, currentEnv)));
+  
+  const totalCollected = successDonations.reduce((s, d) => s + d.amount, 0);
+  const totalDonors = successDonations.length;
   const totalTarget = active.reduce((s, c) => s + c.target, 0);
 
   return { total: all.length, active: active.length, totalCollected, totalDonors, totalTarget };
