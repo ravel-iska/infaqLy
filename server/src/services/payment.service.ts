@@ -190,6 +190,10 @@ export async function handleNotification(body: any) {
     await db.execute(
       sql`UPDATE campaigns SET collected = collected + ${donation.amount}, donors = donors + 1, updated_at = NOW() WHERE id = ${donation.campaignId}`
     );
+    // Auto-complete campaign if target is reached
+    await db.execute(
+      sql`UPDATE campaigns SET status = 'completed', updated_at = NOW() WHERE id = ${donation.campaignId} AND target > 0 AND collected >= target AND status = 'active'`
+    );
   }
 
   return { orderId, status, donation, isNewSuccess };
@@ -259,6 +263,10 @@ export async function simulateSuccess(orderId: string) {
   // Increment campaign collected amount
   await db.execute(
     sql`UPDATE campaigns SET collected = collected + ${donation.amount}, donors = donors + 1, updated_at = NOW() WHERE id = ${donation.campaignId}`
+  );
+  // Auto-complete campaign if target is reached
+  await db.execute(
+    sql`UPDATE campaigns SET status = 'completed', updated_at = NOW() WHERE id = ${donation.campaignId} AND target > 0 AND collected >= target AND status = 'active'`
   );
 
   return { orderId, status: 'success', donation, isNewSuccess: true };
