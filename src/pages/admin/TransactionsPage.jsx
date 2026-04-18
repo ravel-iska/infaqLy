@@ -20,17 +20,23 @@ export default function TransactionsPage() {
   const loadTransactions = async () => {
     setLoading(true);
     try {
-      const [dataRes, configRes] = await Promise.all([
-        api.get(`/donations?t=${Date.now()}`),
-        api.get(`/payment/client-config?t=${Date.now()}`)
-      ]);
-      setTransactions(dataRes.data?.donations || dataRes.donations || []);
-      setMidtransEnv(configRes.data?.env || configRes.env || 'production');
+      const dataRes = await api.get(`/donations?t=${Date.now()}`);
+      setTransactions(dataRes.donations || []);
     } catch (err) {
       console.error('[TransactionsPage] Load error:', err);
       toast.error(err.message || 'Gagal memuat transaksi');
     } finally {
       setLoading(false);
+    }
+
+    // Fetch Midtrans env separately so it never blocks transactions
+    try {
+      const configRes = await api.get(`/payment/client-config?t=${Date.now()}`);
+      console.log('[TransactionsPage] configRes:', configRes);
+      setMidtransEnv(configRes.env || 'production');
+    } catch (err) {
+      console.error('[TransactionsPage] Config error:', err);
+      setMidtransEnv('production'); // safe fallback
     }
   };
 
