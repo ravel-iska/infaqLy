@@ -73,6 +73,8 @@ function PrivacyModal({ isOpen, onClose }) {
       </div>
     </div>
   );
+}
+
 function BugModal({ isOpen, onClose }) {
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
