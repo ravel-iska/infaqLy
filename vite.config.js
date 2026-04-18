@@ -29,6 +29,10 @@ export default defineConfig({
     chunkSizeWarningLimit: 1500,
     // Minify with terser for smaller bundles
     target: 'es2020',
+    modulePreload: {
+      // Disable polyfill to prevent preloading admin-only chunks (recharts) on user pages
+      polyfill: false,
+    },
     rollupOptions: {
       output: {
         manualChunks(id) {
