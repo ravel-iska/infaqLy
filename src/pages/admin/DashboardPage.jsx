@@ -76,17 +76,17 @@ export default function DashboardPage() {
     }
   };
 
-  // METRIK AKTIVITAS & TRAFIK
+  // METRIK KREATIF AKTIVITAS
   const todayVisitor = visitorData.length > 0 ? visitorData[visitorData.length - 1].visitors : 0;
-  const weeklyVisitor = visitorData.reduce((acc, curr) => acc + curr.visitors, 0);
-  const totalProgram = campaigns.length;
-  const activeProgram = campaigns.filter(c => c.status === 'active').length;
+  const totalPahlawan = campaigns.reduce((s, c) => s + c.donors, 0);
+  const ruangAktif = campaigns.filter(c => c.status === 'active').length;
+  const misiSelesai = campaigns.filter(c => c.target > 0 && c.collected >= c.target).length;
 
   const STATS = [
-    { icon: 'visibility', label: 'Visitor Harian', value: todayVisitor, trend: 'Hari ini', up: true, color: 'text-primary', bg: 'bg-primary/10' },
-    { icon: 'bar_chart', label: 'Visitor Mingguan', value: weeklyVisitor, trend: '7 hari terakhir', up: true, color: 'text-secondary', bg: 'bg-secondary/10' },
-    { icon: 'campaign', label: 'Total Kampanye', value: totalProgram, trend: 'Total program', up: true, color: 'text-info', bg: 'bg-info/10' },
-    { icon: 'local_fire_department', label: 'Program Aktif', value: activeProgram, trend: 'Sedang berjalan', up: true, color: 'text-warning', bg: 'bg-warning/10' },
+    { icon: 'visibility', label: 'Visitor Harian', value: todayVisitor, trend: 'Trafik hari ini', up: true, color: 'text-primary', bg: 'bg-primary/10' },
+    { icon: 'volunteer_activism', label: 'Pahlawan Kebaikan', value: totalPahlawan, trend: 'Aksi hamba Allah', up: true, color: 'text-secondary', bg: 'bg-secondary/10' },
+    { icon: 'rocket_launch', label: 'Ruang Berbagi Aktif', value: ruangAktif, trend: 'Sedang menggalang dana', up: true, color: 'text-info', bg: 'bg-info/10' },
+    { icon: 'task_alt', label: 'Target Terselesaikan', value: misiSelesai, trend: 'Misi sukses 100%', up: true, color: 'text-success', bg: 'bg-success/10' },
   ];
 
   // Real visitor data fetched mapped to visitorData state
