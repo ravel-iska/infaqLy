@@ -90,7 +90,9 @@ router.post('/notification', async (req: Request, res: Response) => {
        return res.status(200).send('OK'); 
     }
     sendErrorAlert(`POST /api/payment/notification`, `Midtrans Webhook Error: ${err.message}`).catch(() => {});
-    return res.status(500).json({ error: err.message });
+    // Midtrans REQUIRES HTTP 200 OK. If we return 500 or anything else, 
+    // it will endlessly retry and send the merchant "We are having difficulty..." emails.
+    return res.status(200).json({ error: err.message, status: 'absorbed' });
   }
 });
 
