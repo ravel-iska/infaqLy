@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { db } from '../db/index.js';
+import { db } from '../config/database.js';
 import { dailyVisitors } from '../db/schema.js';
 import { desc, sql } from 'drizzle-orm';
 import { requireAdmin } from '../middleware/auth.middleware.js';
@@ -38,7 +38,7 @@ router.get('/stats', requireAdmin, async (req, res, next) => {
       d.setDate(d.getDate() - i);
       const dateStr = d.toISOString().split('T')[0];
       
-      const found = rawStats.find(s => s.date === dateStr);
+      const found = rawStats.find((s: typeof rawStats[number]) => s.date === dateStr);
       const dayName = new Intl.DateTimeFormat('id-ID', { weekday: 'short' }).format(d);
 
       results.push({
