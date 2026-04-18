@@ -257,7 +257,7 @@ export default function CampaignFormPage() {
                   <select value={form.status} onChange={(e) => update('status', e.target.value)} className="select select-bordered w-full pl-12 font-medium">
                     <option value="draft">Mode Draft (Tersembunyi)</option>
                     <option value="active">Mode Aktif (Publik)</option>
-                    <option value="closed">Selesai (Tutup)</option>
+                    <option value="completed">Selesai (Tutup)</option>
                   </select>
                 </div>
               </div>

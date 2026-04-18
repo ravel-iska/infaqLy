@@ -82,7 +82,7 @@ export default function CampaignsPage() {
             <option value="all">Semua Status</option>
             <option value="active">Aktif</option>
             <option value="draft">Draft</option>
-            <option value="closed">Selesai</option>
+            <option value="completed">Selesai</option>
           </select>
         </div>
       </div>
