@@ -94,7 +94,7 @@ function AppRoutes() {
   useEffect(() => {
     const checkMaintenance = async () => {
       try {
-        const res = await fetch('/api/settings/public');
+        const res = await fetch(`/api/settings/public?t=${Date.now()}`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           if (data.settings?.maintenance_mode === 'true' || data.settings?.maintenance_mode === true) {
