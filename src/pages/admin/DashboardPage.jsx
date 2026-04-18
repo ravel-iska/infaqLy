@@ -77,16 +77,16 @@ export default function DashboardPage() {
   };
 
   const activeCampaigns = campaigns.filter(c => c.status === 'active');
-  const infaqTotal = campaigns.filter(c => c.category === 'infaq').reduce((s, c) => s + c.collected, 0);
-  const wakafTotal = campaigns.filter(c => c.category === 'wakaf').reduce((s, c) => s + c.collected, 0);
-  const yatimTotal = campaigns.filter(c => c.category === 'yatim').reduce((s, c) => s + c.collected, 0);
-  const bencanaTotal = campaigns.filter(c => c.category === 'bencana').reduce((s, c) => s + c.collected, 0);
+  const activeCampaigns = campaigns.filter(c => c.status === 'active');
+  const totalCollected = campaigns.reduce((s, c) => s + c.collected, 0);
+  const totalDonors = campaigns.reduce((s, c) => s + c.donors, 0);
+  const currentMonthTotal = monthlyStats.length > 0 ? monthlyStats[monthlyStats.length - 1].total : 0;
 
   const STATS = [
-    { icon: 'volunteer_activism', label: 'Terkumpul (Infaq)', value: infaqTotal, trend: 'Kategori Infaq', up: true, color: 'text-primary', bg: 'bg-primary/10' },
-    { icon: 'real_estate_agent', label: 'Terkumpul (Wakaf)', value: wakafTotal, trend: 'Kategori Wakaf', up: true, color: 'text-secondary', bg: 'bg-secondary/10' },
-    { icon: 'child_care', label: 'Terkumpul (Yatim Piatu)', value: yatimTotal, trend: 'Kategori Yatim', up: true, color: 'text-info', bg: 'bg-info/10' },
-    { icon: 'healing', label: 'Terkumpul (Bencana)', value: bencanaTotal, trend: 'Kategori Bencana', up: true, color: 'text-error', bg: 'bg-error/10' },
+    { icon: 'account_balance_wallet', label: 'Total Dana Terkumpul', value: totalCollected, trend: 'Akumulasi sepanjang waktu', up: true, color: 'text-primary', bg: 'bg-primary/10' },
+    { icon: 'calendar_month', label: 'Pemasukan Bulan Ini', value: currentMonthTotal, trend: 'Riwayat bulan berjalan', up: true, color: 'text-success', bg: 'bg-success/10' },
+    { icon: 'campaign', label: 'Program Berjalan', value: activeCampaigns.length, trend: `Dari ${campaigns.length} kampanye dibuat`, up: true, color: 'text-warning', bg: 'bg-warning/10' },
+    { icon: 'group', label: 'Total Donatur', value: totalDonors, trend: 'Hamba Allah berpartisipasi', up: true, color: 'text-info', bg: 'bg-info/10' },
   ];
 
   // Real visitor data fetched mapped to visitorData state
