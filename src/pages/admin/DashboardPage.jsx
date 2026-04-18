@@ -76,16 +76,36 @@ export default function DashboardPage() {
     }
   };
 
-  const activeCampaigns = campaigns.filter(c => c.status === 'active');
-  const totalCollected = campaigns.reduce((s, c) => s + c.collected, 0);
-  const totalDonors = campaigns.reduce((s, c) => s + c.donors, 0);
-  const currentMonthTotal = monthlyStats.length > 0 ? monthlyStats[monthlyStats.length - 1].total : 0;
+  // METRIK KUALITAS TINGGI (ANALYTICS)
+  const activeWithTarget = campaigns.filter(c => c.status === 'active' && c.target > 0);
+  
+  // 1. Rata-rata Pencapaian Target Keseluruhan
+  const avgProgress = activeWithTarget.length 
+    ? Math.round((activeWithTarget.reduce((acc, c) => acc + Math.min(c.collected / c.target, 1), 0) / activeWithTarget.length) * 100) 
+    : 0;
+
+  // 2. Kategori Favorit Donatur
+  const catStats = campaigns.reduce((acc, c) => {
+    acc[c.category] = (acc[c.category] || 0) + c.donors;
+    return acc;
+  }, {});
+  const topCategoryEntry = Object.entries(catStats).sort((a,b) => b[1] - a[1])[0];
+  const topCategoryLabel = topCategoryEntry && topCategoryEntry[1] > 0 ? topCategoryEntry[0].toUpperCase() : 'N/A';
+  const topCategoryDonors = topCategoryEntry ? topCategoryEntry[1] : 0;
+
+  // 3. Tingkat Kedermawanan (Rata-rata sumbangan per transaksi)
+  const totalDana = campaigns.reduce((s, c) => s + c.collected, 0);
+  const totalOrang = campaigns.reduce((s, c) => s + c.donors, 0);
+  const avgDonation = totalOrang > 0 ? Math.round(totalDana / totalOrang) : 0;
+
+  // 4. Program Mendesak (Progress masih di bawah 30%)
+  const urgentCampaigns = activeWithTarget.filter(c => (c.collected / c.target) < 0.3).length;
 
   const STATS = [
-    { icon: 'account_balance_wallet', label: 'Total Dana Terkumpul', value: totalCollected, trend: 'Akumulasi sepanjang waktu', up: true, color: 'text-primary', bg: 'bg-primary/10' },
-    { icon: 'calendar_month', label: 'Pemasukan Bulan Ini', value: currentMonthTotal, trend: 'Riwayat bulan berjalan', up: true, color: 'text-success', bg: 'bg-success/10' },
-    { icon: 'campaign', label: 'Program Berjalan', value: activeCampaigns.length, trend: `Dari ${campaigns.length} kampanye dibuat`, up: true, color: 'text-warning', bg: 'bg-warning/10' },
-    { icon: 'group', label: 'Total Donatur', value: totalDonors, trend: 'Hamba Allah berpartisipasi', up: true, color: 'text-info', bg: 'bg-info/10' },
+    { icon: 'analytics', label: 'Indeks Ketercapaian', value: `${avgProgress}%`, trend: 'Distribusi target tercapai', up: true, color: 'text-primary', bg: 'bg-primary/10' },
+    { icon: 'loyalty', label: 'Kategori Terfavorit', value: topCategoryLabel, trend: `${topCategoryDonors} donatur memilih jalur ini`, up: true, color: 'text-secondary', bg: 'bg-secondary/10' },
+    { icon: 'donut_large', label: 'Rata-rata Infaq / User', value: formatCurrencyShort(avgDonation), trend: 'Tingkat kemurahan hati donatur', up: true, color: 'text-info', bg: 'bg-info/10' },
+    { icon: 'notification_important', label: 'Program Mendesak', value: urgentCampaigns, trend: 'Butuh atensi (Target < 30%)', up: false, color: 'text-error', bg: 'bg-error/10' },
   ];
 
   // Real visitor data fetched mapped to visitorData state
@@ -128,15 +148,13 @@ export default function DashboardPage() {
                     <span className="material-symbols-outlined text-[14px]">
                       {stat.up ? 'trending_up' : 'trending_down'}
                     </span>
-                    {stat.trend}
                   </span>
                 </div>
                 <p className="text-sm font-medium text-base-content/60">{stat.label}</p>
                 <p className="text-3xl font-bold text-base-content mt-1 font-headline tracking-tight">
-                  {typeof stat.value === 'number' && stat.value > 9999
-                    ? formatCurrencyShort(stat.value)
-                    : (stat.value || 0).toLocaleString('id-ID')}
+                  {typeof stat.value === 'string' ? stat.value : (typeof stat.value === 'number' && stat.value > 9999 ? formatCurrencyShort(stat.value) : (stat.value || 0).toLocaleString('id-ID'))}
                 </p>
+                <p className="text-xs font-medium text-base-content/50 mt-1 opacity-80">{stat.trend}</p>
               </div>
             ))}
       </div>
