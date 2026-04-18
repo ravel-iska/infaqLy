@@ -1,33 +1,34 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 
-// Layouts
+// Layouts (keep eager — always needed)
 import UserLayout from '@/layouts/UserLayout';
 import AdminLayout from '@/layouts/AdminLayout';
 import MinimalLayout from '@/layouts/MinimalLayout';
 
+// ═══ Lazy-loaded Pages (code-split per route) ═══
 // User Pages
-import HomePage from '@/pages/user/HomePage';
-import ExplorePage from '@/pages/user/ExplorePage';
-import CampaignDetailPage from '@/pages/user/CampaignDetailPage';
-import LoginPage from '@/pages/user/LoginPage';
-import RegisterPage from '@/pages/user/RegisterPage';
-import ForgotPasswordPage from '@/pages/user/ForgotPasswordPage';
-import ProfilePage from '@/pages/user/ProfilePage';
-import HowToDonatePage from '@/pages/user/HowToDonatePage';
-import MaintenancePage from '@/pages/user/MaintenancePage';
+const HomePage = lazy(() => import('@/pages/user/HomePage'));
+const ExplorePage = lazy(() => import('@/pages/user/ExplorePage'));
+const CampaignDetailPage = lazy(() => import('@/pages/user/CampaignDetailPage'));
+const LoginPage = lazy(() => import('@/pages/user/LoginPage'));
+const RegisterPage = lazy(() => import('@/pages/user/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('@/pages/user/ForgotPasswordPage'));
+const ProfilePage = lazy(() => import('@/pages/user/ProfilePage'));
+const HowToDonatePage = lazy(() => import('@/pages/user/HowToDonatePage'));
+const MaintenancePage = lazy(() => import('@/pages/user/MaintenancePage'));
 
 // Admin Pages
-import AdminLoginPage from '@/pages/admin/AdminLoginPage';
-import DashboardPage from '@/pages/admin/DashboardPage';
-import CampaignsPage from '@/pages/admin/CampaignsPage';
-import CampaignFormPage from '@/pages/admin/CampaignFormPage';
-import TransactionsPage from '@/pages/admin/TransactionsPage';
-import WithdrawalsPage from '@/pages/admin/WithdrawalsPage';
-import SettingsPage from '@/pages/admin/SettingsPage';
+const AdminLoginPage = lazy(() => import('@/pages/admin/AdminLoginPage'));
+const DashboardPage = lazy(() => import('@/pages/admin/DashboardPage'));
+const CampaignsPage = lazy(() => import('@/pages/admin/CampaignsPage'));
+const CampaignFormPage = lazy(() => import('@/pages/admin/CampaignFormPage'));
+const TransactionsPage = lazy(() => import('@/pages/admin/TransactionsPage'));
+const WithdrawalsPage = lazy(() => import('@/pages/admin/WithdrawalsPage'));
+const SettingsPage = lazy(() => import('@/pages/admin/SettingsPage'));
 
 // Route Guards
 function GuestOnly({ children }) {
@@ -113,44 +114,46 @@ function AppRoutes() {
   // PENGECUALIAN: /admin-panel tetap bisa diakses meskipun sedang maintenance
   const isAdminRoute = location.pathname.startsWith('/admin-panel');
   if (isMaintenance && !isAdminRoute) {
-    return <MaintenancePage />;
+    return <Suspense fallback={<LoadingScreen />}><MaintenancePage /></Suspense>;
   }
 
   return (
-    <Routes>
-      {/* ── User Public Routes ── */}
-      <Route element={<UserLayout />}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/explore" element={<ExplorePage />} />
-        <Route path="/explore/:campaignId" element={<CampaignDetailPage />} />
-        <Route path="/cara-donasi" element={<HowToDonatePage />} />
-        <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
-      </Route>
+    <Suspense fallback={<LoadingScreen />}>
+      <Routes>
+        {/* ── User Public Routes ── */}
+        <Route element={<UserLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/explore" element={<ExplorePage />} />
+          <Route path="/explore/:campaignId" element={<CampaignDetailPage />} />
+          <Route path="/cara-donasi" element={<HowToDonatePage />} />
+          <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
+        </Route>
 
-      {/* ── Auth Routes (Minimal Layout) ── */}
-      <Route element={<MinimalLayout />}>
-        <Route path="/login" element={<GuestOnly><LoginPage /></GuestOnly>} />
-        <Route path="/register" element={<GuestOnly><RegisterPage /></GuestOnly>} />
-        <Route path="/forgot-password" element={<GuestOnly><ForgotPasswordPage /></GuestOnly>} />
-      </Route>
+        {/* ── Auth Routes (Minimal Layout) ── */}
+        <Route element={<MinimalLayout />}>
+          <Route path="/login" element={<GuestOnly><LoginPage /></GuestOnly>} />
+          <Route path="/register" element={<GuestOnly><RegisterPage /></GuestOnly>} />
+          <Route path="/forgot-password" element={<GuestOnly><ForgotPasswordPage /></GuestOnly>} />
+        </Route>
 
-      {/* ── Admin Login (No Layout) ── */}
-      <Route path="/admin-panel/login" element={<AdminGuestOnly><AdminLoginPage /></AdminGuestOnly>} />
+        {/* ── Admin Login (No Layout) ── */}
+        <Route path="/admin-panel/login" element={<AdminGuestOnly><AdminLoginPage /></AdminGuestOnly>} />
 
-      {/* ── Admin Protected Routes ── */}
-      <Route element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
-        <Route path="/admin-panel/dashboard" element={<DashboardPage />} />
-        <Route path="/admin-panel/campaigns" element={<CampaignsPage />} />
-        <Route path="/admin-panel/campaigns/new" element={<CampaignFormPage />} />
-        <Route path="/admin-panel/campaigns/:id" element={<CampaignFormPage />} />
-        <Route path="/admin-panel/transactions" element={<TransactionsPage />} />
-        <Route path="/admin-panel/withdrawals" element={<WithdrawalsPage />} />
-        <Route path="/admin-panel/settings" element={<SettingsPage />} />
-      </Route>
+        {/* ── Admin Protected Routes ── */}
+        <Route element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
+          <Route path="/admin-panel/dashboard" element={<DashboardPage />} />
+          <Route path="/admin-panel/campaigns" element={<CampaignsPage />} />
+          <Route path="/admin-panel/campaigns/new" element={<CampaignFormPage />} />
+          <Route path="/admin-panel/campaigns/:id" element={<CampaignFormPage />} />
+          <Route path="/admin-panel/transactions" element={<TransactionsPage />} />
+          <Route path="/admin-panel/withdrawals" element={<WithdrawalsPage />} />
+          <Route path="/admin-panel/settings" element={<SettingsPage />} />
+        </Route>
 
-      {/* 404 */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* 404 */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Suspense>
   );
 }
 
