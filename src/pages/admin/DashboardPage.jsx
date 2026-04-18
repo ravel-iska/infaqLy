@@ -5,7 +5,7 @@ import { formatTimeAgo } from '@/utils/formatDate';
 import { Link } from 'react-router-dom';
 import { getAllCampaigns } from '@/services/campaignService';
 import api from '@/services/api';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as LineTooltip, ResponsiveContainer, PieChart, Pie, Cell, Tooltip as PieTooltip, Legend } from 'recharts';
 
 export default function DashboardPage() {
   const [campaigns, setCampaigns] = useState([]);
@@ -71,6 +71,12 @@ export default function DashboardPage() {
     { icon: 'schedule', label: 'Program Aktif', value: activeCampaigns.length, trend: `${campaigns.length} total`, up: true, color: 'text-warning', bg: 'bg-warning/10' },
     { icon: 'group', label: 'Donatur', value: totalDonors, trend: '+15%', up: true, color: 'text-primary', bg: 'bg-primary/10' },
   ];
+
+  const pieData = [
+    { name: 'Infaq', value: infaqTotal, color: '#10B981' },
+    { name: 'Wakaf', value: wakafTotal, color: '#F59E0B' },
+  ].filter(d => d.value > 0);
+  if (pieData.length === 0) pieData.push({ name: 'Belum Ada', value: 1, color: '#334155' });
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -149,7 +155,7 @@ export default function DashboardPage() {
                     tickFormatter={(value) => formatCurrencyShort(value)}
                     width={50}
                   />
-                  <Tooltip 
+                  <LineTooltip 
                     contentStyle={{ backgroundColor: '#1E293B', borderColor: '#334155', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)' }}
                     itemStyle={{ color: '#818CF8', fontWeight: 'bold' }}
                     labelStyle={{ color: '#94A3B8', marginBottom: '4px' }}
@@ -174,6 +180,129 @@ export default function DashboardPage() {
           )}
         </div>
 
+        {/* Pie Chart / Distribusi Kategori */}
+        <div className="lg:col-span-2 bg-base-100 shadow rounded-2xl p-6 flex flex-col">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="material-symbols-outlined text-secondary">pie_chart</span>
+            <h2 className="text-lg font-bold text-base-content">Distribusi Dana</h2>
+          </div>
+          <div className="flex-1 flex items-center justify-center">
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <PieTooltip 
+                    contentStyle={{ backgroundColor: '#1E293B', borderColor: '#334155', borderRadius: '8px', border: 'none' }}
+                    itemStyle={{ color: '#fff', fontWeight: 'bold' }}
+                    formatter={(value, name) => {
+                      if (name === 'Belum Ada') return ['Rp 0', name];
+                      return [formatCurrency(value), name];
+                    }}
+                  />
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                    animationDuration={1500}
+                    animationEasing="ease-out"
+                    stroke="none"
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Legend 
+                    verticalAlign="bottom" 
+                    height={36} 
+                    iconType="circle"
+                    formatter={(value) => <span className="text-sm font-semibold text-base-content/80 ml-1">{value}</span>}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Row 3: Active Campaigns Table + Recent Transactions */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        
+        {/* Active Campaigns Table (lg:col-span-3) */}
+        <div className="lg:col-span-3 bg-base-100 shadow rounded-2xl p-0 overflow-hidden flex flex-col">
+          <div className="p-6 border-b border-base-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-secondary">campaign</span>
+              <h2 className="text-lg font-bold text-base-content">Daftar Kampanye Aktif</h2>
+            </div>
+            <Link to="/admin-panel/campaigns/new" className="btn btn-primary btn-sm">
+              <span className="material-symbols-outlined text-[18px]">add</span> Buat Baru
+            </Link>
+          </div>
+          
+          <div className="overflow-x-auto flex-1">
+            <table className="table table-zebra table-md w-full">
+              <thead>
+                <tr>
+                  <th className="bg-base-200">Nama Program</th>
+                  <th className="bg-base-200">Target</th>
+                  <th className="bg-base-200">Progress</th>
+                  <th className="bg-base-200 text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {campaigns.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="text-center py-10 text-base-content/50">
+                      Tidak ada kampanye aktif. <Link to="/admin-panel/campaigns/new" className="text-primary hover:underline">Buat sekarang</Link>.
+                    </td>
+                  </tr>
+                ) : campaigns.slice(0, 5).map((c) => {
+                  const progress = c.target > 0 ? Math.round((c.collected / c.target) * 100) : 0;
+                  return (
+                    <tr key={c.id}>
+                      <td>
+                        <div className="flex items-center gap-3">
+                          <div className="avatar">
+                            <div className="w-10 rounded-lg bg-base-300">
+                              {(c.imageUrl || c.image) ? (
+                                <img src={c.imageUrl || c.image} alt="" />
+                              ) : (
+                                <span className="material-symbols-outlined m-2 text-base-content/50">image</span>
+                              )}
+                            </div>
+                          </div>
+                          <span className="font-bold line-clamp-2 max-w-[200px]">{c.title}</span>
+                        </div>
+                      </td>
+                      <td className="font-mono font-medium whitespace-nowrap">
+                        {formatCurrencyShort(c.target)}
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-2 w-32">
+                          <progress className="progress progress-secondary w-full" value={progress} max="100"></progress>
+                          <span className="text-xs font-mono font-bold w-8 text-right">{progress}%</span>
+                        </div>
+                      </td>
+                      <td className="text-center">
+                        <div className={`badge badge-sm badge-outline gap-1 ${
+                          c.status === 'active' ? 'badge-success' :
+                          c.status === 'draft' ? 'badge-warning' : ''
+                        }`}>
+                           {c.status === 'active' ? 'Aktif' : c.status === 'draft' ? 'Draft' : 'Selesai'}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Recent Transactions (lg:col-span-2) */}
         <div className="lg:col-span-2 bg-base-100 shadow rounded-2xl p-6 flex flex-col">
           <div className="flex items-center gap-2 mb-6">
             <span className="material-symbols-outlined text-warning">bolt</span>
@@ -207,78 +336,7 @@ export default function DashboardPage() {
             Lihat Semua <span className="material-symbols-outlined text-[16px] ml-1">arrow_forward</span>
           </Link>
         </div>
-      </div>
 
-      {/* Active Campaigns Table */}
-      <div className="bg-base-100 shadow rounded-2xl p-0 overflow-hidden">
-        <div className="p-6 border-b border-base-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-secondary">campaign</span>
-            <h2 className="text-lg font-bold text-base-content">Daftar Kampanye Aktif</h2>
-          </div>
-          <Link to="/admin-panel/campaigns/new" className="btn btn-primary btn-sm">
-            <span className="material-symbols-outlined text-[18px]">add</span> Buat Baru
-          </Link>
-        </div>
-        
-        <div className="overflow-x-auto">
-          <table className="table table-zebra table-md w-full">
-            <thead>
-              <tr>
-                <th className="bg-base-200">Nama Program</th>
-                <th className="bg-base-200">Target</th>
-                <th className="bg-base-200">Progress</th>
-                <th className="bg-base-200 text-center">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {campaigns.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="text-center py-10 text-base-content/50">
-                    Tidak ada kampanye aktif. <Link to="/admin-panel/campaigns/new" className="text-primary hover:underline">Buat sekarang</Link>.
-                  </td>
-                </tr>
-              ) : campaigns.slice(0, 5).map((c) => {
-                const progress = c.target > 0 ? Math.round((c.collected / c.target) * 100) : 0;
-                return (
-                  <tr key={c.id}>
-                    <td>
-                      <div className="flex items-center gap-3">
-                        <div className="avatar">
-                          <div className="w-10 rounded-lg bg-base-300">
-                            {(c.imageUrl || c.image) ? (
-                              <img src={c.imageUrl || c.image} alt="" />
-                            ) : (
-                              <span className="material-symbols-outlined m-2 text-base-content/50">image</span>
-                            )}
-                          </div>
-                        </div>
-                        <span className="font-bold line-clamp-2 max-w-[200px]">{c.title}</span>
-                      </div>
-                    </td>
-                    <td className="font-mono font-medium whitespace-nowrap">
-                      {formatCurrencyShort(c.target)}
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-2 w-32">
-                        <progress className="progress progress-secondary w-full" value={progress} max="100"></progress>
-                        <span className="text-xs font-mono font-bold w-8 text-right">{progress}%</span>
-                      </div>
-                    </td>
-                    <td className="text-center">
-                      <div className={`badge badge-sm badge-outline gap-1 ${
-                        c.status === 'active' ? 'badge-success' :
-                        c.status === 'draft' ? 'badge-warning' : ''
-                      }`}>
-                         {c.status === 'active' ? 'Aktif' : c.status === 'draft' ? 'Draft' : 'Selesai'}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
       </div>
 
       {isBugModalOpen && (
