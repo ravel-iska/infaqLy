@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin-panel/
+Disallow: /admin-login
+Disallow: /profile/
+
+Sitemap: https://infaqly-production.up.railway.app/sitemap.xml
