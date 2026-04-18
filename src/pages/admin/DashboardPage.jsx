@@ -77,7 +77,6 @@ export default function DashboardPage() {
   };
 
   const activeCampaigns = campaigns.filter(c => c.status === 'active');
-  const activeCampaigns = campaigns.filter(c => c.status === 'active');
   const totalCollected = campaigns.reduce((s, c) => s + c.collected, 0);
   const totalDonors = campaigns.reduce((s, c) => s + c.donors, 0);
   const currentMonthTotal = monthlyStats.length > 0 ? monthlyStats[monthlyStats.length - 1].total : 0;
