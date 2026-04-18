@@ -15,6 +15,9 @@ export const MIN_DONATION = 1000;
 export const CAMPAIGN_CATEGORIES = [
   { value: 'infaq', label: 'Infaq' },
   { value: 'wakaf', label: 'Wakaf' },
+  { value: 'yatim', label: 'Yatim Piatu' },
+  { value: 'bencana', label: 'Bencana Alam' },
+  { value: 'kemanusiaan', label: 'Kemanusiaan' },
 ];
 
 /** Status kampanye */

@@ -9,6 +9,7 @@ export default function HomePage() {
   const { isAuthenticated } = useAuth();
   const [campaigns, setCampaigns] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isImpactOpen, setIsImpactOpen] = useState(false);
   const location = useLocation();
 
   const loadData = useCallback(async () => {
@@ -66,10 +67,10 @@ export default function HomePage() {
               <Link to="/explore" className="hero-gradient text-white px-8 py-4 rounded-xl font-bold text-lg ambient-shadow transition-transform hover:scale-[1.02] text-center dark:shadow-emerald-900/20">
                 Mulai Berdonasi
               </Link>
-              <a href="#cara-donasi" className="flex items-center justify-center gap-2 border-2 border-outline-variant/30 dark:border-slate-700 text-primary dark:text-emerald-400 px-8 py-4 rounded-xl font-bold text-lg hover:bg-surface-container dark:hover:bg-slate-800 transition-colors">
-                <span className="material-symbols-outlined">play_circle</span>
+              <button onClick={() => setIsImpactOpen(true)} className="flex items-center justify-center gap-2 border-2 border-outline-variant/30 dark:border-slate-700 text-primary dark:text-emerald-400 px-8 py-4 rounded-xl font-bold text-lg hover:bg-surface-container dark:hover:bg-slate-800 transition-colors">
+                <span className="material-symbols-outlined text-[24px]">play_circle</span>
                 Lihat Dampak
-              </a>
+              </button>
             </div>
           </div>
           <div className="relative">
@@ -229,6 +230,47 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Dampak Modal */}
+      {isImpactOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-surface dark:bg-slate-800 w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden animate-scale-in relative">
+            <button onClick={() => setIsImpactOpen(false)} className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/20 hover:bg-black/40 text-white rounded-full flex items-center justify-center transition-colors">
+              <span className="material-symbols-outlined">close</span>
+            </button>
+            <div className="aspect-video w-full bg-slate-200">
+              <iframe 
+                width="100%" 
+                height="100%" 
+                src="https://www.youtube.com/embed/P6bH3sP0FkI?autoplay=1&mute=1" 
+                title="Dampak Donasi" 
+                frameBorder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen
+              ></iframe>
+            </div>
+            <div className="p-8">
+              <h3 className="text-2xl font-bold text-on-surface dark:text-white mb-2">Dampak Nyata Kebaikan Anda</h3>
+              <p className="text-on-surface-variant dark:text-slate-400 mb-6 leading-relaxed">Ribuan senyum telah tercipta berkat gotong royong dan uluran tangan dari para donatur InfaqLy. Bersama-sama, kita membangun masa depan yang lebih cerah untuk mereka yang membutuhkan.</p>
+              
+              <div className="grid grid-cols-3 gap-4 border-t border-outline-variant/20 dark:border-slate-700 pt-6">
+                <div className="text-center">
+                  <p className="text-3xl font-black text-primary dark:text-emerald-400 mb-1">15K+</p>
+                  <p className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wide">Penerima Manfaat</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-3xl font-black text-secondary dark:text-teal-400 mb-1">420</p>
+                  <p className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wide">Program Selesai</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-3xl font-black text-primary dark:text-emerald-400 mb-1">100%</p>
+                  <p className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wide">Tersalurkan</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

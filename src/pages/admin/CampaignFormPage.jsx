@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { getCampaignById, createCampaign, updateCampaign, getAllCampaigns } from '@/services/campaignService';
+import { CAMPAIGN_CATEGORIES } from '@/utils/constants';
 import toast from 'react-hot-toast';
 
 export default function CampaignFormPage() {
@@ -21,13 +22,16 @@ export default function CampaignFormPage() {
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [existingCategories, setExistingCategories] = useState(['infaq', 'wakaf']);
+  
+  // Ambil dari constants agar konsisten
+  const baseCats = CAMPAIGN_CATEGORIES.map(c => c.value);
+  const [existingCategories, setExistingCategories] = useState(baseCats);
 
   useEffect(() => {
     (async () => {
       try {
         const campaigns = await getAllCampaigns();
-        const cats = new Set(['infaq', 'wakaf']);
+        const cats = new Set(baseCats);
         campaigns.forEach(c => cats.add(c.category));
         setExistingCategories([...cats]);
       } catch {}
@@ -50,7 +54,7 @@ export default function CampaignFormPage() {
             });
             setImagePreview(campaign.imageUrl || campaign.image);
             // If the loaded category is not standard, show custom input
-            if (campaign.category !== 'infaq' && campaign.category !== 'wakaf') {
+            if (!baseCats.includes(campaign.category)) {
               setIsCustomCategory(true);
             }
           } else {
