@@ -232,19 +232,18 @@ export async function checkTransactionStatus(orderId: string) {
 
 /**
  * Simulate Payment Success (Developer Sandbox Mode)
- * Bypasses Midtrans and forces a transaction to success.
+ * Bypasses payment gateways and forces a transaction to success.
  */
 export async function simulateSuccess(orderId: string) {
-  // Security lock: Only allow in Sandbox mode
-  const config = await getMidtransConfig();
-  if (config.env === 'production') {
-    throw new Error('SECURITY ALERT: Opsi Developer ditolak. Website Anda sedang dalam mode Production!');
-  }
-
-  // Check existing transaction
+  // Check existing transaction first
   const [existing] = await db.select().from(donations).where(eq(donations.orderId, orderId)).limit(1);
   if (!existing) throw new Error('Opsi Developer: Transaksi tidak ditemukan di database.');
   
+  // Security lock: Only allow simulating Sandbox transactions
+  if (existing.env === 'production') {
+    throw new Error('SECURITY ALERT: Opsi Developer ditolak. Website Anda sedang dalam mode Production!');
+  }
+
   if (existing.paymentStatus === 'success') {
     throw new Error('Opsi Developer: Transaksi ini sudah berstatus success.');
   }
