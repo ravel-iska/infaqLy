@@ -11,6 +11,8 @@ export default function DashboardPage() {
   const [campaigns, setCampaigns] = useState([]);
   const [recentTxn, setRecentTxn] = useState([]);
   const [monthlyStats, setMonthlyStats] = useState([]);
+  const [visitorData, setVisitorData] = useState([]);
+  const [visitorStats, setVisitorStats] = useState({ total: 0, growth: 0 });
   const [bugReports, setBugReports] = useState([]);
   const [isBugModalOpen, setIsBugModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -18,14 +20,28 @@ export default function DashboardPage() {
   useEffect(() => {
     (async () => {
       try {
-        const [campData, txData, chartData] = await Promise.all([
+        const [campData, txData, chartData, vData] = await Promise.all([
           getAllCampaigns().catch(() => []),
           api.get('/donations?limit=5').catch(() => ({ donations: [] })),
-          api.get('/campaigns/monthly-stats').catch(() => ({ months: [] }))
+          api.get('/campaigns/monthly-stats').catch(() => ({ months: [] })),
+          api.get('/visitors/stats').catch(() => [])
         ]);
         setCampaigns(campData);
         setRecentTxn((txData.donations || []).slice(0, 5));
         setMonthlyStats(chartData.months || []);
+        
+        if (Array.isArray(vData)) {
+          const ordered = [...vData].reverse();
+          setVisitorData(ordered);
+          let sum = 0;
+          ordered.forEach(v => sum += v.visitors);
+          
+          const todayAmt = ordered[ordered.length - 1]?.visitors || 0;
+          const yesterdayAmt = ordered[ordered.length - 2]?.visitors || 0;
+          const pct = yesterdayAmt > 0 ? Math.round(((todayAmt - yesterdayAmt) / yesterdayAmt) * 100) : (todayAmt > 0 ? 100 : 0);
+          
+          setVisitorStats({ total: sum, growth: pct });
+        }
         await fetchBugs();
       } finally {
         setIsLoading(false);
@@ -73,16 +89,7 @@ export default function DashboardPage() {
     { icon: 'group', label: 'Donatur', value: totalDonors, trend: '+15%', up: true, color: 'text-primary', bg: 'bg-primary/10' },
   ];
 
-  // Fake weekly visitor data for presentation purposes
-  const visitorData = [
-    { day: 'Sen', visitors: 420 },
-    { day: 'Sel', visitors: 580 },
-    { day: 'Rab', visitors: 390 },
-    { day: 'Kam', visitors: 610 },
-    { day: 'Jum', visitors: 1250 }, 
-    { day: 'Sab', visitors: 850 },
-    { day: 'Min', visitors: 940 },
-  ];
+  // Real visitor data fetched mapped to visitorData state
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -217,10 +224,12 @@ export default function DashboardPage() {
             ) : (
               <>
                 <div className="mb-6">
-                  <p className="text-4xl font-headline font-black text-base-content tracking-tight">5.040</p>
+                  <p className="text-4xl font-headline font-black text-base-content tracking-tight">{visitorStats.total.toLocaleString('id-ID')}</p>
                   <p className="text-sm font-medium text-base-content/60 mt-1 flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-success text-[18px]">trending_up</span>
-                    Jangkauan naik <span className="text-success font-bold">18%</span> dari minggu lalu
+                    <span className={`material-symbols-outlined text-[18px] ${visitorStats.growth >= 0 ? 'text-success' : 'text-error'}`}>
+                      {visitorStats.growth >= 0 ? 'trending_up' : 'trending_down'}
+                    </span>
+                    Jangkauan {visitorStats.growth >= 0 ? 'naik' : 'turun'} <span className={`${visitorStats.growth >= 0 ? 'text-success' : 'text-error'} font-bold`}>{Math.abs(visitorStats.growth)}%</span> dari kemarin
                   </p>
                 </div>
                 

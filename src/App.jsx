@@ -109,6 +109,21 @@ function AppRoutes() {
     })();
   }, []);
 
+  // Visitor Tracking (Anti-Spam Refresh)
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const lastVisit = localStorage.getItem('infaqly_last_visit_date');
+    
+    // Jika hari ini belum tercatat kunjungannya di browser ini
+    if (lastVisit !== today) {
+      fetch('/api/visitors/track', { method: 'POST' })
+        .then(res => {
+          if (res.ok) localStorage.setItem('infaqly_last_visit_date', today);
+        })
+        .catch(() => {}); // Silent fail
+    }
+  }, []);
+
   if (checkingMaintenance) return <LoadingScreen />;
 
   // PENGECUALIAN: /admin-panel tetap bisa diakses meskipun sedang maintenance

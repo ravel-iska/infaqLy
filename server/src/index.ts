@@ -23,6 +23,7 @@ import uploadRoutes from './routes/upload.routes.js';
 import settingsRoutes from './routes/settings.routes.js';
 import wabotRoutes from './routes/wabot.routes.js';
 import bugsRoutes from './routes/bugs.routes.js';
+import visitorRoutes from './routes/visitor.routes.js';
 import { startBot } from './services/wabot.service.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -58,6 +59,7 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/bugs', bugsRoutes);
 app.use('/api/midtrans', paymentRoutes);
 app.use('/api/wabot', wabotRoutes);
+app.use('/api/visitors', visitorRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {
