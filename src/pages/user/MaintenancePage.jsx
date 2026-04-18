@@ -1,6 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 export default function MaintenancePage() {
+  useEffect(() => {
+    // Memeriksa status maintenance secara berkala (Polling setiap 5 detik)
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch('/api/settings/public');
+        if (res.ok) {
+          const data = await res.json();
+          // Jika maintenance dimatikan oleh admin, otomatis refresh halaman
+          if (data.settings?.maintenance_mode === 'false' || data.settings?.maintenance_mode === false) {
+            window.location.reload();
+          }
+        }
+      } catch (e) {
+        // Abaikan error koneksi (silently fail)
+      }
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-surface dark:bg-slate-900 relative overflow-hidden px-6 transition-colors duration-300">
       {/* Background Glows */}
