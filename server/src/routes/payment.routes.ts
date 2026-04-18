@@ -19,7 +19,9 @@ router.get('/client-config', async (_req: Request, res: Response) => {
     const activeGateway = row?.value || 'midtrans';
 
     if (activeGateway === 'doku') {
-       return res.json({ gateway: 'doku' });
+       const [dokuEnvRow] = await db.select().from(settings).where(eq(settings.key, 'doku_env')).limit(1);
+       const dokuEnv = dokuEnvRow?.value || 'production';
+       return res.json({ gateway: 'doku', env: dokuEnv });
     }
 
     const config = await paymentService.getClientConfig();
