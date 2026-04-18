@@ -27,3 +27,12 @@ dist-ssr
 server/.wa-session
 uploads/
 .env
+
+# Scratch / debug files
+*.cjs
+scratch_*.jsx
+diff_*.txt
+knip-report.txt
+server/dump_keys.js
+server/force_sandbox.cjs
+check-case.cjs
