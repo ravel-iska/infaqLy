@@ -51,8 +51,18 @@ function FloatingWA() {
 export default function UserLayout() {
   const { isUserDark } = useTheme();
 
+  useEffect(() => {
+    if (isUserDark) {
+      document.documentElement.classList.add('dark');
+      document.documentElement.style.backgroundColor = '#0f172a'; // slate-900
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.style.backgroundColor = '#f8fafc'; // slate-50
+    }
+  }, [isUserDark]);
+
   return (
-    <div className={`min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900 transition-colors duration-300 ${isUserDark ? 'dark' : ''}`}>
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300">
       <Navbar />
       <main className="flex-1 w-full relative">
         <Outlet />

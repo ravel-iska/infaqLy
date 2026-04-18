@@ -24,8 +24,18 @@ export default function AdminLayout() {
     }
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (isAdminDark) {
+      document.documentElement.classList.add('dark');
+      document.documentElement.style.backgroundColor = '#1d232a'; // base-200 in dark
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.style.backgroundColor = '#f2f2f2'; // base-200 in light
+    }
+  }, [isAdminDark]);
+
   return (
-    <div data-theme={isAdminDark ? "dark" : "light"} className={`bg-base-200 text-base-content min-h-screen flex w-full overflow-hidden ${isAdminDark ? 'dark' : ''}`}>
+    <div data-theme={isAdminDark ? "dark" : "light"} className="bg-base-200 text-base-content min-h-screen flex w-full overflow-hidden transition-colors duration-300">
       {/* Overlay for mobile */}
       {!sidebarCollapsed && (
         <div 

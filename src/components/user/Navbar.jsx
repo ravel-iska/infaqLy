@@ -51,7 +51,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-colors duration-300 ease-in-out ${scrolled ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-sm dark:border-b dark:border-slate-800' : 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md'}`}>
+    <nav className={`fixed top-0 w-full z-50 transition-colors duration-300 ease-in-out ${scrolled ? 'bg-white/95 dark:bg-slate-950/90 backdrop-blur-md shadow-sm dark:shadow-black/20 dark:border-b dark:border-slate-800/50' : 'bg-transparent dark:bg-transparent backdrop-blur-0'}`}>
       <div className="flex justify-between items-center px-4 md:px-8 py-3 md:py-4 max-w-7xl mx-auto w-full">
         <div className="flex-1 flex items-baseline">
           {/* Logo */}

@@ -148,7 +148,7 @@ export default function Footer() {
     fetchSettings();
   }, []);
   return (
-    <footer className="bg-slate-50 dark:bg-slate-900 w-full rounded-t-3xl mt-auto transition-colors duration-300">
+    <footer className="bg-white dark:bg-slate-950 w-full rounded-t-3xl mt-auto transition-colors duration-300 shadow-[0_-10px_40px_rgba(0,0,0,0.02)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.2)] relative z-10">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-8 lg:gap-12 px-8 lg:px-12 py-16 max-w-7xl mx-auto font-body text-sm leading-relaxed">
         <div className="md:col-span-2 space-y-6">
           <div className="text-xl font-headline font-bold text-emerald-800 dark:text-emerald-500 leading-tight">Infaqly</div>
