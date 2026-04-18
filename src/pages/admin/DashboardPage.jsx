@@ -78,15 +78,27 @@ export default function DashboardPage() {
 
   const activeCampaigns = campaigns.filter(c => c.status === 'active');
   const totalCollected = campaigns.reduce((s, c) => s + c.collected, 0);
-  const totalTarget = campaigns.reduce((s, c) => s + c.target, 0);
   const totalDonors = campaigns.reduce((s, c) => s + c.donors, 0);
+  const currentMonthTotal = monthlyStats.length > 0 ? monthlyStats[monthlyStats.length - 1].total : 0;
+  const targetCompletedCount = campaigns.filter(c => c.target > 0 && c.collected >= c.target).length;
 
   const STATS = [
-    { icon: 'account_balance_wallet', label: 'Total Dana Terkumpul', value: totalCollected, trend: 'Global Platform', up: true, color: 'text-primary', bg: 'bg-primary/10' },
-    { icon: 'flag', label: 'Total Target Dana', value: totalTarget, trend: 'Global Platform', up: true, color: 'text-secondary', bg: 'bg-secondary/10' },
-    { icon: 'local_fire_department', label: 'Program Aktif', value: activeCampaigns.length, trend: `Dari ${campaigns.length} total program`, up: true, color: 'text-warning', bg: 'bg-warning/10' },
-    { icon: 'group', label: 'Total Donatur', value: totalDonors, trend: 'Orang baik', up: true, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+    { icon: 'calendar_month', label: 'Pemasukan Bulan Ini', value: currentMonthTotal, trend: 'Pendapatan riil bulan berjalan', up: true, color: 'text-primary', bg: 'bg-primary/10' },
+    { icon: 'account_balance_wallet', label: 'Total Dana Terkumpul', value: totalCollected, trend: 'Akumulasi sepanjang waktu', up: true, color: 'text-success', bg: 'bg-success/10' },
+    { icon: 'group', label: 'Partisipasi Donatur', value: totalDonors, trend: 'Total riwayat transaksi', up: true, color: 'text-info', bg: 'bg-info/10' },
+    { icon: 'verified', label: 'Program Selesai / Tembus Target', value: targetCompletedCount, trend: `Dari ${campaigns.length} total kampanye dibuat`, up: true, color: 'text-warning', bg: 'bg-warning/10' },
   ];
+
+  // Matriks Distribusi Kategori
+  const categoryMatrix = campaigns.reduce((acc, c) => {
+    const cat = c.category;
+    if (!acc[cat]) acc[cat] = { name: cat, count: 0, collected: 0, donors: 0 };
+    acc[cat].count += 1;
+    acc[cat].collected += c.collected;
+    acc[cat].donors += c.donors;
+    return acc;
+  }, {});
+  const matrixData = Object.values(categoryMatrix).sort((a,b) => b.collected - a.collected);
 
   // Real visitor data fetched mapped to visitorData state
 
@@ -139,6 +151,48 @@ export default function DashboardPage() {
                 </p>
               </div>
             ))}
+      </div>
+
+      {/* Matriks Kategori & Distribusi Keuangan */}
+      <div className="bg-base-100 shadow rounded-2xl p-6 border border-base-200">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="material-symbols-outlined text-info">space_dashboard</span>
+          <h2 className="text-lg font-bold text-base-content">Matriks Performa Kategori</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {matrixData.length === 0 ? (
+             <div className="col-span-full text-center py-6 text-base-content/50 text-sm font-medium">Belum ada data matriks.</div>
+          ) : matrixData.map((cat, i) => {
+            // Gradient mapping untuk variasi warna kategori agar modern
+            const colors = [
+              'bg-gradient-to-br from-primary/20 to-primary/5 border-primary/20 text-primary',
+              'bg-gradient-to-br from-secondary/20 to-secondary/5 border-secondary/20 text-secondary',
+              'bg-gradient-to-br from-warning/20 to-warning/5 border-warning/20 text-warning',
+              'bg-gradient-to-br from-info/20 to-info/5 border-info/20 text-info',
+              'bg-gradient-to-br from-error/20 to-error/5 border-error/20 text-error'
+            ];
+            const colorClass = colors[i % colors.length];
+            const percentWidth = totalCollected > 0 ? Math.round((cat.collected / totalCollected) * 100) : 0;
+            
+            return (
+              <div key={cat.name} className={`p-4 rounded-xl border ${colorClass} backdrop-blur-sm transition-transform hover:-translate-y-1`}>
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-xs font-bold uppercase tracking-wider opacity-80">{cat.name}</span>
+                  <span className="text-[10px] font-black bg-base-100/50 px-2 py-0.5 rounded shadow-sm">
+                    {percentWidth}%
+                  </span>
+                </div>
+                <div className="mb-3">
+                  <p className="text-xl font-black font-mono tracking-tight">{formatCurrencyShort(cat.collected)}</p>
+                </div>
+                <div className="flex items-center justify-between text-xs font-medium border-t border-current/10 pt-2 opacity-80">
+                  <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">campaign</span> {cat.count} Program</span>
+                  <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">group</span> {cat.donors} Donatur</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Chart + Recent Transactions */}
