@@ -39,7 +39,8 @@ router.get('/public', async (req: Request, res: Response) => {
     return res.json({ 
       hasWa,
       settings: {
-        maintenance_mode: settingsMap['maintenance_mode'] || 'false'
+        maintenance_mode: settingsMap['maintenance_mode'] || 'false',
+        active_payment_gateway: settingsMap['active_payment_gateway'] || 'midtrans',
       }
     });
   } catch (err: any) {

@@ -3,6 +3,10 @@ import * as paymentService from '../services/payment.service.js';
 import * as donationService from '../services/donation.service.js';
 import * as campaignService from '../services/campaign.service.js';
 import { sendDonationNotification, sendErrorAlert, sendAdminTransactionUpdate } from '../services/whatsapp.service.js';
+import * as dokuService from '../services/doku.service.js';
+import { db } from '../config/database.js';
+import { settings } from '../db/schema.js';
+import { eq } from 'drizzle-orm';
 import { requireAuth, requireAdmin } from '../middleware/auth.middleware.js';
 
 const router = Router();
@@ -11,8 +15,15 @@ const router = Router();
 // Returns client key + environment from DB settings (no secrets exposed)
 router.get('/client-config', async (_req: Request, res: Response) => {
   try {
+    const [row] = await db.select().from(settings).where(eq(settings.key, 'active_payment_gateway')).limit(1);
+    const activeGateway = row?.value || 'midtrans';
+
+    if (activeGateway === 'doku') {
+       return res.json({ gateway: 'doku' });
+    }
+
     const config = await paymentService.getClientConfig();
-    return res.json(config);
+    return res.json({ ...config, gateway: 'midtrans' });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }
@@ -35,15 +46,25 @@ router.post('/create-token', requireAuth, async (req: Request, res: Response) =>
     const donorName = isAnonymous ? 'Hamba Allah' : user.username;
     const orderId = paymentService.generateOrderId();
 
-    // Create Snap Token (reads server key from DB settings)
-    const snap = await paymentService.createSnapToken({
-      orderId,
-      amount: Number(amount),
-      donorName,
-      donorEmail: user.email,
-      donorPhone: user.whatsapp,
-      programName: campaign.title,
-    });
+    // Check active gateway
+    const [row] = await db.select().from(settings).where(eq(settings.key, 'active_payment_gateway')).limit(1);
+    const activeGateway = row?.value || 'midtrans';
+
+    let token = '';
+    let redirectUrl = '';
+
+    if (activeGateway === 'doku') {
+      const dokuConfig = await dokuService.createCheckoutUrl({
+        orderId, amount: Number(amount), donorName, donorEmail: user.email, donorPhone: user.whatsapp, programName: campaign.title
+      });
+      redirectUrl = dokuConfig.checkoutUrl;
+    } else {
+      const snap = await paymentService.createSnapToken({
+        orderId, amount: Number(amount), donorName, donorEmail: user.email, donorPhone: user.whatsapp, programName: campaign.title
+      });
+      token = snap.token;
+      redirectUrl = snap.redirectUrl;
+    }
 
     // Save donation record (pending)
     await donationService.createDonation({
@@ -55,11 +76,11 @@ router.post('/create-token', requireAuth, async (req: Request, res: Response) =>
       donorPhone: user.whatsapp,
       amount: Number(amount),
       isAnonymous: isAnonymous || false,
-      snapToken: snap.token,
-      snapRedirectUrl: snap.redirectUrl,
+      snapToken: token,
+      snapRedirectUrl: redirectUrl,
     });
 
-    return res.json({ token: snap.token, redirectUrl: snap.redirectUrl, orderId });
+    return res.json({ token, redirectUrl, orderId, gateway: activeGateway });
   } catch (err: any) {
     if (err.message && err.message.toLowerCase().includes('midtrans')) {
       sendErrorAlert(`POST /api/payment/create-token`, `Midtrans API Error: ${err.message}`).catch(() => {});
@@ -133,6 +154,40 @@ router.post('/simulate-success/:orderId', requireAdmin, async (req: Request, res
   }
 });
 
+// POST /api/payment/doku-notification — DOKU webhook implementation
+router.post('/doku-notification', async (req: Request, res: Response) => {
+  try {
+    const result = await dokuService.handleNotification(req.body, req.headers);
+
+    let programTitle = 'Program Donasi InfaqLy';
+    if (result.donation) {
+      const campaign = await campaignService.getCampaignById(result.donation.campaignId);
+      if (campaign) programTitle = campaign.title;
+
+      sendAdminTransactionUpdate(
+        result.orderId, 
+        result.status, 
+        result.donation.amount, 
+        result.donation.donorName, 
+        programTitle
+      ).catch(() => {});
+    }
+
+    if (result.status === 'success' && result.isNewSuccess && result.donation) {
+      const d = result.donation;
+      sendDonationNotification(
+        d.donorName, d.donorPhone || '', programTitle, d.amount, d.orderId
+      ).catch(() => {});
+    }
+
+    return res.json({ status: 'ok' });
+  } catch (err: any) {
+    console.error('[DOKU Webhook Error]', err.message);
+    sendErrorAlert(`POST /api/payment/doku-notification`, `DOKU Webhook Error: ${err.message}`).catch(() => {});
+    return res.status(200).json({ error: err.message, status: 'absorbed' });
+  }
+});
+
 // GET /api/payment/check-status/:orderId — poll Midtrans API for real-time status
 // Called by frontend after Snap popup closes to ensure DB is updated
 router.get('/check-status/:orderId', requireAuth, async (req: Request, res: Response) => {
@@ -147,11 +202,27 @@ router.get('/check-status/:orderId', requireAuth, async (req: Request, res: Resp
       return res.json({ status: 'success', orderId, data: { status: 'success' } });
     }
 
-    const statusResult = await paymentService.checkTransactionStatus(orderId);
+    // Get active gateway to know which API to poll
+    const [row] = await db.select().from(settings).where(eq(settings.key, 'active_payment_gateway')).limit(1);
+    const activeGateway = row?.value || 'midtrans';
+
+    let statusResult = null;
+    let result = null;
+
+    if (activeGateway === 'doku') {
+      statusResult = await dokuService.checkTransactionStatus(orderId);
+      if (statusResult) {
+        result = await dokuService.handleNotification(statusResult, {});
+      }
+    } else {
+      statusResult = await paymentService.checkTransactionStatus(orderId);
+      if (statusResult) {
+        result = await paymentService.handleNotification(statusResult);
+      }
+    }
     
-    // Update DB with latest status from Midtrans
-    if (statusResult) {
-      const result = await paymentService.handleNotification(statusResult);
+    // Update DB with latest status
+    if (result) {
       
       // Send WA notification on relatively new success
       if (result.status === 'success' && result.isNewSuccess && result.donation) {

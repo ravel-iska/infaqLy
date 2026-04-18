@@ -31,13 +31,13 @@ async function seed() {
   }
 
   // 2. Seed basic settings
-  const existingSettings = await db.select().from(schema.settings).where(eq(schema.settings.key, 'fonnte_admin_phone'));
-  if (existingSettings.length === 0) {
-    await db.insert(schema.settings).values({
-      key: 'fonnte_admin_phone',
-      value: '081200000000',
-    }).onConflictDoNothing();
-    console.log('✅ Default Admin Phone setting seeded');
+  const checkSettings = await db.select().from(schema.settings);
+  if (checkSettings.length === 0) {
+    await db.insert(schema.settings).values([
+      { key: 'fonnte_admin_phone', value: '081200000000' },
+      { key: 'active_payment_gateway', value: 'midtrans' }
+    ]).onConflictDoNothing();
+    console.log('✅ Default settings seeded');
   }
 
   // 3. Seed test donations for certificate download testing

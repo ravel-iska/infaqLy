@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { QUICK_AMOUNTS, MIN_DONATION } from '@/utils/constants';
@@ -104,7 +104,9 @@ export default function CampaignDetailPage() {
         isAnonymous,
       });
 
-      if (data.token) {
+      if (data.gateway === 'doku' && data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+      } else if (data.token) {
         await loadSnapScript();
 
         // Buka Snap Popup
@@ -146,7 +148,7 @@ export default function CampaignDetailPage() {
         }
 
       } else if (data.redirectUrl) {
-        window.open(data.redirectUrl, '_blank');
+        window.open(data.redirectUrl, '_self');
       }
     } catch (error) {
       console.error('Payment error:', error);

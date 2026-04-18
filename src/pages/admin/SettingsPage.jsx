@@ -13,9 +13,9 @@ export default function SettingsPage() {
   const [prodServerKey, setProdServerKey] = useState('');
   const [prodClientKey, setProdClientKey] = useState('');
 
-  const [showServerKey, setShowServerKey] = useState(false);
   const [midtransTab, setMidtransTab] = useState('sandbox');
 
+  const [activePaymentGateway, setActivePaymentGateway] = useState('midtrans');
   const [maintenanceMode, setMaintenanceMode] = useState(false);
 
   const [adminPhone, setAdminPhone] = useState('');
@@ -71,6 +71,8 @@ export default function SettingsPage() {
         setDokuSandboxSecretKey(s.doku_sandbox_secret_key || '');
         setDokuProdClientId(s.doku_prod_client_id || '');
         setDokuProdSecretKey(s.doku_prod_secret_key || '');
+
+        setActivePaymentGateway(s.active_payment_gateway || 'midtrans');
 
         setAdminPhone(s.fonnte_admin_phone || '');
         setSystemAlertPhone(s.system_alert_phone || '');
@@ -133,6 +135,16 @@ export default function SettingsPage() {
       toast.success('PIN berhasil dihapus');
     } catch (err) {
       toast.error(err.message || 'Gagal menghapus PIN');
+    }
+  };
+
+  const saveActiveGateway = async (gateway) => {
+    try {
+      await api.put('/settings', { active_payment_gateway: gateway });
+      setActivePaymentGateway(gateway);
+      toast.success(`Gateway aktif diubah ke ${gateway.toUpperCase()}`);
+    } catch (err) {
+      toast.error('Gagal mengubah gateway: ' + err.message);
     }
   };
 
@@ -278,8 +290,51 @@ export default function SettingsPage() {
         </button>
       </div>
 
+      {/* PAYMENT GATEWAY MASTER SWITCHER */}
+      <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 relative overflow-hidden mb-8 border border-base-200">
+        <div className="absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl text-[11px] font-bold uppercase tracking-wider text-white shadow-sm bg-primary">
+          Master Controller
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
+          <div>
+            <h2 className="text-lg font-semibold text-base-content flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary">swap_horiz</span> Pilih Gateway Pembayaran Aktif
+            </h2>
+            <p className="text-sm text-base-content/60 mt-1">Seluruh transaksi (baru) akan dialihkan ke gateway terpilih secara instan.</p>
+          </div>
+        </div>
+
+        <div className="flex bg-base-200/50 p-1.5 rounded-2xl border border-base-200 w-full md:w-3/4 mx-auto max-w-xl">
+          <button
+            onClick={() => saveActiveGateway('midtrans')}
+            className={`flex-1 flex flex-col items-center justify-center py-4 rounded-xl font-bold transition-all ${
+              activePaymentGateway === 'midtrans' 
+                ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-100 z-10' 
+                : 'text-base-content/50 hover:bg-base-200 hover:text-base-content scale-95 opacity-80'
+            }`}
+          >
+            <span className="material-symbols-outlined text-3xl mb-1 mt-1">account_balance</span>
+            MIDTRANS
+            {activePaymentGateway === 'midtrans' && <span className="absolute top-2 right-2 flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span></span>}
+          </button>
+
+          <button
+            onClick={() => saveActiveGateway('doku')}
+            className={`flex-1 flex flex-col items-center justify-center py-4 rounded-xl font-bold transition-all ${
+              activePaymentGateway === 'doku' 
+                ? 'bg-info text-white shadow-lg shadow-info/20 scale-100 z-10' 
+                : 'text-base-content/50 hover:bg-base-200 hover:text-base-content scale-95 opacity-80'
+            }`}
+          >
+            <span className="material-symbols-outlined text-3xl mb-1 mt-1">account_balance_wallet</span>
+            DOKU JOKUL
+            {activePaymentGateway === 'doku' && <span className="absolute top-2 right-2 flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span></span>}
+          </button>
+        </div>
+      </div>
+
       {/* MIDTRANS CONFIGURATION */}
-      <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 border-l-4 border-l-primary relative overflow-hidden">
+      <div className={`bg-base-100 shadow rounded-2xl p-6 sm:p-8 border-l-4 relative overflow-hidden transition-all duration-300 ${activePaymentGateway === 'midtrans' ? 'border-l-primary ring-2 ring-primary/20' : 'border-l-base-300 opacity-60'}`}>
         {/* Dynamic Badge indicating ACTIVE mode */}
         <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl text-[11px] font-bold uppercase tracking-wider text-white shadow-sm ${env === 'production' ? 'bg-success' : 'bg-primary'}`}>
           Active: {env === 'production' ? 'Production' : 'Sandbox'}
@@ -447,7 +502,7 @@ export default function SettingsPage() {
       </div>
 
       {/* DOKU PAYMENT GATEWAY */}
-      <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 border-l-4 border-l-info relative overflow-hidden">
+      <div className={`bg-base-100 shadow rounded-2xl p-6 sm:p-8 border-l-4 relative overflow-hidden mt-8 transition-all duration-300 ${activePaymentGateway === 'doku' ? 'border-l-info ring-2 ring-info/20' : 'border-l-base-300 opacity-60'}`}>
         <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl text-[11px] font-bold uppercase tracking-wider text-white shadow-sm ${dokuEnv === 'production' ? 'bg-success' : 'bg-info'}`}>
           Active: {dokuEnv === 'production' ? 'Production' : 'Sandbox'}
         </div>
