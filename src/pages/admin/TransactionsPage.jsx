@@ -21,8 +21,8 @@ export default function TransactionsPage() {
     setLoading(true);
     try {
       const [dataRes, configRes] = await Promise.all([
-        api.get('/donations'),
-        api.get('/payment/client-config')
+        api.get(`/donations?t=${Date.now()}`),
+        api.get(`/payment/client-config?t=${Date.now()}`)
       ]);
       setTransactions(dataRes.data?.donations || dataRes.donations || []);
       setMidtransEnv(configRes.data?.env || configRes.env || 'production');
