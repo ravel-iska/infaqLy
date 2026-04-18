@@ -270,7 +270,7 @@ export default function ProfilePage() {
       {/* OTP Modal overlay for unverified profiles */}
       {showOtpModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fade-in" style={{ zIndex: 9999 }}>
-          <div className="bg-surface-container-lowest dark:bg-slate-800 p-8 rounded-3xl shadow-2xl w-full max-w-md animate-slide-up border border-outline-variant/20 dark:border-slate-700 text-center relative overflow-hidden">
+          <div className="bg-surface-container-lowest dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-2xl w-full max-w-md animate-slide-up border border-outline-variant/20 dark:border-slate-700 text-center relative overflow-hidden mx-4">
             <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary dark:from-emerald-500 to-secondary-container dark:to-emerald-800"></div>
             <button onClick={() => setShowOtpModal(false)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 flex items-center justify-center text-slate-500 transition-colors z-10">
               <span className="material-symbols-outlined text-[18px]">close</span>
@@ -291,7 +291,7 @@ export default function ProfilePage() {
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                 placeholder="000000"
-                className="w-full text-center tracking-[1em] text-2xl font-bold bg-surface-container/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 text-on-surface dark:text-slate-100 placeholder:text-slate-400/50 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                className="w-full text-center tracking-[0.5em] md:tracking-[1em] text-2xl font-bold bg-surface-container/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 text-on-surface dark:text-slate-100 placeholder:text-slate-400/50 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                 autoFocus
               />
               <button
@@ -330,15 +330,15 @@ export default function ProfilePage() {
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary dark:from-emerald-500 to-secondary-container dark:to-emerald-800"></div>
           <Avatar user={user} size="lg" />
           <div className="flex-1 text-center sm:text-left">
-            <h1 className="text-2xl font-bold text-on-surface dark:text-white font-headline flex items-center justify-center sm:justify-start gap-2">
+            <h1 className="text-2xl font-bold text-on-surface dark:text-white font-headline flex flex-wrap items-center justify-center sm:justify-start gap-2 break-all sm:break-normal max-w-full">
               {user?.username || 'User Explorer'}
               {user?.isVerified && (
                 <span className="material-symbols-outlined text-emerald-500 bg-emerald-50 dark:bg-emerald-900/40 rounded-full w-6 h-6 flex items-center justify-center text-[16px] shadow-sm" title="Akun Terverifikasi">verified</span>
               )}
             </h1>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 mt-3 text-sm text-on-surface-variant dark:text-slate-400 font-medium">
-              <span className="flex items-center justify-center sm:justify-start gap-1.5"><span className="material-symbols-outlined text-[16px]">mail</span> {user?.email || 'email@example.com'} {user?.isVerified && <span className="material-symbols-outlined text-emerald-500 text-[16px]">check_circle</span>}</span>
-              <span className="flex items-center justify-center sm:justify-start gap-1.5"><span className="material-symbols-outlined text-[16px]">phone</span> {user?.whatsapp || 'Belum diisi'} {user?.isVerified && <span className="material-symbols-outlined text-emerald-500 text-[16px]">check_circle</span>}</span>
+              <span className="flex items-center justify-center sm:justify-start gap-1.5 break-all sm:break-normal"><span className="material-symbols-outlined text-[16px]">mail</span> {user?.email || 'email@example.com'} {user?.isVerified && <span className="material-symbols-outlined text-emerald-500 text-[16px] shrink-0">check_circle</span>}</span>
+              <span className="flex items-center justify-center sm:justify-start gap-1.5 break-all sm:break-normal"><span className="material-symbols-outlined text-[16px]">phone</span> {user?.whatsapp || 'Belum diisi'} {user?.isVerified && <span className="material-symbols-outlined text-emerald-500 text-[16px] shrink-0">check_circle</span>}</span>
             </div>
             {!user?.isVerified && (
               <div className="mt-4 flex justify-center sm:justify-start">
@@ -398,7 +398,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Filter Tabs — grid 2x2 on mobile, inline on desktop */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
+          <div className="grid grid-cols-2 md:flex md:flex-wrap gap-2 md:gap-3 mb-6">
             {FILTER_TABS.map((tab) => (
               <button
                 key={tab.key}
@@ -438,9 +438,11 @@ export default function ProfilePage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto pr-2 pb-4 pt-1 snap-y scroll-smooth">
               {filteredDonations.map((tx) => (
-                <DonationCard key={tx.id || tx.orderId} tx={tx} user={user} onPaymentSuccess={loadDonations} />
+                <div key={tx.id || tx.orderId} className="snap-start relative">
+                  <DonationCard tx={tx} user={user} onPaymentSuccess={loadDonations} />
+                </div>
               ))}
             </div>
           )}
