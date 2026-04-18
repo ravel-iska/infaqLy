@@ -3,12 +3,22 @@ import { donations, campaigns, settings } from '../db/schema.js';
 import { eq, desc, ilike, and, sql, lt } from 'drizzle-orm';
 
 /**
- * Helper: Get current midtrans env from DB settings
+ * Helper: Get current active environment from DB settings
+ * Segregates Sandbox data by gateway (doku_sandbox vs sandbox) but groups production data
  */
-async function getCurrentEnv(): Promise<'sandbox' | 'production'> {
-  const [row] = await db.select().from(settings).where(eq(settings.key, 'midtrans_env')).limit(1);
-  const val = row?.value;
-  return (val === 'production' || val === 'sandbox') ? val : 'sandbox';
+async function getCurrentEnv(): Promise<string> {
+  const [gwRow] = await db.select().from(settings).where(eq(settings.key, 'active_payment_gateway')).limit(1);
+  const activeGateway = gwRow?.value || 'midtrans';
+
+  if (activeGateway === 'doku') {
+    const [envRow] = await db.select().from(settings).where(eq(settings.key, 'doku_env')).limit(1);
+    const env = envRow?.value || 'production';
+    return env === 'sandbox' ? 'doku_sandbox' : 'production';
+  } else {
+    const [envRow] = await db.select().from(settings).where(eq(settings.key, 'midtrans_env')).limit(1);
+    const env = envRow?.value || 'production';
+    return env === 'sandbox' ? 'sandbox' : 'production';
+  }
 }
 
 /**
