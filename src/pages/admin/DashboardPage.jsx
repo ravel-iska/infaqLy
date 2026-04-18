@@ -76,36 +76,17 @@ export default function DashboardPage() {
     }
   };
 
-  // METRIK KUALITAS TINGGI (ANALYTICS)
-  const activeWithTarget = campaigns.filter(c => c.status === 'active' && c.target > 0);
-  
-  // 1. Rata-rata Pencapaian Target Keseluruhan
-  const avgProgress = activeWithTarget.length 
-    ? Math.round((activeWithTarget.reduce((acc, c) => acc + Math.min(c.collected / c.target, 1), 0) / activeWithTarget.length) * 100) 
-    : 0;
-
-  // 2. Kategori Favorit Donatur
-  const catStats = campaigns.reduce((acc, c) => {
-    acc[c.category] = (acc[c.category] || 0) + c.donors;
-    return acc;
-  }, {});
-  const topCategoryEntry = Object.entries(catStats).sort((a,b) => b[1] - a[1])[0];
-  const topCategoryLabel = topCategoryEntry && topCategoryEntry[1] > 0 ? topCategoryEntry[0].toUpperCase() : 'N/A';
-  const topCategoryDonors = topCategoryEntry ? topCategoryEntry[1] : 0;
-
-  // 3. Tingkat Kedermawanan (Rata-rata sumbangan per transaksi)
-  const totalDana = campaigns.reduce((s, c) => s + c.collected, 0);
-  const totalOrang = campaigns.reduce((s, c) => s + c.donors, 0);
-  const avgDonation = totalOrang > 0 ? Math.round(totalDana / totalOrang) : 0;
-
-  // 4. Program Mendesak (Progress masih di bawah 30%)
-  const urgentCampaigns = activeWithTarget.filter(c => (c.collected / c.target) < 0.3).length;
+  // METRIK AKTIVITAS & TRAFIK
+  const todayVisitor = visitorData.length > 0 ? visitorData[visitorData.length - 1].visitors : 0;
+  const weeklyVisitor = visitorData.reduce((acc, curr) => acc + curr.visitors, 0);
+  const totalProgram = campaigns.length;
+  const activeProgram = campaigns.filter(c => c.status === 'active').length;
 
   const STATS = [
-    { icon: 'analytics', label: 'Indeks Ketercapaian', value: `${avgProgress}%`, trend: 'Target Global', up: true, color: 'text-primary', bg: 'bg-primary/10' },
-    { icon: 'loyalty', label: 'Kategori Terfavorit', value: topCategoryLabel, trend: `${topCategoryDonors} Donatur`, up: true, color: 'text-secondary', bg: 'bg-secondary/10' },
-    { icon: 'donut_large', label: 'Rata-rata Infaq', value: formatCurrencyShort(avgDonation), trend: 'Per Transaksi', up: true, color: 'text-info', bg: 'bg-info/10' },
-    { icon: 'notification_important', label: 'Program Mendesak', value: urgentCampaigns, trend: 'Target < 30%', up: false, color: 'text-error', bg: 'bg-error/10' },
+    { icon: 'visibility', label: 'Visitor Harian', value: todayVisitor, trend: 'Hari ini', up: true, color: 'text-primary', bg: 'bg-primary/10' },
+    { icon: 'bar_chart', label: 'Visitor Mingguan', value: weeklyVisitor, trend: '7 hari terakhir', up: true, color: 'text-secondary', bg: 'bg-secondary/10' },
+    { icon: 'campaign', label: 'Total Kampanye', value: totalProgram, trend: 'Total program', up: true, color: 'text-info', bg: 'bg-info/10' },
+    { icon: 'local_fire_department', label: 'Program Aktif', value: activeProgram, trend: 'Sedang berjalan', up: true, color: 'text-warning', bg: 'bg-warning/10' },
   ];
 
   // Real visitor data fetched mapped to visitorData state
