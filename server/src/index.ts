@@ -98,7 +98,7 @@ app.listen(env.PORT, () => {
   console.log(`   Port:     ${env.PORT}`);
   console.log(`   Frontend: ${env.FRONTEND_URL}`);
   console.log(`   Midtrans: ${env.MIDTRANS_ENV}`);
-  console.log(`   Fonnte:   ${env.FONNTE_TOKEN ? '✅ configured' : '❌ not set'}`);
+
   console.log(`   DB:       ${env.DATABASE_URL.replace(/:[^:@]+@/, ':***@')}`);
   console.log(`\n   Ready! 🚀\n`);
 

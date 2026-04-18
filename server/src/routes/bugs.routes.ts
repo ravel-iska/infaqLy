@@ -31,7 +31,7 @@ router.post('/', async (req, res) => {
       let adminPhone = '';
       const [row] = await db.select().from(settings).where(eq(settings.key, 'system_alert_phone')).limit(1);
       adminPhone = row?.value || '';
-      if (!adminPhone) adminPhone = env.FONNTE_ADMIN_PHONE || '';
+      if (!adminPhone) adminPhone = env.ADMIN_PHONE || '';
 
       if (adminPhone) {
         await sendWhatsApp(adminPhone, alertMessage);

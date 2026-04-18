@@ -6,80 +6,24 @@ import * as wabot from './wabot.service.js';
 import { generateCertificatePDF } from './pdf.service.js';
 import fs from 'fs';
 
-const FONNTE_API_URL = 'https://api.fonnte.com/send';
-
-function sanitizePhone(phone: string): string {
-  let num = phone.replace(/[\s\-\+]/g, '');
-  if (num.startsWith('0')) num = '62' + num.slice(1);
-  if (!num.startsWith('62')) num = '62' + num;
-  return num;
-}
-
-/** Get Fonnte token — tries DB settings first, then .env fallback */
-async function getFonnteToken(): Promise<string | null> {
-  try {
-    const [row] = await db.select().from(settings).where(eq(settings.key, 'fonnte_token')).limit(1);
-    if (row?.value) return row.value;
-  } catch {}
-  return env.FONNTE_TOKEN || null;
-}
-
 /**
- * Send WhatsApp message via Fonnte API (fallback)
- */
-async function sendViaFonnte(target: string, message: string) {
-  const token = await getFonnteToken();
-  if (!token) {
-    return { success: false, message: 'Token Fonnte belum dikonfigurasi' };
-  }
-
-  const phoneNumber = sanitizePhone(target);
-
-  try {
-    const body = new URLSearchParams();
-    body.append('target', phoneNumber);
-    body.append('message', message);
-    body.append('countryCode', '0');
-
-    const response = await fetch(FONNTE_API_URL, {
-      method: 'POST',
-      headers: { 'Authorization': token },
-      body,
-    });
-
-    const data = await response.json();
-    return data.status === true
-      ? { success: true, message: 'Pesan WhatsApp terkirim via Fonnte', data }
-      : { success: false, message: data.reason || 'Gagal mengirim via Fonnte', data };
-  } catch (error: any) {
-    return { success: false, message: 'Fonnte error: ' + error.message };
-  }
-}
-
-/**
- * Send WhatsApp message — WABot first, Fonnte fallback
- * Prioritas: WABot (Baileys self-hosted) → Fonnte API
+ * Send WhatsApp message — WABot (Baileys self-hosted)
  */
 export async function sendWhatsApp(target: string, message: string) {
-  // 1. Try WABot (Baileys) first
   const botStatus = wabot.getStatus();
+  const phone = sanitizePhone(target);
   if (botStatus.connected) {
     const result = await wabot.sendMessage(target, message);
     if (result.success) {
-      console.log(`[WA] ✅ Sent via WABot to ${sanitizePhone(target)}`);
+      console.log(`[WA] ✅ Sent via WABot to ${phone}`);
       return result;
     }
-    console.warn(`[WA] WABot send failed, trying Fonnte...`);
+    console.warn(`[WA] ❌ WABot send failed for ${phone}`);
+    return result;
   }
 
-  // 2. Fallback to Fonnte
-  const fonnteResult = await sendViaFonnte(target, message);
-  if (fonnteResult.success) {
-    console.log(`[WA] ✅ Sent via Fonnte to ${sanitizePhone(target)}`);
-  } else {
-    console.warn(`[WA] ❌ Both WABot and Fonnte failed for ${sanitizePhone(target)}`);
-  }
-  return fonnteResult;
+  console.warn(`[WA] ❌ WABot is disconnected. Cannot send to ${phone}`);
+  return { success: false, message: 'WhatsApp Bot terputus' };
 }
 
 /** Welcome notification for new users */
@@ -154,7 +98,7 @@ export async function sendWithdrawalNotification(amount: number, bank: string, n
     const [row] = await db.select().from(settings).where(eq(settings.key, 'system_alert_phone')).limit(1);
     adminPhone = row?.value || '';
   } catch {}
-  if (!adminPhone) adminPhone = env.FONNTE_ADMIN_PHONE || '';
+  if (!adminPhone) adminPhone = env.ADMIN_PHONE || '';
   if (!adminPhone) return { success: false, message: 'Admin phone not set' };
 
   const fmt = new Intl.NumberFormat('id-ID').format(amount);
@@ -168,7 +112,7 @@ export async function sendAdminTransactionUpdate(orderId: string, status: string
     const [row] = await db.select().from(settings).where(eq(settings.key, 'system_alert_phone')).limit(1);
     adminPhone = row?.value || '';
   } catch {}
-  if (!adminPhone) adminPhone = env.FONNTE_ADMIN_PHONE || '';
+  if (!adminPhone) adminPhone = env.ADMIN_PHONE || '';
   if (!adminPhone) return { success: false, message: 'Admin phone not set' };
 
   const fmt = new Intl.NumberFormat('id-ID').format(amount);
@@ -192,7 +136,7 @@ export async function sendErrorAlert(endpoint: string, errorMessage: string) {
     const [row] = await db.select().from(settings).where(eq(settings.key, 'system_alert_phone')).limit(1);
     adminPhone = row?.value || '';
   } catch {}
-  if (!adminPhone) adminPhone = env.FONNTE_ADMIN_PHONE || '';
+  if (!adminPhone) adminPhone = env.ADMIN_PHONE || '';
   if (!adminPhone) return { success: false, message: 'Admin phone not set' };
 
   const msg = `🚨 *infaqLy API ALERT* 🚨\n\nTerjadi kesalahan fatal (Crash) pada sistem server!\n\n*Endpoint:* ${endpoint}\n*Error:* ${errorMessage}\n*Waktu:* ${new Date().toLocaleString('id-ID')}\n\n_Harap segera cek log pada dashboard Railway Anda._`;

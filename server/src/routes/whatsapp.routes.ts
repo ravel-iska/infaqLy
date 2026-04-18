@@ -25,7 +25,7 @@ router.post('/test', requireAdmin, async (req: Request, res: Response) => {
 
     const result = await sendWhatsApp(
       target,
-      `✅ *Test Koneksi infaqLy*\n\nKoneksi Fonnte WhatsApp API berhasil!\nWaktu: ${new Date().toLocaleString('id-ID')}`
+      `✅ *Test Koneksi infaqLy*\n\nKoneksi Native WhatsApp Engine berhasil!\nWaktu: ${new Date().toLocaleString('id-ID')}`
     );
     return res.json(result);
   } catch (err: any) {

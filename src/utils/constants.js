@@ -44,7 +44,7 @@ export const PAYMENT_METHODS = [
 
 /** WA Gateway providers */
 export const WA_PROVIDERS = [
-  { value: 'fonnte', label: 'Fonnte' },
+
   { value: 'wablas', label: 'Wablas' },
 ];
 

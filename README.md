@@ -40,7 +40,7 @@ Sistem telah dirombak penuh untuk performa maksimal ("Zero JS bloat", Gzip/Brotl
 | Ekosistem | Keunggulan InfaqLy |
 | :--- | :--- |
 | **💳 Dynamic Payment Gateway** | Didukung algoritma *Midtrans* yang mampu memproses **Virtual Account (VA), e-Wallet (GoPay, OVO), & QRIS** secara *real-time*. |
-| **🛡️ Anti-Spam OTP (WhatsApp)** | Verifikasi *Fonnte API* mencegah pembuatan akun anonim/bot, memastikan nomor HP *Crowd* benar-benar terverifikasi. |
+| **🛡️ Anti-Spam OTP (WhatsApp)** | Verifikasi via *Native WABot Daemon* mencegah pembuatan akun anonim/bot, memastikan nomor HP *Crowd* benar-benar terverifikasi. |
 | **📜 Sertifikat Amal Otomatis** | Mencetak *Sertifikat Penghargaan PDF* eksklusif atas nama donatur seketika. Meningkatkan *trust* & psikologi donatur. |
 | **⚡ Ultra-Optimized UI** | Menggunakan arsitektur *Vite* dengan pemangkasan *bundle*, **Pemuatan Berbasis GZIP/Brotli**, dan optimasi Lighthouse agar aplikasi berjalan sangat mulus di jaringan lokal. |
 | **🎛️ Sistem Aksesibilitas Modern** | UI dibalut jubah *Glassmorphism* dan mode gelap, mematuhi standar *Aria-Labels* agar aksesibilitas memanjakan semua kalangan. |

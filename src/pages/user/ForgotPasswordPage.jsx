@@ -40,9 +40,9 @@ export default function ForgotPasswordPage() {
       }, 1000);
     } catch (err) {
       const msg = err.message || 'Gagal mengirim OTP';
-      if (msg.includes('Fonnte') || msg.includes('WhatsApp') || msg.includes('token')) {
+      if (msg.includes('WhatsApp')) {
         setSendError(msg);
-        toast.error('Gagal mengirim OTP — konfigurasi WhatsApp API belum lengkap');
+        toast.error('Gagal mengirim OTP — WhatsApp Bot mungkin sedang offline');
       } else {
         toast.error(msg);
       }
@@ -155,12 +155,12 @@ export default function ForgotPasswordPage() {
                 </>}
               </button>
 
-              {/* Error: Fonnte not configured */}
+              {/* Error: WhatsApp Daemon not running */}
               {sendError && (
                 <div className="p-3 rounded-xl bg-danger/10 border border-danger/20 text-xs text-danger">
                   <p className="font-semibold mb-1">❌ Gagal Mengirim OTP</p>
                   <p>{sendError}</p>
-                  <p className="mt-2 text-user-text-muted">Hubungi admin untuk mengkonfigurasi token Fonnte WhatsApp di panel admin.</p>
+                  <p className="mt-2 text-user-text-muted">Sistem WhatsApp OTP sedang mengalami gangguan. Silakan coba lagi nanti.</p>
                 </div>
               )}
             </div>

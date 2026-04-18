@@ -14,9 +14,8 @@ export const env = {
   MIDTRANS_CLIENT_KEY: process.env.MIDTRANS_CLIENT_KEY || '',
   MIDTRANS_MERCHANT_ID: process.env.MIDTRANS_MERCHANT_ID || '',
 
-  // Fonnte WhatsApp
-  FONNTE_TOKEN: process.env.FONNTE_TOKEN || '',
-  FONNTE_ADMIN_PHONE: process.env.FONNTE_ADMIN_PHONE || '',
+  // Native WhatsApp Admin Fallback Phone
+  ADMIN_PHONE: process.env.ADMIN_PHONE || process.env.FONNTE_ADMIN_PHONE || '',
 
   // Server
   PORT: parseInt(process.env.PORT || '5000', 10),
