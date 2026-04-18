@@ -7,7 +7,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 export default function AdminLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(window.innerWidth < 768);
   const location = useLocation();
-  const { isDark } = useTheme();
+  const { isAdminDark } = useTheme();
 
   useEffect(() => {
     const handleResize = () => {
@@ -25,7 +25,7 @@ export default function AdminLayout() {
   }, [location.pathname]);
 
   return (
-    <div data-theme={isDark ? "dark" : "light"} className={`bg-base-200 text-base-content min-h-screen flex w-full overflow-hidden ${isDark ? 'dark' : ''}`}>
+    <div data-theme={isAdminDark ? "dark" : "light"} className={`bg-base-200 text-base-content min-h-screen flex w-full overflow-hidden ${isAdminDark ? 'dark' : ''}`}>
       {/* Overlay for mobile */}
       {!sidebarCollapsed && (
         <div 

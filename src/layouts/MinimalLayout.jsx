@@ -1,8 +1,10 @@
 import { Outlet, Link } from 'react-router-dom';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function MinimalLayout() {
+  const { isUserDark } = useTheme();
   return (
-    <div className="min-h-screen bg-surface dark:bg-slate-900 font-body flex flex-col transition-colors duration-300">
+    <div className={`min-h-screen bg-surface dark:bg-slate-900 font-body flex flex-col transition-colors duration-300 ${isUserDark ? 'dark' : ''}`}>
       {/* Simplified Navbar — logo only */}
       <header className="py-6 px-8 absolute top-0 left-0 w-full z-10 w-full flex justify-center md:justify-start">
         <Link to="/" className="inline-flex items-center gap-2 text-2xl font-bold font-headline text-primary dark:text-emerald-400 hover:text-primary/80 dark:hover:text-emerald-300 transition-colors">

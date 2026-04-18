@@ -8,7 +8,7 @@ import api from '@/services/api';
 
 export default function Topbar({ onToggleSidebar }) {
   const { admin, logoutAdmin } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
+  const { isAdminDark, toggleAdminTheme } = useTheme();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -99,11 +99,11 @@ export default function Topbar({ onToggleSidebar }) {
       <div className="flex items-center gap-4">
         {/* Theme Toggle */}
         <button
-          onClick={toggleTheme}
+          onClick={toggleAdminTheme}
           className="btn btn-ghost btn-circle btn-sm text-base-content/70 hover:text-base-content"
           aria-label="Toggle Theme"
         >
-          {isDark ? <Sun size={20} /> : <Moon size={20} />}
+          {isAdminDark ? <Sun size={20} /> : <Moon size={20} />}
         </button>
 
         {/* Notifications */}

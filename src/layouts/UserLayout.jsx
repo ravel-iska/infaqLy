@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/user/Navbar';
 import Footer from '@/components/user/Footer';
+import { useTheme } from '@/contexts/ThemeContext';
 import api from '@/services/api';
 
 function FloatingWA() {
@@ -48,8 +49,10 @@ function FloatingWA() {
 }
 
 export default function UserLayout() {
+  const { isUserDark } = useTheme();
+
   return (
-    <div className="min-h-screen flex flex-col user-bg dark:bg-slate-900 transition-colors duration-300">
+    <div className={`min-h-screen flex flex-col user-bg dark:bg-slate-900 transition-colors duration-300 ${isUserDark ? 'dark' : ''}`}>
       <Navbar />
       <main className="flex-1">
         <Outlet />
