@@ -13,6 +13,7 @@ export default function SettingsPage() {
   const [prodServerKey, setProdServerKey] = useState('');
   const [prodClientKey, setProdClientKey] = useState('');
 
+  const [showServerKey, setShowServerKey] = useState(false);
   const [midtransTab, setMidtransTab] = useState('sandbox');
 
   const [activePaymentGateway, setActivePaymentGateway] = useState('midtrans');
