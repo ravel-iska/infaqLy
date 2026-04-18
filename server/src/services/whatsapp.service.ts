@@ -6,6 +6,13 @@ import * as wabot from './wabot.service.js';
 import { generateCertificatePDF } from './pdf.service.js';
 import fs from 'fs';
 
+function sanitizePhone(phone: string): string {
+  let num = phone.replace(/[\s\-\+]/g, '');
+  if (num.startsWith('0')) num = '62' + num.slice(1);
+  if (!num.startsWith('62')) num = '62' + num;
+  return num;
+}
+
 /**
  * Send WhatsApp message — WABot (Baileys self-hosted)
  */
