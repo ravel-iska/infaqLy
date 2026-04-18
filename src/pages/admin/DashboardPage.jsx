@@ -13,22 +13,23 @@ export default function DashboardPage() {
   const [monthlyStats, setMonthlyStats] = useState([]);
   const [bugReports, setBugReports] = useState([]);
   const [isBugModalOpen, setIsBugModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
-        const data = await getAllCampaigns();
-        setCampaigns(data);
-      } catch {}
-      try {
-        const txData = await api.get('/donations?limit=5');
+        const [campData, txData, chartData] = await Promise.all([
+          getAllCampaigns().catch(() => []),
+          api.get('/donations?limit=5').catch(() => ({ donations: [] })),
+          api.get('/campaigns/monthly-stats').catch(() => ({ months: [] }))
+        ]);
+        setCampaigns(campData);
         setRecentTxn((txData.donations || []).slice(0, 5));
-      } catch {}
-      try {
-        const chartData = await api.get('/campaigns/monthly-stats');
         setMonthlyStats(chartData.months || []);
-      } catch {}
-      fetchBugs();
+        await fetchBugs();
+      } finally {
+        setIsLoading(false);
+      }
     })();
   }, []);
 
@@ -95,27 +96,38 @@ export default function DashboardPage() {
 
       {/* Stats Grid - Metronic Style */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-        {STATS.map((stat) => (
-          <div key={stat.label} className="bg-base-100 shadow rounded-2xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`p-3 rounded-xl ${stat.bg}`}>
-                <span className={`material-symbols-outlined ${stat.color} text-[24px]`}>{stat.icon}</span>
+        {isLoading
+          ? [...Array(4)].map((_, i) => (
+              <div key={i} className="bg-base-100 shadow rounded-2xl p-6 h-[140px] animate-pulse">
+                <div className="flex justify-between mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-base-200"></div>
+                  <div className="w-16 h-6 rounded-md bg-base-200"></div>
+                </div>
+                <div className="w-24 h-4 rounded bg-base-200 mb-2"></div>
+                <div className="w-32 h-8 rounded bg-base-200"></div>
               </div>
-              <span className={`text-xs font-semibold flex items-center gap-1 px-2.5 py-1 rounded-md ${stat.up ? 'bg-success/10 text-success' : 'bg-error/10 text-error'}`}>
-                <span className="material-symbols-outlined text-[14px]">
-                  {stat.up ? 'trending_up' : 'trending_down'}
-                </span>
-                {stat.trend}
-              </span>
-            </div>
-            <p className="text-sm font-medium text-base-content/60">{stat.label}</p>
-            <p className="text-3xl font-bold text-base-content mt-1 font-headline tracking-tight">
-              {typeof stat.value === 'number' && stat.value > 9999
-                ? formatCurrencyShort(stat.value)
-                : (stat.value || 0).toLocaleString('id-ID')}
-            </p>
-          </div>
-        ))}
+            ))
+          : STATS.map((stat) => (
+              <div key={stat.label} className="bg-base-100 shadow rounded-2xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`p-3 rounded-xl ${stat.bg}`}>
+                    <span className={`material-symbols-outlined ${stat.color} text-[24px]`}>{stat.icon}</span>
+                  </div>
+                  <span className={`text-xs font-semibold flex items-center gap-1 px-2.5 py-1 rounded-md ${stat.up ? 'bg-success/10 text-success' : 'bg-error/10 text-error'}`}>
+                    <span className="material-symbols-outlined text-[14px]">
+                      {stat.up ? 'trending_up' : 'trending_down'}
+                    </span>
+                    {stat.trend}
+                  </span>
+                </div>
+                <p className="text-sm font-medium text-base-content/60">{stat.label}</p>
+                <p className="text-3xl font-bold text-base-content mt-1 font-headline tracking-tight">
+                  {typeof stat.value === 'number' && stat.value > 9999
+                    ? formatCurrencyShort(stat.value)
+                    : (stat.value || 0).toLocaleString('id-ID')}
+                </p>
+              </div>
+            ))}
       </div>
 
       {/* Chart + Recent Transactions */}
@@ -125,7 +137,9 @@ export default function DashboardPage() {
             <span className="material-symbols-outlined text-primary">monitoring</span>
             <h2 className="text-lg font-bold text-base-content">Grafik Donasi Bulanan</h2>
           </div>
-          {monthlyStats.length === 0 ? (
+          {isLoading ? (
+            <div className="h-64 mt-2 bg-base-200/50 rounded-xl animate-pulse"></div>
+          ) : monthlyStats.length === 0 ? (
             <div className="h-64 flex flex-col items-center justify-center text-base-content/50 bg-base-200/50 rounded-xl border border-base-200">
               <span className="material-symbols-outlined text-4xl mb-2 opacity-50">bar_chart</span>
               <p className="text-sm font-medium">Belum ada data donasi</p>
@@ -187,42 +201,46 @@ export default function DashboardPage() {
             <h2 className="text-lg font-bold text-base-content">Distribusi Dana</h2>
           </div>
           <div className="flex-1 flex items-center justify-center">
-            <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <PieTooltip 
-                    contentStyle={{ backgroundColor: '#1E293B', borderColor: '#334155', borderRadius: '8px', border: 'none' }}
-                    itemStyle={{ color: '#fff', fontWeight: 'bold' }}
-                    formatter={(value, name) => {
-                      if (name === 'Belum Ada') return ['Rp 0', name];
-                      return [formatCurrency(value), name];
-                    }}
-                  />
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                    animationDuration={1500}
-                    animationEasing="ease-out"
-                    stroke="none"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Legend 
-                    verticalAlign="bottom" 
-                    height={36} 
-                    iconType="circle"
-                    formatter={(value) => <span className="text-sm font-semibold text-base-content/80 ml-1">{value}</span>}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+            {isLoading ? (
+              <div className="w-48 h-48 rounded-full border-[10px] border-base-200 animate-pulse"></div>
+            ) : (
+              <div className="h-64 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <PieTooltip 
+                      contentStyle={{ backgroundColor: '#1E293B', borderColor: '#334155', borderRadius: '8px', border: 'none' }}
+                      itemStyle={{ color: '#fff', fontWeight: 'bold' }}
+                      formatter={(value, name) => {
+                        if (name === 'Belum Ada') return ['Rp 0', name];
+                        return [formatCurrency(value), name];
+                      }}
+                    />
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="value"
+                      animationDuration={1500}
+                      animationEasing="ease-out"
+                      stroke="none"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={36} 
+                      iconType="circle"
+                      formatter={(value) => <span className="text-sm font-semibold text-base-content/80 ml-1">{value}</span>}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -253,7 +271,16 @@ export default function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {campaigns.length === 0 ? (
+                {isLoading ? (
+                  [...Array(3)].map((_, i) => (
+                    <tr key={`skel-${i}`} className="animate-pulse">
+                      <td><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-base-200"></div><div className="h-4 w-32 bg-base-200 rounded"></div></div></td>
+                      <td><div className="h-4 w-16 bg-base-200 rounded"></div></td>
+                      <td><div className="h-2 w-24 bg-base-200 rounded"></div></td>
+                      <td className="text-center"><div className="h-5 w-12 bg-base-200 rounded mx-auto"></div></td>
+                    </tr>
+                  ))
+                ) : campaigns.length === 0 ? (
                   <tr>
                     <td colSpan={4} className="text-center py-10 text-base-content/50">
                       Tidak ada kampanye aktif. <Link to="/admin-panel/campaigns/new" className="text-primary hover:underline">Buat sekarang</Link>.
@@ -309,7 +336,20 @@ export default function DashboardPage() {
             <h2 className="text-lg font-bold text-base-content">Transaksi Terkini</h2>
           </div>
           <div className="space-y-4 flex-1">
-            {recentTxn.length === 0 ? (
+            {isLoading ? (
+              [...Array(4)].map((_, i) => (
+                <div key={`tx-skel-${i}`} className="flex items-center justify-between p-4 rounded-xl bg-base-200/50 animate-pulse">
+                  <div>
+                    <div className="h-4 w-24 bg-base-300 rounded mb-1"></div>
+                    <div className="h-3 w-32 bg-base-200 rounded"></div>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <div className="h-4 w-20 bg-base-300 rounded mb-1"></div>
+                    <div className="h-5 w-16 bg-base-200 rounded-full"></div>
+                  </div>
+                </div>
+              ))
+            ) : recentTxn.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-base-content/50">
                 <span className="material-symbols-outlined text-4xl mb-2 opacity-50">receipt_long</span>
                 <p className="text-sm font-medium">Belum ada transaksi</p>

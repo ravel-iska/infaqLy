@@ -158,9 +158,31 @@ export default function TransactionsPage() {
       {/* Table */}
       <div className="bg-base-100 shadow rounded-2xl overflow-hidden">
         {loading ? (
-          <div className="text-center py-16 text-base-content/50 flex flex-col items-center">
-            <span className="material-symbols-outlined text-4xl animate-spin mb-4 text-primary">sync</span>
-            <p className="text-lg font-bold text-base-content">Memuat transaksi...</p>
+          <div className="overflow-x-auto">
+            <table className="table table-zebra table-md w-full">
+              <thead>
+                <tr>
+                  <th className="bg-base-200">Order ID</th>
+                  <th className="bg-base-200">Donatur</th>
+                  <th className="bg-base-200">Nominal</th>
+                  <th className="bg-base-200">Metode</th>
+                  <th className="bg-base-200 text-center">Status</th>
+                  <th className="bg-base-200 text-left">Tanggal Waktu</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...Array(5)].map((_, i) => (
+                  <tr key={`skel-${i}`} className="animate-pulse">
+                    <td><div className="h-4 w-24 bg-base-200 rounded"></div></td>
+                    <td><div className="h-4 w-32 bg-base-200 rounded"></div></td>
+                    <td><div className="h-4 w-20 bg-base-200 rounded"></div></td>
+                    <td><div className="h-6 w-24 bg-base-200 rounded"></div></td>
+                    <td><div className="h-6 w-24 bg-base-200 rounded mx-auto"></div></td>
+                    <td><div className="h-4 w-32 bg-base-200 rounded"></div></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-16 text-base-content/50 flex flex-col items-center">

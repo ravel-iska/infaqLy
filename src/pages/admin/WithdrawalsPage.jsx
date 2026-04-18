@@ -59,8 +59,26 @@ export default function WithdrawalsPage() {
 
   if (balancePending) {
     return (
-      <div className="flex items-center justify-center py-32">
-        <Loader2 className="w-12 h-12 text-admin-accent animate-spin" />
+      <div className="animate-pulse space-y-6 pb-12">
+        <div className="flex justify-between mb-6">
+          <div className="h-8 w-48 bg-base-200 rounded"></div>
+          <div className="h-10 w-32 bg-base-200 rounded"></div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="bg-base-100 shadow rounded-2xl p-6 h-[120px]">
+              <div className="h-4 w-32 bg-base-200 rounded mb-4"></div>
+              <div className="h-8 w-48 bg-base-200 rounded"></div>
+            </div>
+          ))}
+        </div>
+        <div className="bg-base-100 shadow rounded-2xl p-6 h-64 mt-6">
+          <div className="h-6 w-48 bg-base-200 rounded mb-6"></div>
+          <div className="space-y-4">
+            <div className="h-12 w-full bg-base-200 rounded"></div>
+            <div className="h-12 w-full bg-base-200 rounded"></div>
+          </div>
+        </div>
       </div>
     );
   }

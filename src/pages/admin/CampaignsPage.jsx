@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 
 export default function CampaignsPage() {
   const [campaigns, setCampaigns] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -19,7 +20,9 @@ export default function CampaignsPage() {
     try {
       const data = await getAllCampaigns();
       setCampaigns(data);
-    } catch {}
+    } catch {} finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDelete = (id, name) => {
@@ -108,7 +111,30 @@ export default function CampaignsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((c) => {
+                  {isLoading ? (
+                    [...Array(5)].map((_, i) => (
+                      <tr key={`skel-${i}`} className="animate-pulse">
+                        <td><div className="w-8 h-4 bg-base-200 rounded"></div></td>
+                        <td>
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-base-200 rounded-xl"></div>
+                            <div>
+                              <div className="w-32 h-4 bg-base-200 rounded mb-2"></div>
+                              <div className="w-24 h-3 bg-base-300 rounded"></div>
+                            </div>
+                          </div>
+                        </td>
+                        <td><div className="w-16 h-6 bg-base-200 rounded"></div></td>
+                        <td>
+                          <div className="w-20 h-4 bg-base-200 rounded mb-2"></div>
+                          <div className="w-16 h-3 bg-base-300 rounded"></div>
+                        </td>
+                        <td><div className="w-32 h-2 bg-base-200 rounded"></div></td>
+                        <td className="text-center"><div className="w-12 h-6 bg-base-200 rounded mx-auto"></div></td>
+                        <td><div className="w-24 h-8 bg-base-200 rounded mx-auto"></div></td>
+                      </tr>
+                    ))
+                  ) : filtered.map((c) => {
                     const progress = c.target > 0 ? Math.round((c.collected / c.target) * 100) : 0;
                     return (
                       <tr key={c.id}>
