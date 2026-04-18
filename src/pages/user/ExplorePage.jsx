@@ -5,6 +5,7 @@ import { getActiveCampaigns, daysRemaining } from '@/services/campaignService';
 
 export default function ExplorePage() {
   const [campaigns, setCampaigns] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
@@ -14,7 +15,9 @@ export default function ExplorePage() {
     try {
       const data = await getActiveCampaigns();
       setCampaigns(data);
-    } catch {}
+    } catch {} finally {
+      setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -104,7 +107,20 @@ export default function ExplorePage() {
         </div>
 
         {/* Results */}
-        {filtered.length === 0 ? (
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-surface-container-lowest dark:bg-slate-800 rounded-[2rem] overflow-hidden ambient-shadow h-[450px] animate-pulse">
+                <div className="h-64 bg-slate-200 dark:bg-slate-700 w-full mb-6"></div>
+                <div className="px-8 flex flex-col gap-4">
+                  <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded-full w-3/4"></div>
+                  <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full w-full"></div>
+                  <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full w-5/6"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="text-center py-32 bg-surface-container-lowest dark:bg-slate-800 rounded-[3rem] border border-white/20 dark:border-slate-700 ambient-shadow">
             <div className="w-24 h-24 mx-auto bg-surface-container dark:bg-slate-700 rounded-full flex items-center justify-center mb-6">
               <span className="material-symbols-outlined text-5xl text-on-surface-variant/50 dark:text-slate-500">
