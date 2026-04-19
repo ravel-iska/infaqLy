@@ -185,17 +185,26 @@ function DonationCard({ tx, user, onPaymentSuccess }) {
           <button
             onClick={handleResumePay}
             disabled={paying}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 hover:bg-amber-500 hover:text-white border border-amber-200 hover:border-amber-500 transition-all duration-300 disabled:opacity-50"
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 disabled:opacity-50 ${
+              tx.snapToken 
+                ? 'bg-amber-50 text-amber-700 hover:bg-amber-500 hover:text-white border border-amber-200 hover:border-amber-500'
+                : 'bg-primary/10 text-primary hover:bg-primary hover:text-white border border-primary/20 hover:border-primary'
+            }`}
           >
             {paying ? (
               <>
                 <span className="material-symbols-outlined text-[18px] animate-spin">sync</span>
                 Memuat...
               </>
-            ) : (
+            ) : tx.snapToken ? (
               <>
                 <span className="material-symbols-outlined text-[16px]">payment</span>
                 Bayar Sekarang
+              </>
+            ) : (
+              <>
+                <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+                Donasi Ulang
               </>
             )}
           </button>
