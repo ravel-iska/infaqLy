@@ -124,4 +124,14 @@ router.post('/expire', requireAdmin, async (_req: Request, res: Response) => {
   }
 });
 
+// GET /api/donations/debug-expire — temporary debug: check & force expire (REMOVE AFTER DEBUGGING)
+router.get('/debug-expire', async (_req: Request, res: Response) => {
+  try {
+    const count = await donationService.expirePendingDonations();
+    return res.json({ expired: count, serverTime: new Date().toISOString(), cutoff: new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString() });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;
