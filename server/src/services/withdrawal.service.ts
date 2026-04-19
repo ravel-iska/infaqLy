@@ -9,9 +9,13 @@ const ENV_CACHE_TTL = 30_000;
 
 async function getCurrentEnv(): Promise<'sandbox' | 'production'> {
   if (cachedEnv && Date.now() - cachedEnvAt < ENV_CACHE_TTL) return cachedEnv;
-  const [row] = await db.select().from(settings).where(eq(settings.key, 'midtrans_env')).limit(1);
+  const [gwRow] = await db.select().from(settings).where(eq(settings.key, 'active_payment_gateway')).limit(1);
+  const activeGateway = gwRow?.value || 'midtrans';
+  const envKey = activeGateway === 'doku' ? 'doku_env' : 'midtrans_env';
+  
+  const [row] = await db.select().from(settings).where(eq(settings.key, envKey)).limit(1);
   const val = row?.value;
-  cachedEnv = (val === 'production' || val === 'sandbox') ? val : 'sandbox';
+  cachedEnv = (val === 'production') ? 'production' : 'sandbox';
   cachedEnvAt = Date.now();
   return cachedEnv;
 }

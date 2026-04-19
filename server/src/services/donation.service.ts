@@ -10,15 +10,9 @@ async function getCurrentEnv(): Promise<string> {
   const [gwRow] = await db.select().from(settings).where(eq(settings.key, 'active_payment_gateway')).limit(1);
   const activeGateway = gwRow?.value || 'midtrans';
 
-  if (activeGateway === 'doku') {
-    const [envRow] = await db.select().from(settings).where(eq(settings.key, 'doku_env')).limit(1);
-    const env = envRow?.value || 'production';
-    return env === 'sandbox' ? 'doku_sandbox' : 'production';
-  } else {
-    const [envRow] = await db.select().from(settings).where(eq(settings.key, 'midtrans_env')).limit(1);
-    const env = envRow?.value || 'production';
-    return env === 'sandbox' ? 'sandbox' : 'production';
-  }
+  const envKey = activeGateway === 'doku' ? 'doku_env' : 'midtrans_env';
+  const [envRow] = await db.select().from(settings).where(eq(settings.key, envKey)).limit(1);
+  return envRow?.value === 'sandbox' ? 'sandbox' : 'production';
 }
 
 /**
