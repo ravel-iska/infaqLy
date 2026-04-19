@@ -53,6 +53,16 @@ router.get('/export', requireAdmin, async (_req: Request, res: Response) => {
   }
 });
 
+// GET /api/donations/debug-expire — temporary debug: force expire (REMOVE AFTER DEBUGGING)
+router.get('/debug-expire', async (_req: Request, res: Response) => {
+  try {
+    const count = await donationService.expirePendingDonations();
+    return res.json({ expired: count, serverTime: new Date().toISOString(), cutoff: new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString() });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/donations/:orderId — public status check for payment verification page
 router.get('/:orderId', async (req: Request, res: Response) => {
   try {
@@ -119,16 +129,6 @@ router.post('/expire', requireAdmin, async (_req: Request, res: Response) => {
   try {
     const count = await donationService.expirePendingDonations();
     return res.json({ message: `${count} donasi expired`, count });
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/donations/debug-expire — temporary debug: check & force expire (REMOVE AFTER DEBUGGING)
-router.get('/debug-expire', async (_req: Request, res: Response) => {
-  try {
-    const count = await donationService.expirePendingDonations();
-    return res.json({ expired: count, serverTime: new Date().toISOString(), cutoff: new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString() });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }
