@@ -1,19 +1,7 @@
 import { db } from '../config/database.js';
 import { donations, campaigns, settings } from '../db/schema.js';
 import { eq, desc, ilike, and, sql, lt } from 'drizzle-orm';
-
-/**
- * Helper: Get current active environment from DB settings
- * Segregates Sandbox data by gateway (doku_sandbox vs sandbox) but groups production data
- */
-async function getCurrentEnv(): Promise<string> {
-  const [gwRow] = await db.select().from(settings).where(eq(settings.key, 'active_payment_gateway')).limit(1);
-  const activeGateway = gwRow?.value || 'midtrans';
-
-  const envKey = activeGateway === 'doku' ? 'doku_env' : 'midtrans_env';
-  const [envRow] = await db.select().from(settings).where(eq(settings.key, envKey)).limit(1);
-  return envRow?.value === 'sandbox' ? 'sandbox' : 'production';
-}
+import { getCurrentEnv } from '../utils/envHelper.js';
 
 /**
  * List all donations with filters — filtered by current env

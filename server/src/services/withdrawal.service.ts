@@ -1,24 +1,7 @@
 import { db } from '../config/database.js';
 import { withdrawals, campaigns, donations, settings } from '../db/schema.js';
 import { desc, eq, and, sql } from 'drizzle-orm';
-
-// ═══ Cached env (same pattern as campaign.service) ═══
-let cachedEnv: 'sandbox' | 'production' | null = null;
-let cachedEnvAt = 0;
-const ENV_CACHE_TTL = 30_000;
-
-async function getCurrentEnv(): Promise<'sandbox' | 'production'> {
-  if (cachedEnv && Date.now() - cachedEnvAt < ENV_CACHE_TTL) return cachedEnv;
-  const [gwRow] = await db.select().from(settings).where(eq(settings.key, 'active_payment_gateway')).limit(1);
-  const activeGateway = gwRow?.value || 'midtrans';
-  const envKey = activeGateway === 'doku' ? 'doku_env' : 'midtrans_env';
-  
-  const [row] = await db.select().from(settings).where(eq(settings.key, envKey)).limit(1);
-  const val = row?.value;
-  cachedEnv = (val === 'production') ? 'production' : 'sandbox';
-  cachedEnvAt = Date.now();
-  return cachedEnv;
-}
+import { getCurrentEnv } from '../utils/envHelper.js';
 
 /**
  * List all withdrawals (with campaign info)

@@ -1,33 +1,9 @@
 import { db } from '../config/database.js';
 import { campaigns, donations, settings } from '../db/schema.js';
 import { eq, ilike, and, or, desc, sql } from 'drizzle-orm';
+import { getCurrentEnv } from '../utils/envHelper.js';
 
-// ═══ Cached env to avoid querying DB on every single function call ═══
-let cachedEnv: 'sandbox' | 'production' | null = null;
-let cachedEnvAt = 0;
-const ENV_CACHE_TTL = 30_000; // 30 seconds
-
-/**
- * Helper: Get current environment from DB settings (cached 30s)
- * Segregates Sandbox data by gateway (doku_sandbox vs sandbox) but groups production data
- */
-async function getCurrentEnv(): Promise<string> {
-  if (cachedEnv && Date.now() - cachedEnvAt < ENV_CACHE_TTL) return cachedEnv;
-
-  const [gwRow] = await db.select().from(settings).where(eq(settings.key, 'active_payment_gateway')).limit(1);
-  const activeGateway = gwRow?.value || 'midtrans';
-
-  const envKey = activeGateway === 'doku' ? 'doku_env' : 'midtrans_env';
-  const [envRow] = await db.select().from(settings).where(eq(settings.key, envKey)).limit(1);
-  const currentEnv = envRow?.value === 'sandbox' ? 'sandbox' : 'production';
-
-  cachedEnv = currentEnv as any;
-  cachedEnvAt = Date.now();
-  return currentEnv;
-}
-
-/** Invalidate env cache (called when admin changes settings) */
-export function invalidateEnvCache() { cachedEnv = null; }
+export { invalidateEnvCache } from '../utils/envHelper.js';
 
 function slugify(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36);

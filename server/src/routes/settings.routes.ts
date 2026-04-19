@@ -3,7 +3,7 @@ import { requireAdmin } from '../middleware/auth.middleware.js';
 import { db } from '../config/database.js';
 import { settings, campaigns, donations } from '../db/schema.js';
 import { eq, and, lt, inArray, sql } from 'drizzle-orm';
-import { invalidateEnvCache } from '../services/campaign.service.js';
+import { invalidateEnvCache } from '../utils/envHelper.js';
 
 function maskSecret(val: string) {
   if (!val) return '';
@@ -72,17 +72,21 @@ router.put('/', requireAdmin, async (req: Request, res: Response) => {
   try {
     const data = req.body as Record<string, string>;
 
-    // Cek apakah admin sedang mengganti mode Midtrans (sandbox <-> production)
     let envSwitched = false;
     let newEnv = '';
-    if (data.midtrans_env) {
-      const [currentEnvRow] = await db.select().from(settings).where(eq(settings.key, 'midtrans_env')).limit(1);
+    
+    // Check if any env is changing based on payload
+    const checkEnvChange = async (key: string, newValue: string) => {
+      const [currentEnvRow] = await db.select().from(settings).where(eq(settings.key, key)).limit(1);
       const currentEnv = currentEnvRow?.value || 'sandbox';
-      if (currentEnv !== data.midtrans_env) {
+      if (currentEnv !== newValue) {
         envSwitched = true;
-        newEnv = data.midtrans_env;
+        newEnv = newValue;
       }
-    }
+    };
+
+    if (data.midtrans_env) await checkEnvChange('midtrans_env', data.midtrans_env);
+    if (!envSwitched && data.doku_env) await checkEnvChange('doku_env', data.doku_env);
 
     const inserts = [];
     for (const [key, value] of Object.entries(data)) {
