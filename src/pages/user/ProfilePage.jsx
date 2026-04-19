@@ -132,12 +132,21 @@ function DonationCard({ tx, user, onPaymentSuccess }) {
 
   return (
     <div className="group bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-primary/20 dark:hover:border-emerald-500/50 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 dark:hover:shadow-emerald-900/10">
-      {/* Top row: Date + Status badge */}
+      {/* Top row: Date + Gateway + Status badge */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-          <span className="material-symbols-outlined text-[14px]">calendar_today</span>
-          {formatDateShort(tx.createdAt)}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-[14px]">calendar_today</span>
+            {formatDateShort(tx.createdAt)}
+          </span>
+          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide flex items-center gap-1 ${
+            tx.snapToken 
+              ? 'bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20' 
+              : 'bg-red-50 text-red-600 border border-red-100 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20'
+          }`}>
+            {tx.snapToken ? 'MIDTRANS' : 'DOKU'}
+          </span>
+        </div>
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full ${status.bg} ${status.text} border ${status.border} dark:bg-opacity-10 dark:border-opacity-20`}>
           <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`}></span>
           {status.label}
