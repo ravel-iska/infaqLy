@@ -88,10 +88,15 @@ function DonationCard({ tx, user, onPaymentSuccess }) {
     }
   };
 
-  /** Resume pending payment using stored Snap token */
+  /** Resume pending payment — Midtrans uses Snap token, DOKU redirects to campaign page */
   const handleResumePay = async () => {
+    // DOKU transactions don't have Snap tokens — redirect to campaign page to re-donate
     if (!tx.snapToken) {
-      toast.error('Token pembayaran sudah kedaluwarsa. Silakan buat donasi baru.');
+      if (tx.campaignId) {
+        window.location.href = `/explore/${tx.campaignId}`;
+      } else {
+        toast.error('Silakan buat donasi baru dari halaman program.');
+      }
       return;
     }
     setPaying(true);

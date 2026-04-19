@@ -211,7 +211,14 @@ export default function CampaignDetailPage() {
 
   const handleContinuePayment = async () => {
     setShowContinueModal(false);
-    if (!pendingToken) return;
+    
+    // For DOKU transactions (no Snap token), redirect to campaign to retry payment
+    if (!pendingToken) {
+      toast('Silakan lakukan donasi ulang untuk melanjutkan pembayaran.', { icon: '💳' });
+      // Scroll to donation form
+      window.scrollTo({ top: document.getElementById('donation-form')?.offsetTop - 100 || 0, behavior: 'smooth' });
+      return;
+    }
 
     try {
       await loadSnapScript();
