@@ -27,6 +27,7 @@ export default function CampaignDetailPage() {
   const [showContinueModal, setShowContinueModal] = useState(false);
   const [pendingToken, setPendingToken] = useState(null);
   const [pendingOrderId, setPendingOrderId] = useState(null);
+  const [dokuDonationAmount, setDokuDonationAmount] = useState(null);
 
   useEffect(() => {
     async function load() {
@@ -86,6 +87,7 @@ export default function CampaignDetailPage() {
         }
 
         if (donation.paymentStatus === 'success') {
+          setDokuDonationAmount(donation.amount);
           setShowThankYou(true);
         } else {
           setPendingOrderId(returnedOrderId);
@@ -516,7 +518,7 @@ export default function CampaignDetailPage() {
             
             <h3 className="text-2xl font-extrabold text-slate-800 dark:text-white mb-2 font-headline">Jazakallahu Khairan!</h3>
             <p className="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
-              Kebaikan Anda senilai <strong className="text-emerald-600 dark:text-emerald-400">{formatCurrency(parseInt(amount))}</strong> telah berhasil disalurkan. 
+              Kebaikan Anda senilai <strong className="text-emerald-600 dark:text-emerald-400">{formatCurrency(dokuDonationAmount || parseInt(amount) || 0)}</strong> telah berhasil disalurkan. 
               Semoga Allah lipat gandakan rezeki dan memberkahi Anda beserta keluarga. Amin.
             </p>
 
