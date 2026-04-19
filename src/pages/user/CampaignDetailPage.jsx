@@ -59,18 +59,33 @@ export default function CampaignDetailPage() {
   }, [campaignId]);
 
   // ═══ DOKU Callback Detection ═══
-  // When DOKU redirects back with ?orderId=XXX, check status and show popup
+  // Detects return from DOKU via: 1) ?orderId= query param (Return to Merchant) or 2) localStorage (browser back)
   useEffect(() => {
-    const returnedOrderId = searchParams.get('orderId');
+    // Source 1: URL query param (from DOKU "Return to Merchant" button)
+    let returnedOrderId = searchParams.get('orderId');
+    
+    // Source 2: localStorage (from browser back button)
+    if (!returnedOrderId) {
+      try {
+        const pending = JSON.parse(localStorage.getItem('infaqly_doku_pending') || 'null');
+        if (pending && pending.orderId && String(pending.campaignId) === String(campaignId)) {
+          returnedOrderId = pending.orderId;
+        }
+      } catch {}
+    }
+
     if (!returnedOrderId) return;
 
-    // Clean up the URL (remove orderId param)
-    searchParams.delete('orderId');
-    setSearchParams(searchParams, { replace: true });
+    // Clean up both sources
+    localStorage.removeItem('infaqly_doku_pending');
+    if (searchParams.has('orderId')) {
+      searchParams.delete('orderId');
+      setSearchParams(searchParams, { replace: true });
+    }
 
     const checkDokuStatus = async () => {
       try {
-        // Try to trigger gateway status check (might fail if not authenticated, that's OK)
+        // Try to trigger gateway status check
         await api.get(`/midtrans/check-status/${returnedOrderId}?t=${Date.now()}`).catch(() => {});
 
         // Fetch donation status from DB
@@ -101,7 +116,7 @@ export default function CampaignDetailPage() {
 
     // Small delay to let the page fully render first
     setTimeout(checkDokuStatus, 500);
-  }, []);
+  }, [campaignId]);
 
   if (loading) {
     return (
@@ -151,6 +166,8 @@ export default function CampaignDetailPage() {
       });
 
       if (data.gateway === 'doku' && data.redirectUrl) {
+        // Save pending order info so we can detect callback via browser back OR "Return to Merchant"
+        localStorage.setItem('infaqly_doku_pending', JSON.stringify({ orderId: data.orderId, campaignId: campaign.id }));
         window.location.href = data.redirectUrl;
       } else if (data.token) {
         await loadSnapScript();
