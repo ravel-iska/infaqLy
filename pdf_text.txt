@@ -1,0 +1,546 @@
+BULLETIN OF COMPUTER SCIENCE RESEARCH  
+ISSN 2774 -3659 (Media Online)  
+Vol 5, No 5, August  2025 | Hal 1272-1282 
+https://hostjournals.com/bulletincsr  
+DOI: 10.47065/ bulletincsr.v5i5.714   
+Copyright  © 202 5 The Author, Page 1272   
+This Journal is licensed under a  Creative Commons Attribution 4.0 International License  Implementasi Metode Prototype Pada Sistem Informasi Penjualan 
+Berbasis Web  
+Erniyanti Lawolo*, Yani Prihati , Satrio Agung Prakoso  
+Fakultas  Teknik dan Informatika , Program Studi  Teknik Informatika, Universitas AKI , Semarang , Indonesia  
+Email: 1,*ernilawolo19 @gmail.com, 2yani.prihati@unaki.ac.id , 3satrio.agung@unaki.ac.id  
+Email Penulis Korespondensi: ernilawolo19 @gmail.com  
+Abstrak−Di era digital saat ini, pemanfaatan teknologi informasi telah menjadi kebutuhan utama dalam menunjang kegiatan bisnis, 
+termasuk pada sektor usaha mikro, kecil, dan menengah , UMKM dituntut untuk lebih melek  digital agar dapat bersaing memenangkan 
+persaingan di dunia bisnis.  MertaBeauty merupakan UMKM yang bergerak di bidang penjualan produk kosmetik dan skincare, namun 
+masih menggunakan metode manual dalam pengelolaan penjualan, stok, dan laporan, yang menghambat efisiensi operasional  dalam 
+menjalankan usahanya belum memaksimalkan dalam penggunaan digital yang membuat lambatnya proses transaksi dan 
+memungkinkan terjadinya kesalahan dalam pencatatan . Penelitian ini bertujuan untuk membangun sistem informasi p enjualan berbasis 
+web guna mempermudah proses transaksi, manajemen produk, serta penyusunan laporan. Metode yang digunakan adalah prototyping, 
+dengan hasil akhir berupa sistem berbasis web yang mendukung pengelolaan produk, transaksi, stok, promosi, dan la poran penjualan. 
+Implementasi sistem ini diharapkan dapat meningkatkan efektivitas operasional, serta mendukung strategi pemasaran digital 
+MertaBeauty secara lebih optimal . Metode prototyping digunakan karena merupakan cara yang fleksibel, efisien, dan ber pusat pada 
+pengguna untuk mengembangkan produk. Ini membantu mengelola ketidakpastian, meminimalkan risiko, dan menghasilkan produk 
+yang lebih sesuai dengan kebutuhan pasar dan pengguna . 
+Kata Kunci : Sistem Informasi ; Penjualan ; Web ; UMKM ; Prototype   
+Abstract−In today's digital era, the use of technology has become a primary need in supporting business activities, including in the 
+micro, small, and medium enterprise sector, MSMEs are required to be more digitally literate in order to compete and win the 
+competi tion in the business world. MertaBeauty is an MSME engaged in the sale of cosmetic and skincare products, but still uses 
+manual methods in managing sales, stock, and reports, which hinders operational efficiency in running its business has not ma ximized 
+the use of digital which makes the transaction process slow and allows errors in recording. This study aims to build a web -based sales 
+information system to simplify the transaction process, product management, and report preparation. The method used is prot otyping, 
+with the final result being a web -based system that supports the management of products, transactions, stock, promotions, and sales 
+reports. The implementation of this system is expected to increase operational effectiveness, as well as support Me rtaBeauty's digital 
+marketing strategy more optimally. The prototyping method is used because it is a flexible, efficient, and user -centered way to develop 
+products. It helps ignite the fire, minimize risks, and produce products that are more in line with market and user needs.  
+Keywords : Information System ; Sales ; Web ; MSME ; Prototyping  
+1. PENDAHULUAN  
+Di era digital saat ini, pemanfaatan teknologi informasi telah menjadi kebutuhan utama dalam menunjang kegiatan bisnis, 
+termasuk pada sektor usaha mikro, kecil, dan menengah (UMKM)  [1]. Salah satu bentuk penerapan teknologi yang paling 
+umum dan efektif adalah pengembangan sistem informasi berbasis web. Sistem ini tidak hanya mampu meningkatkan 
+kinerja operasional, tetapi juga dapat memperluas jangkauan pasar dan membangun brand bisnis secara lebih luas  
+[2],[3],[4]. 
+MertaBeauty, sebuah UMKM yang bergerak di bidang penjualan produk kosmetik sejak tahun 2020, memiliki 
+potensi besar untuk berkembang di tengah meningkatnya tren penggunaan produk kecantikan. Namun demikian, dalam 
+operasionalnya, MertaBeauty masih menghadap i berbagai kendala yang dapat menghambat proses pertumbuhan bisnis. 
+Salah satu masalah utama yang menjadi perhatian adalah belum tersedianya sistem informasi berbasis web yang 
+terintegrasi dengan baik  [5],[6]. Selain itu, MertaBeauty belum memiliki website, sehingga promosi dan penjualan produk 
+masih terbatas. Proses pemesanan juga belum rapi karena masih dilakukan lewat pesan di media sosial, yang sering 
+membuat data tidak tercatat dengan baik. Oleh karena itu,  pengembangan sistem informasi penjualan berbasis web di 
+MertaBeauty menjadi sangat penting untuk meningkatkan efisiensi operasional dan mendukung pengambilan keputusan 
+yang lebih baik  [7],[8],[5].  
+Berbagai penelitian terdahulu telah dilakukan diantaranya Ipnuwati Sri dalam penelitiannya mengenai 
+"Perancangan Sistem Informasi Penjualan pada Toko Minak Singa" tidak mencakup aspek integrasi yang lebih luas dalam 
+konteks pengelolaan data dan proses bisnis yang efektif (Jurnal Janitra Informatika dan Sistem Inf ormasi, 2022) , Arief 
+Selay et al. (2023) mengemukakan bahwa Sistem Informasi Penjualan sangat penting dalam membuat produk yang akan 
+dijual karna dengan ini membantu merancang, mencatat, memudahkan pengelolaan Stok barang,membuat dokumen dan 
+informasi penju alan, Hendri  dkk (2022) Prototype sistem informasi penjualan yang dapat membantu pengguna dalam 
+mengelola data penjualan dan transaksi secara lebih efisien.  Rohmat Triyanto  (2020) Sistem informasi yang dapat 
+meningkatkan kualitas pelayanan dan pengelolaan data pada toko.  
+Penelitian yang ada sering kali tidak membahas secara mendalam tentang bagaimana sistem informasi berbasis 
+web dapat mengintegrasikan berbagai proses bisnis dalam UKM. Urgensi  penelitian ini mengangkat sebuah 
+permasalahan yang terjadi pada MertaBeauty yang masih belum tersedianya sistem informasi berbasis web yang mampu 
+mengintegrasikan dan mendukung proses bisnis secara efektif dan efisien. Kegiatan operasional seperti pencatatan 
+BULLETIN OF COMPUTER SCIENCE RESEARCH  
+ISSN 2774 -3659 (Media Online)  
+Vol 5, No 5, August  2025 | Hal 1272-1282 
+https://hostjournals.com/bulletincsr  
+DOI: 10.47065/ bulletincsr.v5i5.714   
+Copyright  © 202 5 The Author, Page 1273   
+This Journal is licensed under a  Creative Commons Attribution 4.0 International License  transaksi, stok produk, masih dilakukan secara manual.  Penelitian ini terletak pada pengembangan sistem informasi 
+penjualan berbasis web yang dirancang khusus untuk memenuhi kebutuhan MertaBeauty. Sistem ini tidak hanya akan 
+mengintegrasikan proses pencatatan transaksi dan pengelolaan stok, tetapi juga akan menyediakan fitur -fitur yang 
+mendukung promosi dan penjualan produk secara online. Dengan  adanya website, MertaBeauty dapat menjangkau lebih 
+banyak pelanggan dan meningkatkan visibilitas produk. Selain i tu, sistem ini akan dilengkapi dengan fitur laporan yang 
+memungkinkan pemilik usaha untuk melakukan analisis data secara langsung, sehingga memudahkan dalam pengambilan 
+keputusan.  
+Berdasarkan dari beberapa jurnal tersebut dapat disimpulkan bahwa sistem informasi penjualan berbasis web 
+sangat membantu dalam mengelola penjualan, stok barang, dan transaksi secara lebih cepat dan mudah. Berbagai metode 
+pengembangan seperti prototipe dan  SDLC digunakan untuk membuat tampilan yang ramah pengguna. Hasilnya, sistem 
+ini bisa mempercepat proses transaksi dan mengatasi masalah yang sering dihadapi pemilik usaha. Penelitian -penelitian 
+ini menjadi dasar yang kuat untuk pengembangan sistem penjual an web di MertaBeauty, dan penting juga untuk 
+menyesuaikan  sistem dengan kebutuhan pengguna  
+2. METOD OLOGI PENELITIAN  
+2.1 Tahapan Penelitian   
+Penelitian ini menggunakan beberapa metode pengumpulan data untuk memperoleh informasi yang relevan (Sugiyono, 
+2021) :  
+a. Observasi  
+Metode observasi merupakan teknik pengumpulan data yang dilakukan dengan cara mengamati secara langsung objek 
+yang diteliti. Dalam penelitian ini, observasi dilakukan di toko MertaBeauty untuk memahami secara mendalam 
+proses bisnis penjualan yang sedang be rjalan. Observasi dilakukan secara non -partisipan, di mana peneliti mengamati 
+dan mencatat aktivitas tanpa terlibat langsung dalam kegiatan toko (Saunders, Lewis, & Thornhill, 2019; Handayani 
+et al., 2022). Observasi difokuskan pada alur transaksi penjuala n online  dan offline , interaksi antara pemilik dan 
+pelanggan, serta pengelolaan stok barang.  
+b. Wawancara  
+Metode wawancara  merupakan pengumpulan data kualitatif yang melibatkan pertemuan antara dua pihak atau lebih 
+untuk bertukar informasi dan ide melalui proses tanya jawab, sehingga dapat dikonstruksikan makna dalam suatu 
+topik tertentu. Tujuan dari wawancar a adalah untuk mendapatkan informasi yang dibutuhkan dari responden serta 
+memperoleh pemahaman yang lebih mendalam tentang suatu topik atau masalah yang sedang diteliti. Dalam metode 
+ini penulis melakukan wawancara dengan pemilik usaha, hasil dari wawancar a diperoleh data penjualan, informasi 
+mengenai pemesanan, dan alur sistem yang saat ini sedang berjalan di MertaBeauty.  
+c. Studi Pustaka  
+Studi pustaka merupakan proses mengumpulkan, membaca, dan mengidentifikasi informasi yang relevan dari 
+berbagai literatur ilmiah, seperti buku, artikel, jurnal, dan sumber online, untuk dijadikan dasar atau referensi dalam 
+penelitian. Studi pustaka ini ber fungsi untuk memberikan kerangka teoritis, mengidentifikasi kesenjangan penelitian, 
+dan mendukung argumen atau temuan penelitian. Dalam metode ini penulis mempelajari buku -buku dan jurnal yang 
+berkaitan dengan pembuatan sistem informasi penjualan berbasis web, serta artikel yang berkaitan tentang sistem 
+informasi dan penjualan.  
+2.2 Metode Pengembangan Sistem  
+Metode pengembangan sistem yang digunakan dalam penelitian ini adalah metode Prototype. Prototype adalah metode 
+pengembangan perangkat lunak iteratif yang memungkinkan pengembang dan pengguna untuk berkolaborasi dalam 
+membangun prototipe sistem yang kemudi an disempurnakan berdasarkan umpan balik pengguna [8], [10]. Adapun 
+tahapan – tahapan dalam metode prototype sebagai berikut :  
+ 
+Gambar 1 . Tahapan Metode Prototype  
+
+BULLETIN OF COMPUTER SCIENCE RESEARCH  
+ISSN 2774 -3659 (Media Online)  
+Vol 5, No 5, August  2025 | Hal 1272-1282 
+https://hostjournals.com/bulletincsr  
+DOI: 10.47065/ bulletincsr.v5i5.714   
+Copyright  © 202 5 The Author, Page 1274   
+This Journal is licensed under a  Creative Commons Attribution 4.0 International License  a. Kebutuhan Awal ( Initial Requirement ) 
+Tahapan ini adalah proses awal untuk memahami kebutuhan dasar pengguna. Dalam tahap ini, penulis menganalisis 
+kebutuhan yang dibutuhkan MertaBeauty, dengan menganalisis sistem yang sedang berjalan, perancangan sistem yang 
+diusulkan, dan kebutuhan dari sist em yang akan dibangun  [9],[10]. 
+b. Perancangan ( Design ) 
+Tahapan ini adalah merancang bentuk awal sistem, baik alur proses maupun tampilan antarmuka (UI), desain ini hanya 
+berupa kerangka kasar (wirefrime atau mockup). Dalam tahap ini penulis, membuat sketsa desain tampilan web, alur 
+navigasi dan fitur utama (mi salnya form data barang, keranjang, login admin). Perancangan prototipe ini tidak 
+sepenuhnya fungsional tetapi cukup untuk memberikan gambaran tentang bagaimana sistem akan terlihat dan 
+berinteraksi.  
+c. Pembuatan Prototipe ( Prototyping ) 
+Tahapan ini membangun prototype dengan membuat perancangan sementara yang berfokus pada penyajian alur kerja 
+dan antar muka. Dalam tahap ini penulis, membuat prototipe website penjualan, menggunakan teknologi web seperti 
+HTML, CSS, dan JavaScript, serta framework  CSS seperti Bootstrap untuk responsivitas. Basis data sementara dapat 
+digunakan untuk menyimpan data prototipe. Tahap ini bertujuan untuk menunjukkan bagaimana sistem penjualan 
+akan berjalan apakah sistem sesuai harapan  [11],[12],[13]. 
+d. Evaluasi Pengguna ( Customer Evalution ) 
+Tahap ini merupakan evaluasi yang dilakukan oleh pengguna sistem apakah prototipe yang dibangun sudah sesuai 
+dengan keinginan pelanggan. Dalam tahap ini, pemilik MertaBeauty mencoba prototipe dan memberikan masukan, 
+baik dari segi tampilan maupun fungsi, m asukkan ini sangat penting untuk perbaikan selanjutnya  [10]. 
+e. Tinjauan dan Pembaruan ( Review & Updation ). 
+Tahapan ini melakukan revisi prototipe sesuai masukkan dari tahap evaluasi. Masukkan dari pengguna digunakan 
+untuk memperbaiki prototipe, siklus desain→prototyping→evaluasi→revisi bisa terjadi berulang kali hingga 
+pengguna puas. Dalam tahap ini penulis, me lakukan revisi desain, menambahkan fitur yang diminta, dan memperbaiki 
+kekurangan agar sistem lebih sesuai dengan kebutuhan Toko MertaBeauty  [10],[14]. 
+f. Pengembangan Sistem Final ( Development ) 
+Pada tahapan ini setelah prototipe dianggap sesuai, sistem final dibangun dengan fitur lengkap dan kode yang siap 
+digunakan.  Dalam tahap ini penulis, membangun sistem informasi penjualan berbasis web secara penuh, 
+menggunakan teknologi seperti HTML, CSS, JavaScript,  dan PHP/MySQL  atau Framework seperti CodeIgniter  [15]. 
+g. Pengujian Sistem ( Testing ) 
+Tahapan ini sistem diuji untuk mengetahui apakah semua fitur berjalan sesuai rencana dan kebutuhan, pengujian bisa 
+dilakukan oleh developer dan pengguna. Dalam tahap ini penulis, melakukan uji coba terhadap masing -masing sub 
+sistem,apakah hasilnya sudah se suai dengan yang diharapkan atau masih ada bug  [16]. Jika sub sistem dinyatakan 
+sudah sesuai, maka akan dilakukan pengujian secara keseluruhan. Pengujian ini penting untuk memastikan sistem bisa 
+digunakan dengan baik oleh admin MertaBeauty  [17],[9]. 
+h. Pemeliharaan ( Maintain ) 
+Setelah sistem digunakan, pemeliharaan dilakukan untuk memperbaiki bug yang muncul dan menyesuaikan fitur jika 
+kebutuhan berubah. Dalam tahap ini, Setelah sistem digunakan oleh pengguna, mungkin ada permintaan penyesuaian, 
+seperti menambah fitur. Tahap ini  menjaga agar sistem tetap stabil dan relevan  [18],[19],[20]. 
+2.3 Rancangan Penelitian  
+Berikut merupakan flowchart program rancangan penelitian pembuatan web untuk informasi penjualan berbasis web pada 
+MertaBeauty . 
+ 
+Gambar 2 . Flowchart Rancangan Penelitian  
+
+BULLETIN OF COMPUTER SCIENCE RESEARCH  
+ISSN 2774 -3659 (Media Online)  
+Vol 5, No 5, August  2025 | Hal 1272-1282 
+https://hostjournals.com/bulletincsr  
+DOI: 10.47065/ bulletincsr.v5i5.714   
+Copyright  © 202 5 The Author, Page 1275   
+This Journal is licensed under a  Creative Commons Attribution 4.0 International License  Pada gambar rancangan penelitian menjelasakan proses bagaimana tahapan yang muncul dalam hasil pembuatan 
+prototype web pada MertaBeauty . 
+3. HASIL DAN PEMBAHASAN  
+3.1 Perancangan ( Design ) 
+Perancangan adalah proses menggambarkan bagaimana sistem akan dibangun, dengan tujuan untuk menjembatani antara 
+kebutuhan pengguna(requirement) dan implementasi teknis.   Dalam tahap ini, kebutuhan aplikasi e -commerce dapat 
+diketahui, yaitu memudahkan MertaBeauty dalam menjualkan produk -produknya dan memahami bagaimana sistem akan 
+bekerja dan terlihat nantinya. Pada tahap ini, penulis menggunakan desain sistem, dan  desain database . 
+ 
+Gambar 3. Use Case Diagram yang diusulkan  
+Pada sistem baru, admin memiliki peran penting dalam mengelola berbagai aktivitas operasional. Admin dapat 
+melakukan login untuk mengakses dashboard yang menampilkan ringkasan sistem. Selanjutnya, admin dapat mengelola 
+produk dengan menambahkan, mengedit, atau menghapus produk, serta mengatur kategori dan brand produk. Admin juga 
+bertanggung jawab dalam mengelola diskon yang mencakup penambahan, pengeditan, dan penghapusan diskon. Selain 
+itu, admin mengelola pesanan pelanggan dengan melihat daftar pesanan, mengubah status pesanan, dan melakukan 
+konfirmasi pembayaran. Pengelolaan data pengguna juga dilakukan oleh admin untuk memastikan informasi pelanggan 
+tetap akurat. Dalam menjaga kualitas testimoni, admin memiliki akses untuk menyetujui ulasan yang masuk d ari 
+pelanggan. Admin juga dapat memperbarui informasi pada bagian FAQ agar pelanggan dapat dengan mudah memahami 
+sistem. Terakhir, admin memiliki akses terhadap laporan penjualan dan pendapatan sebagai bahan evaluasi dan 
+pengambilan keputusan bisnis. Selur uh aktivitas tersebut saling terhubung dan dirancang untuk mendukung kelancaran 
+proses penjualan serta pelayanan pelanggan secara efisien.  
+Pelanggan memulai interaksi dengan melakukan registrasi akun dan login untuk dapat mengakses fitur -fitur dalam 
+sistem. Setelah berhasil masuk, pelanggan dapat melihat home page yaitu halaman awal yang dilihat pelanggan saat 
+pertama kali mengakses sistem ke mudian, melihat daftar produk yang tersedia dan mencari produk tertentu menggunakan 
+fitur pencarian. Setiap produk dapat dilihat detailnya sebelum pelanggan memutuskan untuk menambahkannya ke 
+keranjang. Produk yang sudah ditambahkan dapat dikelola kembali melalui fitur kelola keranjang, seperti mengubah 
+jumlah atau menghapus produk dari daftar pembelian. Ketika siap melakukan pembelian, pelanggan melakukan checkout 
+yang di dalamnya mencakup proses pembayaran. Setelah transaksi berhasil, pelanggan dapat meli hat riwayat transaksi 
+untuk memantau status pesanan. Setelah menerima produk, pelanggan diberi kesempatan untuk memberikan ulasan 
+
+BULLETIN OF COMPUTER SCIENCE RESEARCH  
+ISSN 2774 -3659 (Media Online)  
+Vol 5, No 5, August  2025 | Hal 1272-1282 
+https://hostjournals.com/bulletincsr  
+DOI: 10.47065/ bulletincsr.v5i5.714   
+Copyright  © 202 5 The Author, Page 1276   
+This Journal is licensed under a  Creative Commons Attribution 4.0 International License  sebagai bentuk feedback. Pelanggan juga memiliki akses untuk melihat atau mengedit profil pribadi mereka serta dapat 
+melakukan logout untuk keluar dari sistem.   
+3.2 Class Diagram  
+Gambar 4 Class diagram dibawah menjelaskan sebuah  class yang menggambarkan stuktur dan penjelasan kelas serta 
+hubungan antara kelas.  
+ 
+Gambar 4 . Class diagram  
+3.3 Tampilan Aplikasi  
+Tahap ini menampilkan hasil akhir sistem e -commerce MertaBeauty yang telah dikembangkan berdasarkan prototipe 
+yang dievaluasi sebelumnya. Sistem dibangun menggunakan HTML,CSS,Bootstrap,PHP, dan MySQL . Berikut ini adalah 
+hasil tampilan antarmuka sistem final  : 
+a. Tampilan Website Halaman Pengguna  
+Halaman pada gambar 5 dibawah ini merupakan tampilan awal yang dilihat pelanggan saat mengakses website 
+MertaBeauty. Menampilkan produk unggulan, banner promosi, dan navigasi menuju halaman produk, ulasan atau 
+tesimoni pelanggan, melihat FAQ seputar pertanyaan yang sering ditanya pelanggan kepada toko, melihat kontak, dan 
+menampilkan denah toko melalui maps. Pada produk yang ditampilkan belum bisa ditambahkan ke keranjang dan 
+harus login terlebih dahulu.  
+ 
+Gambar 5.  Tampilan Home Page  
+Selanjutnya pada gambar 6 dibawah ini merupakan  Tampilan halaman Login dan Registrasi Pengguna  
+ 
+Gambar 6. Tampilan Halaman Registrasi  
+Pada Gambar 7 berikut ini merupakan halaman login pengguna. Yang dimana Halaman ini digunakan pelanggan 
+untuk melakukan login ke dalam sistem atau mendaftar akun baru. Proses registrasi memerlukan nama, email, dan 
+password.  
+
+BULLETIN OF COMPUTER SCIENCE RESEARCH  
+ISSN 2774 -3659 (Media Online)  
+Vol 5, No 5, August  2025 | Hal 1272-1282 
+https://hostjournals.com/bulletincsr  
+DOI: 10.47065/ bulletincsr.v5i5.714   
+Copyright  © 202 5 The Author, Page 1277   
+This Journal is licensed under a  Creative Commons Attribution 4.0 International License   
+Gambar 7. Tampilan Halaman Login  
+b. Tampilan  Halaman Produk  
+Pada gambar 8 ini merupakan tampilan halaman produk yang dimana Halaman ini menampilkan seluruh produk. Pada 
+bagian atas halaman terdapat banner promosi yang berfungsi untuk menarik perhatian pengunjung terhadap produk -
+produk diskon yang sedang berlangsung. Pengguna dapat memanfaatkan fitur kategori dan pencarian produ k untuk 
+menyaring produk berdasarkan kategori tertentu atau nama produk yang diinginkan. Setiap kartu produk menampilkan 
+gambar produk, nama produk, harga asli (dicoret) dan harga setelah diskon, informasi potongan harga dalam persen, 
+jumlah penghematan da lam rupiah, deskripsi singkat produk, dan beberapa tombol aksi seperti lihat produk, beli 
+sekarang dan label promo.  
+ 
+Gambar 8. Tampilan Halaman Produk  
+c. Tampilan  Halaman Detail Produk  
+Pada gambar 9 dibawah ini dapat dilihat tampilan halaman Detail Produk, Yang dimana Menampilkan informasi 
+lengkap tentang produk, seperti nama, deskripsi, Komposisi, harga, stok, dan foto. Terdapat tombol "Tambah ke 
+Keranjang" untuk memesan produk.  
+ 
+Gambar 9. Tampilan Detail Produk  
+d. Tampilan   Keranjang Belanja  
+Pada gambar 10 dibawah ini merupakan tampilan keranjang belanja. Halaman ini menampilkan daftar produk yang 
+telah ditambahkan ke keranjang oleh pelanggan. Pelanggan dapat menghapus item atau mengubah jumlah sebelum 
+melanjutkan ke checkout.  
+
+BULLETIN OF COMPUTER SCIENCE RESEARCH  
+ISSN 2774 -3659 (Media Online)  
+Vol 5, No 5, August  2025 | Hal 1272-1282 
+https://hostjournals.com/bulletincsr  
+DOI: 10.47065/ bulletincsr.v5i5.714   
+Copyright  © 202 5 The Author, Page 1278   
+This Journal is licensed under a  Creative Commons Attribution 4.0 International License   
+Gambar 10. Tampilan Keranjang Belanja  
+e. Tampilan  Checkout  
+Pada gambar 11 berikut ini dapat dilihat tampilan checkout. Pada halaman ini pelanggan mengisi data pengiriman dan 
+memilih metode pembayaran. Sistem juga menyediakan opsi untuk mengunggah bukti transfer pembayaran.  
+ 
+Gambar 11. Tampilan Checkout  
+f. Tampilan  Riwayat Pesanan  
+Pada gambar 12 dibawah ini akan Menampilkan daftar pesanan yang pernah dilakukan pelanggan, lengkap dengan 
+status pengiriman dan rincian pesanan  
+ 
+Gambar 12. Tampilan Checkout  
+g. Tampilan Dashboard Admin  
+Pada gambar 13 dan 14 dibawah ini dapat dilihat tampilan  dashboard admin. Tampilan halaman dashboard admin ini, 
+dibagian atas terdapat kartu informasi statistik yang terdaftar. Kartu ini memberikan informasi ringkas dan cepat untuk 
+memantau aktivitas toko. Dibawahnya terdapat bagian laporan penjualan, yang terdiri dari dua grafi k utama. Grafik 
+pertama adalah grafik pendapatan yang menunjukkan total pendapatan pada buln tertentu. Admin dapat menggunakan 
+fitur filter berdasarkan bulan dan tahun untuk melihat tren penjualan dari waktu ke waktu. Grafik kedua menampilkan 
+produk terlar is, yang mengurutkan produk berdasarkan jumlah penjualan tertinggi. Fitur ini sangat berguna untuk 
+menganalisis performa produk dan merancang strategi promosi yang lebih tepat. Data yang ditampilkan dapat diekspor 
+ke dalam format PDF atau Excel untuk keper luan pelaporan dan dokumentasi .  
+
+BULLETIN OF COMPUTER SCIENCE RESEARCH  
+ISSN 2774 -3659 (Media Online)  
+Vol 5, No 5, August  2025 | Hal 1272-1282 
+https://hostjournals.com/bulletincsr  
+DOI: 10.47065/ bulletincsr.v5i5.714   
+Copyright  © 202 5 The Author, Page 1279   
+This Journal is licensed under a  Creative Commons Attribution 4.0 International License   
+Gambar 13. Tampilan Dashboard Admin  
+ 
+Gambar 14. Tampilan Dashbord Admin – Grafik Produk Terlaris  
+h. Tampilan  Halaman Kelola Produk  
+Pada gambar 15 dibawah ini terdapat tampilan halaman kelola produk. Halaman kelola produk Admin dapat 
+menambah, mengedit, atau menghapus data produk. Juga tersedia pengelolaan kategori dan brand untuk setiap produk.  
+ 
+Gambar 15. Tampilan Daftar Produk  
+3.4 Pengujian  Sistem (Testing)  
+Pada tahap ini dilakukan pengujian pada seua bagian aplikasi yang telah dibangun. Proses ini dilakukan agar aplikasi 
+yang dibangun berjalan sesuai dengan perancangan sistem. Pengujian ini dilakukan dengan menggunakan metode black 
+box testing,  yaitu metode pengujian yang berfokus pada pengujian fungsionalitas aplikasi dari sisi input dan output tanpa 
+memperhatikan bagaiman proses di dalamnya berlangsung. Tujuan utamanya adalah memastikan aplikasi berfungsi 
+sesuai spesifikasi dan kebutuhan pengg una, serta sia p digunakan atau dipublikasikan.  
+a. Pengujian Sistem oleh Pelanggan  
+Tabel  1 berikut merupakan pengujian terhadap fitur -fitur yang digunakan oleh pelanggan :  
+Tabel 1. Pengujian Sistem Oleh Pelanggan  
+No. Fitur yang diuji  Skenario Pengujian  Input  Output yang Diharapkan  Status  
+1. Registrasi Akun  Pengguna melakukan 
+pendaftaran akun baru  Nama, Email, 
+Password valid  Akun berhasil dibuat  dan 
+diarahkan ke halaman 
+login  Berhasil  
+ 
+2. Login Pelanggan  Pengguna masuk ke 
+sistem dengan akun yang 
+telah terdaftar  Email dan password 
+valid  Berhasil login dan 
+diarahkan ke halaman 
+beranda pelanggan  Berhasil  
+ 
+
+BULLETIN OF COMPUTER SCIENCE RESEARCH  
+ISSN 2774 -3659 (Media Online)  
+Vol 5, No 5, August  2025 | Hal 1272-1282 
+https://hostjournals.com/bulletincsr  
+DOI: 10.47065/ bulletincsr.v5i5.714   
+Copyright  © 202 5 The Author, Page 1280   
+This Journal is licensed under a  Creative Commons Attribution 4.0 International License  No. Fitur yang diuji  Skenario Pengujian  Input  Output yang Diharapkan  Status  
+3. Login gagal  Login dengan data yang 
+salah  Email atau password 
+salah  Muncul pesan kesalahan 
+login  Berhasil  
+ 
+4. Melihat daftar 
+produk  Pengguna mengakses 
+halaman produk  Klik menu “Produk”  Sistem menampilkan 
+semua produk yang 
+tersedia  Berhasil  
+ 
+5. Filter & cari 
+produk  Mencari produk 
+berdasarkan nama atau 
+kategori  Nama produk atau 
+pilih kategori  Sistem menampilkan 
+hasil pencarian atau filter 
+yang sesuai  Berhasil  
+ 
+6. Detail produk  Melihat informasi 
+lengkap produk  Klik“lihat Produk”  Muncul halaman detail 
+produk yang dipilih  Berhasil  
+7. Tambah keranjang  Menambahkan produk ke 
+keranjang  Klik “Beli 
+Sekarang” atau 
+“Tambah 
+Keranjang”  Produk masuk ke daftar 
+keranjang pengguna  Berhasil  
+8. Edit/Hapus di 
+keranjang  Mengubah jumlah atau 
+menghapus produk dalam 
+keranjang  Klik “Edit” atau 
+“Hapus” pada 
+keranjang  Jumlah berhasil diubah 
+atau produk berhasil 
+dihapus  Berhasil  
+9. Checkout & 
+Upload Bukti 
+Pembayaran  Melakukan pemesanan 
+dan upload bukti 
+pembayaran  Isi alamat, upload 
+bukti transfer  Pesanan tersimpan dan 
+muncul di riwayat 
+pesanan pelanggan  Berhasil  
+10. Riwayat Pesanan  Melihat daftar transaksi 
+yang pernah dilakukan  Klik menu “Pesanan 
+Saya”  Sistem menampilkan 
+seluruh riwayat pesanan 
+dan statusnya  Berhasil  
+11. Ulasan Produk  Memberikan testimoni 
+setelah pesanan selesai  Rating dan komentar  Ulasan tersimpan dan 
+dikirim ke admin untuk 
+moderasi  Berhasil  
+12. Edit Profil  Pelanggan mengubah data 
+profil  Nama baru, email 
+baru, password baru  Data profil berhasil 
+diperbarui  Berhasil  
+b. Pengujian Sistem oleh Admin  
+Tabel 2. Pengujian Sistem Oleh Admin  
+No. Fitur yang 
+diuji Skenario Pengujian  Input  Output yang Diharapkan  Status  
+1. Login admin  Admin masuk ke dashboard  Email dan 
+password valid  Admin berhasil login dan 
+masuk ke halaman dashboard  Berhasil  
+2. Statistik 
+Dashboard  Admin melihat ringkasan 
+statistik  Akses dashboard  Statistik produk, pesanan, 
+pengguna tampil dengan 
+benar  Berhasil  
+3. Tambah 
+produk  Menambahkan produk baru 
+ke katalog  Nama, harga, stok, 
+gambar, kategori  Produk muncul di daftar 
+produk  Berhasil  
+4. Edit/ Hapus 
+Produk  Mengubah atau menghapus 
+data produk  Klik tombol “Edit” 
+atau “Hapus”  Data produk berhasil diubah 
+atau dihapus  Berhasil  
+5. Tambah 
+Diskon  Membuat program diskon 
+baru Nama diskon, 
+Kode kupon, nilai, 
+periode  Diskon muncul di daftar dan 
+bisa diterapkan pada produk  Berhasil  
+6. Filter diskon  Memfilter diskon 
+berdasarkan status  Status “Aktif” atau 
+“kadaluarsa”  Sistem hanya menampilkan 
+diskon sesuai status  Berhasil  
+7. Kelola 
+Pesanan  Melihat, memverifikasi, dan 
+mengubah status pesanan 
+pelanggan  Klik tombol status 
+dan verifikasi bukti  Status pesanan berhasil 
+diubah, dan bukti 
+pembayaran dapat diunduh 
+atau dilihat  Berhasil  
+8. Laporan 
+penjualan  Melihat grafik pendapatan 
+dan produk terlaris 
+berdasarkan filter waktu  Pilih bulan dan 
+tahun, klik “Filter”  Grafik dan data laporan 
+tampil sesuai periode yang 
+dipilih  Berhasil  
+9. Export 
+Laporan  Menyimpan laporan dalam 
+bentuk PDF atau Excel  Klik tombol export  File laporan berhasil diunduh 
+sesuai format yang dipilih  Berhasil  
+10. Manajemen 
+Testimoni  Melihat, menyetujui, atau 
+menghapus ulasan pelanggan  Klik tombol 
+“Setujui” atau 
+“Hapus”  Testimoni tampil di produk 
+atau dihapus dari sistem  Berhasil  
+BULLETIN OF COMPUTER SCIENCE RESEARCH  
+ISSN 2774 -3659 (Media Online)  
+Vol 5, No 5, August  2025 | Hal 1272-1282 
+https://hostjournals.com/bulletincsr  
+DOI: 10.47065/ bulletincsr.v5i5.714   
+Copyright  © 202 5 The Author, Page 1281   
+This Journal is licensed under a  Creative Commons Attribution 4.0 International License  No. Fitur yang 
+diuji Skenario Pengujian  Input  Output yang Diharapkan  Status  
+11. Kelola FAQ  Menambahkan, mengedit, 
+atau menghapus daftar 
+pertanyaan umum (FAQ)  Isi pertanyaan dan 
+jawaban  FAQ tersimpan dan tampil di 
+halaman pelanggan  Berhasil  
+12. Logout 
+Admin  Keluar dari sistem  Klik “Logout”  Admin diarahkan ke halaman 
+login  Berhasil  
+c. Pemeliharaan ( Maintainance ) 
+Pemeliharaan atau maintenance  merupakan tahap akhir dalam siklus pengembangan sistem, termasuk dalam metode 
+prototyping yang digunakan dalam penelitian ini. Tahap ini bertujuan untuk memastikan sistem tetap berjalan dengan 
+baik setelah diterapkan, serta memungkinkan adanya perbaikan a tau penyesuaian berdasarkan kebutuhan di masa 
+mendatang. Sistem MertaBeauty dirancang agar mudah untuk dipelihara  dan dikembangkan secara berkelanjutan. 
+Beberapa bentuk pemeliharaan yang dapat dilakukan antara lain:  
+1. Pemeliharaan  Korektif ( Corrective Maintenance ) Dilakukan untuk memperbaiki kesalahan atau bug yang  
+ditemukan saat sistem sudah berjalan, seperti kesalahan logika, tampilan yang tidak sesuai pada perangkat tertentu, 
+atau kesalahan data.  
+2. Pemeliharaan Adaptif ( Adaptive Maintenance ) Menyesuaikan sistem dengan lingkungan baru, seperti perubahan 
+aturan bisnis, penambahan metode pembayaran, atau integrasi dengan sistem lain (misalnya, pengiriman otomatis 
+atau API ekspedisi).  
+3. Pemeliharaan Perfektif ( Perfective Maintenance ) Merupakan peningkatan atau penyempurnaan sistem 
+berdasarkan masukan dari pengguna, seperti menambahkan fitur baru (wishlist, notifikasi stok, dan sebagainya) 
+atau menyempurnakan tampilan antarmuka agar lebih responsif dan user -friendly.  
+4. KESIMPULAN  
+Berdasarkan hasil analisis, perancangan, implementasi, dan pengujian yang telah dilakukan dalam pengembangan sistem 
+informasi penjualan berbasis web pada MertaBeauty, maka dapat disimpulkan bahwa:  Sistem informasi yang 
+dikembangkan mempermudah pengelolaan produk termasuk dalam hal penambahan, pengeditan, penghapusan, 
+pengelompokkan kategori, pengaturan stok, dan memperluas jangkauan penjualan.  Terlaksananya proses transaksi  secara 
+lebih efisien karena adanya fitur pemilihan produk, keranjang belanja, check out, serta upload bukti pembayaran secara 
+otomatis.  Sistem informasi ini juga menyajikan laporan penjualan yang dapat difilter berdasarkan tanggal, bulan dan 
+tahun, sehingga memudahkan proses analisis penjualan.  Adapun saran yang dapat diberikan terkait pengembangan dan 
+penerapan sistem ini ke depannya, antara lain:  Integrasi  Pembayaran  Otomatis:  Sistem dapat dikembangkan lebih lanjut 
+dengan menambahkan integrasi ke payment gateway agar proses verifikasi pembayaran menjadi otomatis dan lebih 
+efisien.  Keaman an dan Backup Data:  Perlu diperhatikan sistem keamanan dan backup data berkala untuk menjaga 
+integritas data pelanggan, transaksi, dan produk dari kemungkinan kehilangan atau serangan . 
+REFERENCES    
+[1] M. Audrilia and A. Budiman, “Perancangan Sistem Informasi Manajemen Bengkel Berbasis Web (Studi Kasus : Bengkel 
+Anugrah),” J. Madani  Ilmu Pengetahuan, Teknol. dan Hum. , vol. 3, no. 1, pp. 1 –12, 2020, doi: 10.33753/madani.v3i1.78.  
+[2] A. Prabowo and R. Toyib, “Implementasi Metode Smart Untuk Penetapan Ranking Siswa Menggunakan PHP Dan MYSQL,” J. 
+Media Infotama , vol. 18, no. 1, pp. 8 –14, 2022.  
+[3] R. S. Fradita, “ Rancang Bangun Sistem Informasi Penjualan Spare Part Mobil Pada Pt Pamindo Tiga T Berbasis Object 
+Oriented ,” IDEALIS Indones. J. Inf. Syst. , vol. 2, no. 2, pp. 9 –13, 2019.  
+[4] F. Fauzi, W. Wulandari, and S. Aprilia, “Sistem Informasi Penjualan Produk Berbasis Web Pada Chanel Distro Pringsewu,” J. 
+TAM (Technology Accept. Model. , vol. 4, pp. 41 –47, 2021.  
+[5] M. S. Sofiyana, L. D. Lestari, M. H. Triamini, A. I. Faizah, and V. R. Ardiyansyah, “Sosialisasi pemanfaatan media sosial unt uk 
+meningkatkan pemasaran UMKM di Kecamatan Sutojayan, Kabupaten Blitar,” Aptekmas J. Pengabdi. pada Masy. , vol. 4, no. 
+4, pp. 96 –100, 2021.  
+[6] D. D. Utami, N. Indriyani, A. Hasti, S. Tinggi, I. Ekonomi, and Y. Makassar, “Pemberian Kredit Usaha Mikro Kecil Dan 
+Menengah (Umkm) Pada Pt. Bank Perkreditan Rakyat (Bpr) Tabungan Rakyat Makassar,” Account. J. STIE YPUP Makassar 1 
+Account. , vol. 01, no. 01, pp. 445 –457, 2020.  
+[7] R. Hanifudin, P. Rokhmayati, M. Fadhly Noor Rizqi, and L. Fitriana Masitoh, “Rancang Bangun Sistem Enterprise Resource 
+Planning (ERP) Berbasis Web pada Pt Sainsgo Karya Indonesia Menggunakan Metode Scrum,” Syntax Idea , vol. 6, no. 6, pp. 
+2857 –2871, 2024, doi: 10.46799/syntax -idea.v6i6.3889.  
+[8] D. Soelistyowati, A. Z. Haniyah, A. Kusnadi, and B. Sellvia, “Sosialisasi Kewirausahaan Pada Era Digital Bagi Pelaku UMKM 
+Karang Taruna RW 01 Bekasi Jaya Kec. Bekasi Timur,” Innov. J. Soc. Sci. Res. , vol. 3, no. 6, pp. 2439 –2449, 2023.  
+[9] A. I. Rahmansyah and D. Darwis, “Sistem Informasi Akuntansi Pengendalian Internal Terhadap Penjualan (Studi Kasus : Cv. 
+Anugrah Ps),” J. Teknol. dan Sist. Inf. , vol. 1, no. 2, pp. 42 –49, 2020, doi: 10.33365/jtsi.v1i2.388.  
+[10] D. Agustian, E. D. Wahyuni, and I. Nuryasin, “Implementasi Metode Prototype dalam Perancangan Sistem Informasi Tracer 
+Study pada Alumni Informatika UMM,” J. Repos. , vol. 4, no. 2, pp. 147 –158, 2022, doi: 10.22219/repositor.v4i2.1352.  
+[11] D. M. Candrasari and A. Anggraini, “Sistem Informasi Laporan Jasa Pengiriman Barang Pada CV. Mitrajasa Perdana Anugrah 
+Berbasis Web,” Joined J. (Journal Informatics Educ. , vol. 3, no. 2, p. 40, 2020, doi: 10.31331/joined.v3i2.1382.  
+BULLETIN OF COMPUTER SCIENCE RESEARCH  
+ISSN 2774 -3659 (Media Online)  
+Vol 5, No 5, August  2025 | Hal 1272-1282 
+https://hostjournals.com/bulletincsr  
+DOI: 10.47065/ bulletincsr.v5i5.714   
+Copyright  © 202 5 The Author, Page 1282   
+This Journal is licensed under a  Creative Commons Attribution 4.0 International License  [12] A. Novita and A. Andiarni, “Prototipe E -Learning Untuk Pendalaman Dan Evaluasi Materi Pembelajaran Pada Smpn 1 
+Samigaluh,” J. Ilmu Pen , vol. 4, no. 2, pp. 211 –216, 2019.  
+[13] Riska Aprilliah and E. Supratman, “Sistem Informasi Pusat Karir Dan Tracer Study Pada Universitas Bina Darma Berbasis 
+Android,” Zo. J. Sist. Inf. , vol. 4, no. 2, pp. 63 –75, 2022, doi: 10.31849/zn.v4i2.10664.  
+[14] Y. Mulyanto and F. Hamdani, “Rancang Bangun Sistem Informasi Penjualan Pada Toko Omg Berbasis Web Di Kecamatan 
+Empang Kabupaten Sumbawa,” J. Inform. Teknol. dan Sains , vol. 2, no. 1, pp. 69 –77, 2020.  
+[15] T. M. T. Ismail and N. Rachma, “Sistem Informasi Penjualan pada Herangbetta Tangerang berbasis Website,” J. CoSciTech 
+(Computer Sci. Inf. Technol. , vol. 2, no. 1, pp. 40 –45, 2021.  
+[16] A. Rozaq, I. D. Kurniawati, Y. Yunitasari, and L. S. STT, “Pendampingan Pemasaran Produk UMKM Memanfaatkan Media 
+Sosial Instagram dan Tiktok,” J. Nusant. Berbakti , vol. 1, no. 1, pp. 88 –95, 2023.  
+[17] A. U. Zailani, A. Perdananto, and M. Ardhiansyah, “Penggunaan Model Prototype dalam Membuat Library System di SMPIT 
+AL Mustopa,” SMARTICS J. , vol. 6, no. 2, pp. 89 –96, 2020.  
+[18] I. Ilamsyah, S. Rahayu, and D. Lisnawati, “Prototype Aplikasi Analisa Sistem Informasi Inventory Barang Pada PT Anugrah 
+Distributor Indonesia,” Innov. Creat. Inf. Technol. , vol. 6, no. 1, pp. 50 –60, 2020.  
+[19] M. S. Robbi and Y. Yulianti, “Perancangan Aplikasi E -Learning Berbasis Web dengan Model Prototype pada SMPN 7 Kota 
+Tangerang Selatan,” J. Teknol. Sist. Inf. dan Apl , vol. 2, no. 4, p. 148, 2019.  
+[20] I. Hakim, S. Assegaff, M. S. Informasi, S. Dinamika Bangsa, J. J. Jendral, and S. Thehok, “Analisis Dan Perancangan Sistem E -
+Learning Berbasis Web Pada Sma Negeri 4 Kota Jambi,” J. Manaj. Sist. Inf. , vol. 3, no. 4, pp. 1255 –1261, 2018.  
+ 
+ 

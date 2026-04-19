@@ -144,7 +144,6 @@ export default function SettingsPage() {
       await api.put('/settings', { active_payment_gateway: gateway });
       setActivePaymentGateway(gateway);
       toast.success(`Gateway aktif diubah ke ${gateway.toUpperCase()}`);
-      setTimeout(() => window.location.reload(), 1500);
     } catch (err) {
       toast.error('Gagal mengubah gateway: ' + err.message);
     }
@@ -162,7 +161,6 @@ export default function SettingsPage() {
         midtrans_prod_client_key: prodClientKey,
       });
       toast.success('Semua konfigurasi Midtrans berhasil disimpan!');
-      setTimeout(() => window.location.reload(), 1500);
     } catch (err) {
       toast.error(err.message || 'Gagal menyimpan');
     }
@@ -178,7 +176,6 @@ export default function SettingsPage() {
         doku_prod_secret_key: dokuProdSecretKey,
       });
       toast.success('Konfigurasi DOKU berhasil disimpan!');
-      setTimeout(() => window.location.reload(), 1500);
     } catch (err) {
       toast.error(err.message || 'Gagal menyimpan konfigurasi DOKU');
     }
@@ -191,7 +188,6 @@ export default function SettingsPage() {
       await api.put('/settings', { maintenance_mode: newVal.toString() });
       setMaintenanceMode(newVal);
       toast.success(newVal ? 'Sistem DIBLOKIR: Maintenance Aktif' : 'Sistem DIBUKA: Berjalan Normal');
-      setTimeout(() => window.location.reload(), 1500);
     } catch (err) {
       toast.error('Gagal mengubah mode');
     }
@@ -204,7 +200,6 @@ export default function SettingsPage() {
         system_alert_phone: systemAlertPhone.trim()
       });
       toast.success('Pengaturan kontak berhasil disimpan');
-      setTimeout(() => window.location.reload(), 1500);
     } catch (err) {
       toast.error(err.message || 'Gagal menyimpan pengaturan kontak');
     }
