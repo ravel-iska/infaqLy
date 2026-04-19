@@ -20,7 +20,10 @@ async function getCurrentEnv(): Promise<'sandbox' | 'production'> {
  * List all withdrawals (with campaign info)
  */
 export async function listWithdrawals() {
-  const allWithdrawals = await db.select().from(withdrawals).orderBy(desc(withdrawals.createdAt));
+  const currentEnv = await getCurrentEnv();
+  const allWithdrawals = await db.select().from(withdrawals)
+    .where(eq(withdrawals.env, currentEnv as any))
+    .orderBy(desc(withdrawals.createdAt));
   
   // Get all campaign titles in one query
   const allCampaigns = await db.select({ id: campaigns.id, title: campaigns.title }).from(campaigns);
@@ -55,6 +58,7 @@ export async function getCampaignBalances() {
     total: sql<number>`COALESCE(SUM(${withdrawals.amount}), 0)`.as('total'),
   })
     .from(withdrawals)
+    .where(eq(withdrawals.env, currentEnv as any))
     .groupBy(withdrawals.campaignId);
   const wdMap = new Map(withdrawalAgg.map(w => [w.campaignId!, Number(w.total)]));
 
@@ -129,7 +133,7 @@ export async function createWithdrawal(data: {
     total: sql<number>`COALESCE(SUM(${withdrawals.amount}), 0)`.as('total'),
   })
     .from(withdrawals)
-    .where(eq(withdrawals.campaignId, data.campaignId));
+    .where(and(eq(withdrawals.campaignId, data.campaignId), eq(withdrawals.env, currentEnv as any)));
   const totalWithdrawn = Number(wdAgg?.total ?? 0);
 
   const available = totalDonated - totalWithdrawn;
@@ -144,6 +148,7 @@ export async function createWithdrawal(data: {
     note: data.note || null,
     evidenceUrl: data.evidenceUrl || null,
     status: 'completed',
+    env: currentEnv as any,
     createdBy: data.createdBy,
   }).returning();
 

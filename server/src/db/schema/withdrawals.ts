@@ -12,6 +12,7 @@ export const withdrawals = pgTable('withdrawals', {
   note: text('note'),
   evidenceUrl: text('evidence_url'),
   status: withdrawalStatusEnum('status').notNull().default('completed'),
+  env: varchar('env', { length: 20 }).notNull().default('sandbox'),
   createdBy: uuid('created_by').notNull().references(() => users.id),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 }, (table) => {

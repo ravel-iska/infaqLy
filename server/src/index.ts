@@ -7,6 +7,8 @@ import compression from 'compression';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { db } from './config/database.js';
+import { sql } from 'drizzle-orm';
 import { env } from './config/env.js';
 import { errorHandler } from './middleware/error.middleware.js';
 import { expirePendingDonations } from './services/donation.service.js';
@@ -93,8 +95,19 @@ if (fs.existsSync(frontendDist)) {
 app.use(errorHandler);
 
 // ═══ Start Server ═══
-app.listen(env.PORT, () => {
+app.listen(env.PORT, async () => {
   console.log(`\n🕌 infaqLy API Server`);
+  
+  try {
+    // Ensure table structure is updated for isolated withdrawals (safe migrations)
+    await db.execute(sql`ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS env VARCHAR(20) NOT NULL DEFAULT 'production'`);
+    console.log('[DB] Verified withdrawals schema');
+  } catch (err: any) {
+    if (!err.message?.includes('already exists')) {
+      console.warn('[DB] Failed to verify withdrawals schema:', err.message);
+    }
+  }
+
   console.log(`   Port:     ${env.PORT}`);
   console.log(`   Frontend: ${env.FRONTEND_URL}`);
   console.log(`   Midtrans: ${env.MIDTRANS_ENV}`);
