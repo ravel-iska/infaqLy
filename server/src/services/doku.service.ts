@@ -39,7 +39,7 @@ function generateSignature(clientId: string, requestId: string, timestamp: strin
 }
 
 export async function createCheckoutUrl(data: {
-  orderId: string; amount: number; donorName: string; donorEmail: string; donorPhone: string; programName: string;
+  orderId: string; amount: number; donorName: string; donorEmail: string; donorPhone: string; programName: string; campaignId: number;
 }) {
   const config = await getDokuConfig();
 
@@ -62,7 +62,7 @@ export async function createCheckoutUrl(data: {
         quantity: 1
       }],
       amount: data.amount,
-      callback_url: env.FRONTEND_URL + '/payment-verification?orderId=' + data.orderId,
+      callback_url: env.FRONTEND_URL + '/explore/' + data.campaignId + '?orderId=' + data.orderId,
     },
     payment: {
       payment_due_date: 60 // 60 minutes

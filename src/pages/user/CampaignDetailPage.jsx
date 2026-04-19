@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { QUICK_AMOUNTS, MIN_DONATION } from '@/utils/constants';
 import { formatTimeAgo } from '@/utils/formatDate';
@@ -12,6 +12,7 @@ import toast from 'react-hot-toast';
 export default function CampaignDetailPage() {
   const { campaignId } = useParams();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const [campaign, setCampaign] = useState(null);
   const [amount, setAmount] = useState('');
@@ -56,6 +57,51 @@ export default function CampaignDetailPage() {
 
     return () => clearInterval(interval);
   }, [campaignId]);
+
+  // ═══ DOKU Callback Detection ═══
+  // When DOKU redirects back with ?orderId=XXX, check status and show popup
+  useEffect(() => {
+    const returnedOrderId = searchParams.get('orderId');
+    if (!returnedOrderId) return;
+
+    // Clean up the URL (remove orderId param)
+    searchParams.delete('orderId');
+    setSearchParams(searchParams, { replace: true });
+
+    const checkDokuStatus = async () => {
+      try {
+        // Try to trigger gateway status check (might fail if not authenticated, that's OK)
+        await api.get(`/midtrans/check-status/${returnedOrderId}?t=${Date.now()}`).catch(() => {});
+
+        // Fetch donation status from DB
+        const res = await api.get(`/donations/${returnedOrderId}?t=${Date.now()}`);
+        const donation = res.donation;
+
+        if (!donation) {
+          toast.error('Transaksi tidak ditemukan');
+          return;
+        }
+
+        if (donation.paymentStatus === 'success') {
+          setShowThankYou(true);
+        } else {
+          // Pending or other — show "lanjut bayar" modal
+          setPendingOrderId(returnedOrderId);
+          setShowContinueModal(true);
+        }
+
+        // Refresh campaign data
+        const freshData = await getCampaignById(campaignId);
+        if (freshData) setCampaign(freshData);
+      } catch (err) {
+        console.error('[DOKU Callback] Error:', err);
+        toast.error('Gagal memverifikasi status pembayaran');
+      }
+    };
+
+    // Small delay to let the page fully render first
+    setTimeout(checkDokuStatus, 500);
+  }, []);
 
   if (loading) {
     return (

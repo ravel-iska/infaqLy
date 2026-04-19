@@ -57,7 +57,7 @@ router.post('/create-token', requireAuth, async (req: Request, res: Response) =>
 
     if (activeGateway === 'doku') {
       const dokuConfig = await dokuService.createCheckoutUrl({
-        orderId, amount: Number(amount), donorName, donorEmail: user.email, donorPhone: user.whatsapp, programName: campaign.title
+        orderId, amount: Number(amount), donorName, donorEmail: user.email, donorPhone: user.whatsapp, programName: campaign.title, campaignId: campaign.id
       });
       redirectUrl = dokuConfig.checkoutUrl;
     } else {
