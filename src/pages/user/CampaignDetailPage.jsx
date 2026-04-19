@@ -59,77 +59,49 @@ export default function CampaignDetailPage() {
   }, [campaignId]);
 
   // ═══ DOKU Callback Detection ═══
-  // Uses pageshow event to handle bfcache (browser back) + URL query param (Return to Merchant)
+  // UserLayout handles redirecting user to this page. We just detect ?orderId= and show popup.
   useEffect(() => {
-    const handleDokuReturn = () => {
-      // Source 1: URL query param (from DOKU "Return to Merchant" button)
-      const urlParams = new URLSearchParams(window.location.search);
-      let returnedOrderId = urlParams.get('orderId');
-      
-      // Source 2: localStorage (from browser back button)
-      if (!returnedOrderId) {
-        try {
-          const pending = JSON.parse(localStorage.getItem('infaqly_doku_pending') || 'null');
-          if (pending && pending.orderId && String(pending.campaignId) === String(campaignId)) {
-            returnedOrderId = pending.orderId;
-          }
-        } catch {}
-      }
+    const urlParams = new URLSearchParams(window.location.search);
+    const returnedOrderId = urlParams.get('orderId');
+    if (!returnedOrderId) return;
 
-      if (!returnedOrderId) return;
+    // Clean up URL and localStorage
+    localStorage.removeItem('infaqly_doku_pending');
+    urlParams.delete('orderId');
+    const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+    window.history.replaceState({}, '', newUrl);
 
-      // Clean up both sources
-      localStorage.removeItem('infaqly_doku_pending');
-      if (urlParams.has('orderId')) {
-        urlParams.delete('orderId');
-        const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
-        window.history.replaceState({}, '', newUrl);
-      }
+    const checkDokuStatus = async () => {
+      try {
+        // Try to trigger gateway status check
+        await api.get(`/midtrans/check-status/${returnedOrderId}?t=${Date.now()}`).catch(() => {});
 
-      const checkDokuStatus = async () => {
-        try {
-          // Try to trigger gateway status check
-          await api.get(`/midtrans/check-status/${returnedOrderId}?t=${Date.now()}`).catch(() => {});
+        // Fetch donation status from DB
+        const res = await api.get(`/donations/${returnedOrderId}?t=${Date.now()}`);
+        const donation = res.donation;
 
-          // Fetch donation status from DB
-          const res = await api.get(`/donations/${returnedOrderId}?t=${Date.now()}`);
-          const donation = res.donation;
-
-          if (!donation) {
-            toast.error('Transaksi tidak ditemukan');
-            return;
-          }
-
-          if (donation.paymentStatus === 'success') {
-            setShowThankYou(true);
-          } else {
-            // Pending or other — show "lanjut bayar" modal
-            setPendingOrderId(returnedOrderId);
-            setShowContinueModal(true);
-          }
-
-          // Refresh campaign data
-          const freshData = await getCampaignById(campaignId);
-          if (freshData) setCampaign(freshData);
-        } catch (err) {
-          console.error('[DOKU Callback] Error:', err);
-          toast.error('Gagal memverifikasi status pembayaran');
+        if (!donation) {
+          toast.error('Transaksi tidak ditemukan');
+          return;
         }
-      };
 
-      setTimeout(checkDokuStatus, 300);
+        if (donation.paymentStatus === 'success') {
+          setShowThankYou(true);
+        } else {
+          setPendingOrderId(returnedOrderId);
+          setShowContinueModal(true);
+        }
+
+        // Refresh campaign data
+        const freshData = await getCampaignById(campaignId);
+        if (freshData) setCampaign(freshData);
+      } catch (err) {
+        console.error('[DOKU Callback] Error:', err);
+        toast.error('Gagal memverifikasi status pembayaran');
+      }
     };
 
-    // Run on initial mount
-    handleDokuReturn();
-
-    // Also run when page is restored from bfcache (browser back button)
-    const onPageShow = (e) => {
-      if (e.persisted) handleDokuReturn();
-    };
-    window.addEventListener('pageshow', onPageShow);
-
-    return () => window.removeEventListener('pageshow', onPageShow);
+    setTimeout(checkDokuStatus, 300);
   }, [campaignId]);
 
   if (loading) {

@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/user/Navbar';
 import Footer from '@/components/user/Footer';
@@ -50,6 +50,48 @@ function FloatingWA() {
 
 export default function UserLayout() {
   const { isUserDark } = useTheme();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // ═══ Global DOKU Redirect Detector ═══
+  // If user returns from DOKU checkout and lands on wrong page, redirect to correct campaign page
+  useEffect(() => {
+    const pending = localStorage.getItem('infaqly_doku_pending');
+    if (!pending) return;
+
+    try {
+      const data = JSON.parse(pending);
+      const expectedPath = `/explore/${data.campaignId}`;
+      
+      // If we're NOT on the correct campaign page, redirect there
+      if (!location.pathname.startsWith(expectedPath)) {
+        // Don't remove localStorage yet — let CampaignDetailPage handle it and show popup
+        navigate(`${expectedPath}?orderId=${data.orderId}`, { replace: true });
+      }
+    } catch {
+      localStorage.removeItem('infaqly_doku_pending');
+    }
+  }, [location.pathname]);
+
+  // Also handle pageshow event for bfcache
+  useEffect(() => {
+    const onPageShow = (e) => {
+      if (!e.persisted) return;
+      const pending = localStorage.getItem('infaqly_doku_pending');
+      if (!pending) return;
+      try {
+        const data = JSON.parse(pending);
+        const expectedPath = `/explore/${data.campaignId}`;
+        if (!location.pathname.startsWith(expectedPath)) {
+          navigate(`${expectedPath}?orderId=${data.orderId}`, { replace: true });
+        }
+      } catch {
+        localStorage.removeItem('infaqly_doku_pending');
+      }
+    };
+    window.addEventListener('pageshow', onPageShow);
+    return () => window.removeEventListener('pageshow', onPageShow);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (isUserDark) {
