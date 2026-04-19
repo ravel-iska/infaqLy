@@ -53,28 +53,6 @@ router.get('/export', requireAdmin, async (_req: Request, res: Response) => {
   }
 });
 
-// GET /api/donations/debug-expire — temporary debug (REMOVE AFTER DEBUGGING)
-router.get('/debug-expire', async (_req: Request, res: Response) => {
-  try {
-    const count = await donationService.expirePendingDonations();
-    // Raw query ALL donations (no env filter) to see everything
-    const { db } = await import('../config/database.js');
-    const { donations } = await import('../db/schema.js');
-    const { desc } = await import('drizzle-orm');
-    const allRows = await db.select({
-      orderId: donations.orderId,
-      env: donations.env,
-      status: donations.paymentStatus,
-      amount: donations.amount,
-      snapToken: donations.snapToken,
-      created: donations.createdAt,
-    }).from(donations).orderBy(desc(donations.createdAt));
-    return res.json({ expired: count, serverTime: new Date().toISOString(), totalRows: allRows.length, donations: allRows });
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
 // GET /api/donations/:orderId — public status check for payment verification page
 router.get('/:orderId', async (req: Request, res: Response) => {
   try {
