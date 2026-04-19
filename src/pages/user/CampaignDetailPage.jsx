@@ -59,63 +59,77 @@ export default function CampaignDetailPage() {
   }, [campaignId]);
 
   // ═══ DOKU Callback Detection ═══
-  // Detects return from DOKU via: 1) ?orderId= query param (Return to Merchant) or 2) localStorage (browser back)
+  // Uses pageshow event to handle bfcache (browser back) + URL query param (Return to Merchant)
   useEffect(() => {
-    // Source 1: URL query param (from DOKU "Return to Merchant" button)
-    let returnedOrderId = searchParams.get('orderId');
-    
-    // Source 2: localStorage (from browser back button)
-    if (!returnedOrderId) {
-      try {
-        const pending = JSON.parse(localStorage.getItem('infaqly_doku_pending') || 'null');
-        if (pending && pending.orderId && String(pending.campaignId) === String(campaignId)) {
-          returnedOrderId = pending.orderId;
-        }
-      } catch {}
-    }
-
-    if (!returnedOrderId) return;
-
-    // Clean up both sources
-    localStorage.removeItem('infaqly_doku_pending');
-    if (searchParams.has('orderId')) {
-      searchParams.delete('orderId');
-      setSearchParams(searchParams, { replace: true });
-    }
-
-    const checkDokuStatus = async () => {
-      try {
-        // Try to trigger gateway status check
-        await api.get(`/midtrans/check-status/${returnedOrderId}?t=${Date.now()}`).catch(() => {});
-
-        // Fetch donation status from DB
-        const res = await api.get(`/donations/${returnedOrderId}?t=${Date.now()}`);
-        const donation = res.donation;
-
-        if (!donation) {
-          toast.error('Transaksi tidak ditemukan');
-          return;
-        }
-
-        if (donation.paymentStatus === 'success') {
-          setShowThankYou(true);
-        } else {
-          // Pending or other — show "lanjut bayar" modal
-          setPendingOrderId(returnedOrderId);
-          setShowContinueModal(true);
-        }
-
-        // Refresh campaign data
-        const freshData = await getCampaignById(campaignId);
-        if (freshData) setCampaign(freshData);
-      } catch (err) {
-        console.error('[DOKU Callback] Error:', err);
-        toast.error('Gagal memverifikasi status pembayaran');
+    const handleDokuReturn = () => {
+      // Source 1: URL query param (from DOKU "Return to Merchant" button)
+      const urlParams = new URLSearchParams(window.location.search);
+      let returnedOrderId = urlParams.get('orderId');
+      
+      // Source 2: localStorage (from browser back button)
+      if (!returnedOrderId) {
+        try {
+          const pending = JSON.parse(localStorage.getItem('infaqly_doku_pending') || 'null');
+          if (pending && pending.orderId && String(pending.campaignId) === String(campaignId)) {
+            returnedOrderId = pending.orderId;
+          }
+        } catch {}
       }
+
+      if (!returnedOrderId) return;
+
+      // Clean up both sources
+      localStorage.removeItem('infaqly_doku_pending');
+      if (urlParams.has('orderId')) {
+        urlParams.delete('orderId');
+        const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+        window.history.replaceState({}, '', newUrl);
+      }
+
+      const checkDokuStatus = async () => {
+        try {
+          // Try to trigger gateway status check
+          await api.get(`/midtrans/check-status/${returnedOrderId}?t=${Date.now()}`).catch(() => {});
+
+          // Fetch donation status from DB
+          const res = await api.get(`/donations/${returnedOrderId}?t=${Date.now()}`);
+          const donation = res.donation;
+
+          if (!donation) {
+            toast.error('Transaksi tidak ditemukan');
+            return;
+          }
+
+          if (donation.paymentStatus === 'success') {
+            setShowThankYou(true);
+          } else {
+            // Pending or other — show "lanjut bayar" modal
+            setPendingOrderId(returnedOrderId);
+            setShowContinueModal(true);
+          }
+
+          // Refresh campaign data
+          const freshData = await getCampaignById(campaignId);
+          if (freshData) setCampaign(freshData);
+        } catch (err) {
+          console.error('[DOKU Callback] Error:', err);
+          toast.error('Gagal memverifikasi status pembayaran');
+        }
+      };
+
+      setTimeout(checkDokuStatus, 300);
     };
 
-    // Small delay to let the page fully render first
-    setTimeout(checkDokuStatus, 500);
+    // Run on initial mount
+    handleDokuReturn();
+
+    // Also run when page is restored from bfcache (browser back button)
+    const onPageShow = (e) => {
+      if (e.persisted) handleDokuReturn();
+    };
+    window.addEventListener('pageshow', onPageShow);
+
+    return () => window.removeEventListener('pageshow', onPageShow);
   }, [campaignId]);
 
   if (loading) {
