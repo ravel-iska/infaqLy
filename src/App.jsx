@@ -20,6 +20,7 @@ const ForgotPasswordPage = lazy(() => import('@/pages/user/ForgotPasswordPage'))
 const ProfilePage = lazy(() => import('@/pages/user/ProfilePage'));
 const HowToDonatePage = lazy(() => import('@/pages/user/HowToDonatePage'));
 const MaintenancePage = lazy(() => import('@/pages/user/MaintenancePage'));
+const PaymentVerificationPage = lazy(() => import('@/pages/user/PaymentVerificationPage'));
 
 // Admin Pages
 const AdminLoginPage = lazy(() => import('@/pages/admin/AdminLoginPage'));
@@ -152,6 +153,7 @@ function AppRoutes() {
           <Route path="/explore/:campaignId" element={<CampaignDetailPage />} />
           <Route path="/cara-donasi" element={<HowToDonatePage />} />
           <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
+          <Route path="/payment-verification" element={<RequireAuth><PaymentVerificationPage /></RequireAuth>} />
         </Route>
 
         {/* ── Auth Routes (Minimal Layout) ── */}

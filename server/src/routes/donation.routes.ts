@@ -51,6 +51,21 @@ router.get('/export', requireAdmin, async (_req: Request, res: Response) => {
   }
 });
 
+// GET /api/donations/:orderId — get single donation by order ID (authenticated user)
+router.get('/:orderId', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const donation = await donationService.getDonationByOrderId(req.params.orderId as string);
+    if (!donation) return res.status(404).json({ error: 'Transaksi tidak ditemukan' });
+    // Only allow the owner or admin to see the donation
+    if (donation.userId !== req.user!.id) {
+      return res.status(403).json({ error: 'Akses ditolak' });
+    }
+    return res.json({ donation });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/donations — create new donation (user)
 router.post('/', requireAuth, async (req: Request, res: Response) => {
   try {
