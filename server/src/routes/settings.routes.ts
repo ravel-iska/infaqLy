@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { requireAdmin } from '../middleware/auth.middleware.js';
 import { db } from '../config/database.js';
 import { settings, campaigns, donations } from '../db/schema.js';
-import { eq, and, lt, inArray } from 'drizzle-orm';
+import { eq, and, lt, inArray, sql } from 'drizzle-orm';
 import { invalidateEnvCache } from '../services/campaign.service.js';
 
 function maskSecret(val: string) {
@@ -84,18 +84,28 @@ router.put('/', requireAdmin, async (req: Request, res: Response) => {
       }
     }
 
+    const inserts = [];
     for (const [key, value] of Object.entries(data)) {
       // Skip untouched/masked passwords
       if (typeof value === 'string' && value.includes('********')) {
         continue;
       }
-      
-      const existing = await db.select().from(settings).where(eq(settings.key, key)).limit(1);
-      if (existing.length > 0) {
-        await db.update(settings).set({ value: String(value), updatedAt: new Date() }).where(eq(settings.key, key));
-      } else {
-        await db.insert(settings).values({ key, value: String(value) });
-      }
+      inserts.push({
+        key,
+        value: String(value)
+      });
+    }
+
+    if (inserts.length > 0) {
+      await db.insert(settings)
+        .values(inserts)
+        .onConflictDoUpdate({
+          target: settings.key,
+          set: { 
+            value: sql`EXCLUDED.value`,
+            updatedAt: new Date()
+          }
+        });
     }
 
     // ═══ Auto-Reset Dana saat pindah mode ═══
