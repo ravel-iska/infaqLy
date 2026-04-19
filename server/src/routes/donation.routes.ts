@@ -22,6 +22,8 @@ router.get('/', requireAdmin, async (req: Request, res: Response) => {
 // GET /api/donations/me — user's own donations
 router.get('/me', requireAuth, async (req: Request, res: Response) => {
   try {
+    // Auto-expire stale pending donations before returning the list
+    await donationService.expirePendingDonations().catch(() => {});
     const donations = await donationService.getUserDonations(req.user!.id);
     return res.json({ donations });
   } catch (err: any) {
