@@ -153,7 +153,7 @@ function AppRoutes() {
           <Route path="/explore/:campaignId" element={<CampaignDetailPage />} />
           <Route path="/cara-donasi" element={<HowToDonatePage />} />
           <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
-          <Route path="/payment-verification" element={<RequireAuth><PaymentVerificationPage /></RequireAuth>} />
+          <Route path="/payment-verification" element={<PaymentVerificationPage />} />
         </Route>
 
         {/* ── Auth Routes (Minimal Layout) ── */}

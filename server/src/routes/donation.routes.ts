@@ -51,16 +51,25 @@ router.get('/export', requireAdmin, async (_req: Request, res: Response) => {
   }
 });
 
-// GET /api/donations/:orderId — get single donation by order ID (authenticated user)
-router.get('/:orderId', requireAuth, async (req: Request, res: Response) => {
+// GET /api/donations/:orderId — public status check for payment verification page
+router.get('/:orderId', async (req: Request, res: Response) => {
   try {
     const donation = await donationService.getDonationByOrderId(req.params.orderId as string);
     if (!donation) return res.status(404).json({ error: 'Transaksi tidak ditemukan' });
-    // Only allow the owner or admin to see the donation
-    if (donation.userId !== req.user!.id) {
-      return res.status(403).json({ error: 'Akses ditolak' });
-    }
-    return res.json({ donation });
+    // Return only safe public fields (no email, phone, or internal data)
+    return res.json({
+      donation: {
+        orderId: donation.orderId,
+        campaignId: donation.campaignId,
+        donorName: donation.isAnonymous ? 'Hamba Allah' : donation.donorName,
+        amount: donation.amount,
+        paymentMethod: donation.paymentMethod,
+        paymentStatus: donation.paymentStatus,
+        isAnonymous: donation.isAnonymous,
+        paidAt: donation.paidAt,
+        createdAt: donation.createdAt,
+      }
+    });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }
