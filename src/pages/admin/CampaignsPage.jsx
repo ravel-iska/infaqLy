@@ -50,10 +50,13 @@ export default function CampaignsPage() {
 
   return (
     <div className="animate-fade-in space-y-6 pb-12">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[28px] text-base-content">campaign</span>
-          <h1 className="text-2xl font-bold text-base-content tracking-tight">Manajemen Kampanye</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-base-content/5 relative">
+        <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
+        <div className="flex items-center gap-3 relative z-10">
+          <div className="p-2.5 bg-gradient-to-br from-primary to-secondary rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center">
+            <span className="material-symbols-outlined text-[24px] text-white drop-shadow-sm">campaign</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-base-content tracking-tight font-headline">Manajemen Kampanye</h1>
         </div>
         <Link to="/admin-panel/campaigns/new" className="btn btn-primary px-6 flex items-center justify-center gap-2 w-full sm:w-auto shadow-sm">
           <span className="material-symbols-outlined text-[20px]">add</span> Buat Baru
@@ -61,7 +64,7 @@ export default function CampaignsPage() {
       </div>
 
       {/* Search & Filter */}
-      <div className="flex flex-col sm:flex-row gap-4 bg-base-100 p-4 rounded-2xl border border-base-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row gap-4 bg-gradient-to-br from-base-100 to-base-200/50 backdrop-blur-md p-4 rounded-2xl border border-white/10 dark:border-base-content/5 shadow-xl shadow-base-200/40 relative z-10">
         <div className="relative flex-1">
           <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40 text-[20px]">search</span>
           <input
@@ -88,7 +91,7 @@ export default function CampaignsPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-base-100 shadow rounded-2xl border border-base-200 overflow-hidden">
+      <div className="bg-gradient-to-b from-base-100 to-base-200/20 backdrop-blur-md shadow-2xl shadow-base-200/50 rounded-[1.5rem] border border-white/10 dark:border-base-content/5 overflow-hidden relative z-10">
         {filtered.length === 0 ? (
           <div className="text-center py-16 text-base-content/50 flex flex-col items-center">
             <span className="material-symbols-outlined text-6xl opacity-30 mb-4">search_off</span>
@@ -100,7 +103,7 @@ export default function CampaignsPage() {
             <div className="overflow-x-auto">
               <table className="table table-zebra table-md w-full">
                 <thead>
-                  <tr className="bg-base-200 text-base-content/70">
+                  <tr className="bg-base-200/80 text-base-content/70">
                     <th className="font-bold uppercase tracking-wider">#ID</th>
                     <th className="font-bold uppercase tracking-wider">Info Program</th>
                     <th className="font-bold uppercase tracking-wider">Kategori</th>

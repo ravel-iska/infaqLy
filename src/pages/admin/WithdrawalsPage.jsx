@@ -84,10 +84,13 @@ export default function WithdrawalsPage() {
 
   return (
     <div className="animate-fade-in space-y-6 pb-12">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[28px] text-base-content">payments</span>
-          <h1 className="text-2xl font-bold text-base-content tracking-tight">Penarikan Dana</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-base-content/5 relative">
+        <div className="absolute -top-10 -left-10 w-40 h-40 bg-secondary/10 rounded-full blur-3xl"></div>
+        <div className="flex items-center gap-3 relative z-10">
+          <div className="p-2.5 bg-gradient-to-br from-secondary to-primary rounded-xl shadow-lg shadow-secondary/20 flex items-center justify-center">
+            <span className="material-symbols-outlined text-[24px] text-white drop-shadow-sm">payments</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-base-content tracking-tight font-headline">Penarikan Dana</h1>
         </div>
         <button
           onClick={() => eligibleCampaigns.length > 0 ? setShowModal(true) : toast.error('Belum ada kampanye yang mencapai target dan memiliki saldo siap tarik.')}
@@ -99,7 +102,7 @@ export default function WithdrawalsPage() {
 
       {/* Global Balance Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div className="bg-base-100 shadow rounded-2xl p-6 relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+        <div className="bg-gradient-to-br from-base-100 to-base-200/50 backdrop-blur-md shadow-2xl shadow-base-200/40 rounded-[1.5rem] p-6 relative overflow-hidden group hover:-translate-y-2 transition-all duration-500 border border-white/10 dark:border-base-content/5">
           <div className="absolute right-0 top-0 w-24 h-24 bg-primary/10 rounded-bl-[100px] -z-10 group-hover:bg-primary/20 transition-colors"></div>
           <div className="flex items-center gap-3 mb-2">
             <span className="material-symbols-outlined text-base-content/60 text-[20px]">account_balance_wallet</span>
@@ -107,7 +110,7 @@ export default function WithdrawalsPage() {
           </div>
           <p className="text-3xl font-bold text-base-content font-headline mt-1 tracking-tight">{formatCurrency(balance.settled)}</p>
         </div>
-        <div className="bg-base-100 shadow rounded-2xl p-6 relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+        <div className="bg-gradient-to-br from-base-100 to-base-200/50 backdrop-blur-md shadow-2xl shadow-base-200/40 rounded-[1.5rem] p-6 relative overflow-hidden group hover:-translate-y-2 transition-all duration-500 border border-white/10 dark:border-base-content/5">
            <div className="absolute right-0 top-0 w-24 h-24 bg-error/10 rounded-bl-[100px] -z-10 group-hover:bg-error/20 transition-colors"></div>
           <div className="flex items-center gap-3 mb-2">
             <span className="material-symbols-outlined text-error text-[20px]">publish</span>
@@ -115,7 +118,7 @@ export default function WithdrawalsPage() {
           </div>
           <p className="text-3xl font-bold text-error font-headline mt-1 tracking-tight">{formatCurrency(balance.withdrawn)}</p>
         </div>
-        <div className="bg-base-100 shadow rounded-2xl p-6 relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+        <div className="bg-gradient-to-br from-base-100 to-base-200/50 backdrop-blur-md shadow-2xl shadow-base-200/40 rounded-[1.5rem] p-6 relative overflow-hidden group hover:-translate-y-2 transition-all duration-500 border border-white/10 dark:border-base-content/5">
            <div className="absolute right-0 top-0 w-24 h-24 bg-success/10 rounded-bl-[100px] -z-10 group-hover:bg-success/20 transition-colors"></div>
           <div className="flex items-center gap-3 mb-2">
             <span className="material-symbols-outlined text-success text-[20px]">credit_score</span>
@@ -126,7 +129,7 @@ export default function WithdrawalsPage() {
       </div>
 
       {/* Per-Campaign Balance Cards */}
-      <div className="bg-base-100 shadow rounded-2xl overflow-hidden mt-6">
+      <div className="bg-gradient-to-b from-base-100 to-base-200/20 backdrop-blur-md shadow-2xl shadow-base-200/50 rounded-[1.5rem] border border-white/10 dark:border-base-content/5 overflow-hidden mt-8 relative z-10">
         <div className="px-6 py-5 border-b border-base-200 flex items-center gap-2 bg-base-200/50">
           <span className="material-symbols-outlined text-primary text-[20px]">campaign</span>
           <h2 className="text-lg font-bold text-base-content">Saldo Per Kampanye</h2>
@@ -178,7 +181,7 @@ export default function WithdrawalsPage() {
       </div>
 
       {/* History */}
-      <div className="bg-base-100 shadow rounded-2xl overflow-hidden mt-6">
+      <div className="bg-gradient-to-b from-base-100 to-base-200/20 backdrop-blur-md shadow-2xl shadow-base-200/50 rounded-[1.5rem] border border-white/10 dark:border-base-content/5 overflow-hidden mt-8 relative z-10">
         <div className="px-6 py-5 border-b border-base-200 flex items-center gap-2 bg-base-200/50">
           <span className="material-symbols-outlined text-primary text-[20px]">history_edu</span>
           <h2 className="text-lg font-bold text-base-content">Riwayat Penarikan Dana</h2>
@@ -361,7 +364,7 @@ function WithdrawalModal({ eligibleCampaigns, onClose, onSubmit }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in px-4" onClick={onClose}>
-      <div className="bg-base-100 border border-base-200 rounded-2xl p-6 sm:p-8 w-full max-w-lg shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-gradient-to-br from-base-100 to-base-200 border border-white/20 backdrop-blur-xl rounded-[2rem] p-6 sm:p-8 w-full max-w-lg shadow-3xl animate-scale-in max-h-[90vh] overflow-y-auto relative" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-8 pb-4 border-b border-base-200">
           <div className="flex items-center gap-3">
              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
