@@ -48,16 +48,6 @@ export function formatTimeAgo(date) {
   return formatDateShort(date);
 }
 
-/**
- * Hitung sisa hari dari sekarang ke target date
- * @param {string|Date} endDate
- * @returns {number}
- */
-export function daysRemaining(endDate) {
-  if (!endDate) return 0;
-  const diff = new Date(endDate) - new Date();
-  return Math.max(0, Math.ceil(diff / 86400000));
-}
 
 /**
  * Format tanggal + jam lengkap
@@ -80,26 +70,3 @@ export function formatDateTime(date) {
   return `${tanggal}, ${jam} WIB`;
 }
 
-/**
- * Format jam saja
- * @param {string|Date} date
- * @returns {string} contoh: "10:30 WIB"
- */
-export function formatTime(date) {
-  if (!date) return '-';
-  const d = new Date(date);
-  const jam = d.toLocaleTimeString('id-ID', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
-  return `${jam} WIB`;
-}
-
-/**
- * Ambil timestamp sekarang dalam ISO string (untuk menyimpan waktu transaksi)
- * @returns {string} contoh: "2026-04-15T10:30:00.000Z"
- */
-export function nowTimestamp() {
-  return new Date().toISOString();
-}

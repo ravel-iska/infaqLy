@@ -20,36 +20,6 @@ export const CAMPAIGN_CATEGORIES = [
   { value: 'kemanusiaan', label: 'Kemanusiaan' },
 ];
 
-/** Status kampanye */
-export const CAMPAIGN_STATUS = [
-  { value: 'active', label: 'Aktif', color: 'success' },
-  { value: 'draft', label: 'Draft', color: 'warning' },
-  { value: 'closed', label: 'Selesai', color: 'danger' },
-];
-
-/** Status transaksi */
-export const TRANSACTION_STATUS = {
-  success: { label: 'Berhasil', color: 'success', icon: '✅' },
-  pending: { label: 'Menunggu', color: 'warning', icon: '⏳' },
-  expired: { label: 'Kedaluwarsa', color: 'danger', icon: '❌' },
-  failed: { label: 'Gagal', color: 'danger', icon: '❌' },
-};
-
-/** Metode pembayaran  */
-export const PAYMENT_METHODS = [
-  'GoPay', 'OVO', 'DANA', 'ShopeePay',
-  'BCA VA', 'BNI VA', 'BRI VA', 'Mandiri VA',
-  'QRIS', 'Indomaret', 'Alfamart',
-];
-
-/** WA Gateway providers */
-export const WA_PROVIDERS = [
-
-  { value: 'wablas', label: 'Wablas' },
-];
-
-/** API base URL */
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 /** Navigasi user */
 export const USER_NAV_ITEMS = [

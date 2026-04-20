@@ -28,20 +28,6 @@ export async function adminLogin({ username, password }) {
   return { success: true, user: data.user, token: data.token };
 }
 
-/**
- * Logout
- */
-export async function logout() {
-  try { await api.post('/auth/logout'); } catch {}
-}
-
-/**
- * Get current session
- */
-export async function getSession() {
-  const data = await api.get('/auth/session');
-  return data.user;
-}
 
 /**
  * Update profil user
@@ -77,26 +63,3 @@ export async function changePassword({ currentPassword, newPassword }) {
   return { success: true, message: 'Password berhasil diubah' };
 }
 
-/**
- * Cari akun (untuk reset password)
- */
-export async function findAccount(identifier) {
-  const data = await api.post('/users/forgot-password', { identifier });
-  return { success: true, userId: data.userId, whatsapp: data.whatsapp };
-}
-
-/**
- * Verify OTP
- */
-export async function verifyOtp(userId, code) {
-  const data = await api.post('/users/verify-otp', { userId, code });
-  return { success: true, verified: data.verified };
-}
-
-/**
- * Reset password
- */
-export async function resetPassword(userId, newPassword) {
-  await api.post('/users/reset-password', { userId, newPassword });
-  return { success: true, message: 'Password berhasil direset' };
-}

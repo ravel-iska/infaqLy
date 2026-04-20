@@ -16,20 +16,6 @@
 
 import api from './api.js';
 
-/**
- * Create a Snap Token via the backend API.
- * The backend reads Midtrans Server Key from database settings.
- */
-export async function createTransaction({ orderId, amount, donorName, donorEmail, donorPhone, programName, campaignId, isAnonymous }) {
-  // Use the backend endpoint which reads keys from DB
-  const data = await api.post('/midtrans/create-token', {
-    campaignId,
-    amount,
-    isAnonymous,
-  });
-
-  return { success: true, token: data.token, redirectUrl: data.redirectUrl, orderId: data.orderId };
-}
 
 /**
  * Load Midtrans Snap.js script dynamically.
@@ -144,12 +130,3 @@ export function openSnapPopup(snapToken, callbacks = {}) {
   });
 }
 
-/**
- * Generate Order ID unik
- */
-export function generateOrderId() {
-  const now = new Date();
-  const date = now.toISOString().slice(2, 10).replace(/-/g, '');
-  const rand = Math.random().toString(36).slice(2, 7).toUpperCase();
-  return `INF-${date}-${rand}`;
-}
