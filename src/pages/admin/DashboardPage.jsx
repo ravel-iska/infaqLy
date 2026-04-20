@@ -93,10 +93,13 @@ export default function DashboardPage() {
 
   return (
     <div className="animate-fade-in space-y-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-8 pb-4 border-b border-base-content/5 relative">
+        <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[28px] text-base-content">dashboard</span>
-          <h1 className="text-2xl font-bold text-base-content tracking-tight">Dashboard Overview</h1>
+          <div className="p-2.5 bg-gradient-to-br from-primary to-secondary rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center">
+            <span className="material-symbols-outlined text-[24px] text-white drop-shadow-sm">space_dashboard</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-base-content tracking-tight font-headline">Dashboard Overview</h1>
         </div>
         <button onClick={() => setIsBugModalOpen(true)} className="btn btn-ghost btn-circle relative hover:bg-base-200 tooltip tooltip-left" data-tip="Laporan Bug / Masukan">
           <span className="material-symbols-outlined text-rose-500 text-[28px]">mark_email_unread</span>
@@ -120,7 +123,7 @@ export default function DashboardPage() {
               </div>
             ))
           : STATS.map((stat) => (
-              <div key={stat.label} className="bg-base-100 shadow rounded-2xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+              <div key={stat.label} className="bg-gradient-to-br from-base-100 to-base-200/30 backdrop-blur-md shadow-xl shadow-base-200/40 rounded-2xl p-6 border border-base-200/60 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1.5 transition-all duration-500 overflow-hidden relative group">
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-3 rounded-xl ${stat.bg}`}>
                     <span className={`material-symbols-outlined ${stat.color} text-[24px]`}>{stat.icon}</span>
@@ -205,7 +208,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Visitor Traffic (Replaces Pie Chart) */}
-        <div className="lg:col-span-2 bg-base-100 shadow rounded-2xl p-6 flex flex-col">
+        <div className="lg:col-span-2 bg-gradient-to-b from-base-100 to-base-200/20 backdrop-blur-md border border-white/10 dark:border-base-content/5 shadow-2xl shadow-base-200/50 rounded-[1.5rem] p-6 flex flex-col relative overflow-hidden">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-secondary">group</span>
@@ -349,7 +352,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Recent Transactions (lg:col-span-2) */}
-        <div className="lg:col-span-2 bg-base-100 shadow rounded-2xl p-6 flex flex-col">
+        <div className="lg:col-span-2 bg-gradient-to-b from-base-100 to-base-200/20 backdrop-blur-md border border-white/10 dark:border-base-content/5 shadow-2xl shadow-base-200/50 rounded-[1.5rem] p-6 flex flex-col relative overflow-hidden">
           <div className="flex items-center gap-2 mb-6">
             <span className="material-symbols-outlined text-warning">bolt</span>
             <h2 className="text-lg font-bold text-base-content">Transaksi Terkini</h2>

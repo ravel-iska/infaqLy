@@ -1,0 +1,29 @@
+classDiagram
+class Users {
+  +id: serial
+  +name: varchar
+  +password: varchar
+  +role: varchar
+}
+class Campaigns {
+  +id: serial
+  +title: varchar
+  +targetAmount: decimal
+  +collected: decimal
+}
+class Donations {
+  +id: serial
+  +campaignId: integer
+  +amount: decimal
+  +paymentStatus: varchar
+  +paymentMethod: varchar
+}
+class Withdrawals {
+  +id: serial
+  +campaignId: integer
+  +amount: decimal
+  +status: varchar
+}
+Users "1" --> "*" Donations : Melakukan
+Campaigns "1" --> "*" Donations : Menerima
+Campaigns "1" --> "*" Withdrawals : Ditarik

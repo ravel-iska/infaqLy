@@ -221,78 +221,12 @@ export default function SettingsPage() {
         <h1 className="text-2xl font-bold text-base-content tracking-tight">Setelan Sistem</h1>
       </div>
 
-      {/* PIN QUICK RE-LOGIN */}
-      <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 border border-base-200">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-          <div className="flex items-center gap-4">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${hasPin ? 'bg-success/15 text-success' : 'bg-base-200 text-base-content/50'}`}>
-              <span className="material-symbols-outlined text-[24px]">dialpad</span>
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-base-content tracking-tight">PIN Quick Login</h2>
-              <p className="text-sm text-base-content/60 mt-0.5">
-                {hasPin ? (
-                  <span className="text-success font-medium flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">check_circle</span> PIN aktif</span>
-                ) : (
-                  'Bypass kata sandi otomatis saat sesi habis'
-                )}
-              </p>
-            </div>
-          </div>
-          {hasPin && (
-            <button onClick={handleRemovePin} className="btn btn-ghost text-error hover:bg-error/10 px-4 py-2 flex items-center gap-1.5 rounded-xl text-sm">
-              <span className="material-symbols-outlined text-[16px]">delete</span> Hapus PIN
-            </button>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
-          <div>
-            <label className="block text-sm font-medium text-base-content/70 mb-2">
-              {hasPin ? 'Ganti PIN' : 'Buat PIN'} (4-8 digit)
-            </label>
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40 text-[18px]">lock</span>
-              <input
-                type="password"
-                inputMode="numeric"
-                maxLength={8}
-                value={pinNew}
-                onChange={(e) => setPinNew(e.target.value.replace(/\D/g, ''))}
-                placeholder="••••"
-                className="input input-bordered w-full pl-11 font-mono tracking-widest"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-base-content/70 mb-2">Konfirmasi PIN</label>
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40 text-[18px]">lock</span>
-              <input
-                type="password"
-                inputMode="numeric"
-                maxLength={8}
-                value={pinConfirm}
-                onChange={(e) => setPinConfirm(e.target.value.replace(/\D/g, ''))}
-                placeholder="••••"
-                className="input input-bordered w-full pl-11 font-mono tracking-widest"
-              />
-            </div>
-          </div>
-        </div>
-
-        <button
-          onClick={handleSavePin}
-          disabled={pinSaving || !pinNew || pinNew.length < 4}
-          className="btn btn-primary px-6 flex items-center justify-center gap-2 w-full sm:w-auto"
-        >
-          {pinSaving ? <span className="loading loading-spinner"></span> : <span className="material-symbols-outlined text-[18px]">save</span>}
-          {hasPin ? 'Perbarui PIN' : 'Aktifkan PIN'}
-        </button>
-      </div>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+        {/* KIRI - PAYMENT */}
+        <div className="space-y-6 flex flex-col">
 
       {/* PAYMENT GATEWAY MASTER SWITCHER */}
-      <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 relative overflow-hidden mb-8 border border-base-200">
+      <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 relative overflow-hidden border border-base-200">
         <div className="absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl text-[11px] font-bold uppercase tracking-wider text-white shadow-sm bg-primary">
           Master Controller
         </div>
@@ -499,7 +433,7 @@ export default function SettingsPage() {
       </div>
 
       {/* DOKU PAYMENT GATEWAY */}
-      <div className={`bg-base-100 shadow rounded-2xl p-6 sm:p-8 border border-base-200 relative overflow-hidden mt-8 transition-all duration-300 ${activePaymentGateway === 'doku' ? 'ring-1 ring-info/30 shadow-md shadow-info/10' : 'opacity-80'}`}>
+      <div className={`bg-base-100 shadow rounded-2xl p-6 sm:p-8 border border-base-200 relative overflow-hidden transition-all duration-300 ${activePaymentGateway === 'doku' ? 'ring-1 ring-info/30 shadow-md shadow-info/10' : 'opacity-80'}`}>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-base-200 pb-5">
           <div>
@@ -614,6 +548,80 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+      </div>
+
+        </div>
+
+        {/* KANAN - SISTEM & SECURITY */}
+        <div className="space-y-6 flex flex-col">
+      {/* PIN QUICK RE-LOGIN */}
+      <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 border border-base-200">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+          <div className="flex items-center gap-4">
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${hasPin ? 'bg-success/15 text-success' : 'bg-base-200 text-base-content/50'}`}>
+              <span className="material-symbols-outlined text-[24px]">dialpad</span>
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-base-content tracking-tight">PIN Quick Login</h2>
+              <p className="text-sm text-base-content/60 mt-0.5">
+                {hasPin ? (
+                  <span className="text-success font-medium flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">check_circle</span> PIN aktif</span>
+                ) : (
+                  'Bypass kata sandi otomatis saat sesi habis'
+                )}
+              </p>
+            </div>
+          </div>
+          {hasPin && (
+            <button onClick={handleRemovePin} className="btn btn-ghost text-error hover:bg-error/10 px-4 py-2 flex items-center gap-1.5 rounded-xl text-sm">
+              <span className="material-symbols-outlined text-[16px]">delete</span> Hapus PIN
+            </button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+          <div>
+            <label className="block text-sm font-medium text-base-content/70 mb-2">
+              {hasPin ? 'Ganti PIN' : 'Buat PIN'} (4-8 digit)
+            </label>
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40 text-[18px]">lock</span>
+              <input
+                type="password"
+                inputMode="numeric"
+                maxLength={8}
+                value={pinNew}
+                onChange={(e) => setPinNew(e.target.value.replace(/\D/g, ''))}
+                placeholder="••••"
+                className="input input-bordered w-full pl-11 font-mono tracking-widest"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-base-content/70 mb-2">Konfirmasi PIN</label>
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40 text-[18px]">lock</span>
+              <input
+                type="password"
+                inputMode="numeric"
+                maxLength={8}
+                value={pinConfirm}
+                onChange={(e) => setPinConfirm(e.target.value.replace(/\D/g, ''))}
+                placeholder="••••"
+                className="input input-bordered w-full pl-11 font-mono tracking-widest"
+              />
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={handleSavePin}
+          disabled={pinSaving || !pinNew || pinNew.length < 4}
+          className="btn btn-primary px-6 flex items-center justify-center gap-2 w-full sm:w-auto"
+        >
+          {pinSaving ? <span className="loading loading-spinner"></span> : <span className="material-symbols-outlined text-[18px]">save</span>}
+          {hasPin ? 'Perbarui PIN' : 'Aktifkan PIN'}
+        </button>
       </div>
 
       {/* PUSAT BANTUAN & INFO KONTAK ADMIN */}
@@ -810,6 +818,8 @@ export default function SettingsPage() {
 
 
 
+        </div>
+      </div>
     </div>
   );
 }
