@@ -552,129 +552,11 @@ export default function SettingsPage() {
 
         </div>
 
-        {/* KANAN - SISTEM & SECURITY */}
+        
+        {/* KANAN - SISTEM & SECURITY (ORDERED) */}
         <div className="space-y-6 flex flex-col">
-      {/* PIN QUICK RE-LOGIN */}
-      <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 border border-base-200">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-          <div className="flex items-center gap-4">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${hasPin ? 'bg-success/15 text-success' : 'bg-base-200 text-base-content/50'}`}>
-              <span className="material-symbols-outlined text-[24px]">dialpad</span>
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-base-content tracking-tight">PIN Quick Login</h2>
-              <p className="text-sm text-base-content/60 mt-0.5">
-                {hasPin ? (
-                  <span className="text-success font-medium flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">check_circle</span> PIN aktif</span>
-                ) : (
-                  'Bypass kata sandi otomatis saat sesi habis'
-                )}
-              </p>
-            </div>
-          </div>
-          {hasPin && (
-            <button onClick={handleRemovePin} className="btn btn-ghost text-error hover:bg-error/10 px-4 py-2 flex items-center gap-1.5 rounded-xl text-sm">
-              <span className="material-symbols-outlined text-[16px]">delete</span> Hapus PIN
-            </button>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
-          <div>
-            <label className="block text-sm font-medium text-base-content/70 mb-2">
-              {hasPin ? 'Ganti PIN' : 'Buat PIN'} (4-8 digit)
-            </label>
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40 text-[18px]">lock</span>
-              <input
-                type="password"
-                inputMode="numeric"
-                maxLength={8}
-                value={pinNew}
-                onChange={(e) => setPinNew(e.target.value.replace(/\D/g, ''))}
-                placeholder="••••"
-                className="input input-bordered w-full pl-11 font-mono tracking-widest"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-base-content/70 mb-2">Konfirmasi PIN</label>
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40 text-[18px]">lock</span>
-              <input
-                type="password"
-                inputMode="numeric"
-                maxLength={8}
-                value={pinConfirm}
-                onChange={(e) => setPinConfirm(e.target.value.replace(/\D/g, ''))}
-                placeholder="••••"
-                className="input input-bordered w-full pl-11 font-mono tracking-widest"
-              />
-            </div>
-          </div>
-        </div>
-
-        <button
-          onClick={handleSavePin}
-          disabled={pinSaving || !pinNew || pinNew.length < 4}
-          className="btn btn-primary px-6 flex items-center justify-center gap-2 w-full sm:w-auto"
-        >
-          {pinSaving ? <span className="loading loading-spinner"></span> : <span className="material-symbols-outlined text-[18px]">save</span>}
-          {hasPin ? 'Perbarui PIN' : 'Aktifkan PIN'}
-        </button>
-      </div>
-
-      {/* PUSAT BANTUAN & INFO KONTAK ADMIN */}
-      <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 border border-base-200">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-base-200 pb-5">
-          <div>
-            <h2 className="text-lg font-semibold text-base-content flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">support_agent</span> Kontak Pusat Bantuan
-            </h2>
-            <p className="text-sm text-base-content/60 mt-1">Muncul di UI pendaftaran dan gelembung chat bantuan pengguna</p>
-          </div>
-          <button onClick={saveAdminContact} className="btn btn-primary flex items-center gap-2 px-6">
-            <span className="material-symbols-outlined text-[18px]">save</span> Simpan
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-base-content/70 mb-2">
-              1. Nomor Publik (Pusat Bantuan)
-            </label>
-            <input
-              type="text"
-              value={adminPhone}
-              onChange={(e) => setAdminPhone(e.target.value)}
-              placeholder="Contoh: 081234567890"
-              className="input input-bordered w-full"
-            />
-            <p className="text-xs text-base-content/50 mt-2">
-              Ditampilkan ke publik sebagai tautan chat bantuan. Boleh dikosongkan.
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-base-content/70 mb-2">
-              2. Nomor Privat (Alert Sistem & Notifikasi)
-            </label>
-            <input
-              type="text"
-              value={systemAlertPhone}
-              onChange={(e) => setSystemAlertPhone(e.target.value)}
-              placeholder="Contoh: 0822..."
-              className="input input-bordered w-full"
-            />
-            <p className="text-xs text-base-content/50 mt-2">
-              <span className="text-warning font-bold">Privat.</span> Sistem akan mengirim pesan crash (500), eror midtrans, dan tarik dana HANYA ke nomor ini. Tidak disebar ke publik.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* GLOBAL MAINTENANCE MODE */}
-      <div className={`bg-base-100 shadow rounded-2xl p-6 sm:p-8 border transition-colors ${maintenanceMode ? 'border-warning/50 bg-warning/5' : 'border-base-200'}`}>
+          {/* GLOBAL MAINTENANCE MODE */}
+          <div className={`bg-base-100 shadow rounded-2xl p-6 sm:p-8 border transition-colors ${maintenanceMode ? 'border-warning/50 bg-warning/5' : 'border-base-200'}`}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
             <div className={`p-3 rounded-xl flex-shrink-0 ${maintenanceMode ? 'bg-warning/20 text-warning' : 'bg-base-200 text-base-content/50'}`}>
@@ -690,14 +572,9 @@ export default function SettingsPage() {
               </p>
             </div>
           </div>
-          <div className="flex-shrink-0">
-            <input type="checkbox" className="toggle toggle-warning toggle-lg" checked={maintenanceMode} onChange={toggleMaintenanceMode} />
-          </div>
-        </div>
-      </div>
 
-      {/* WHATSAPP BOT (BAILEYS) */}
-      <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 border border-base-200">
+          {/* WHATSAPP BOT (BAILEYS) */}
+          <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 border border-base-200">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-base-200 pb-5">
           <div>
             <h2 className="text-lg font-semibold text-base-content flex items-center gap-2">
@@ -756,70 +633,74 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 mb-6 p-4 rounded-xl bg-base-200/50 border border-base-200">
-          <div className={`w-3 h-3 rounded-full flex-shrink-0 ${botStatus === 'connected' ? 'bg-success shadow-[0_0_8px_rgba(0,0,0,0.2)] shadow-success' : botStatus === 'qr' ? 'bg-warning animate-pulse' : 'bg-base-content/40'}`}></div>
-          <div className="text-sm font-medium text-base-content/70">
-            Status Unit: <span className="font-semibold text-base-content ml-1">{botStatus === 'connected' ? `Tersambung (Stabil) - ${botName || botPhone}` : botStatus === 'qr' ? 'Menunggu QRC Otorisasi' : botStatus === 'connecting' ? 'Menyinkronkan Sesi...' : 'Terputus/Idle'}</span>
+          {/* PIN QUICK RE-LOGIN */}
+          <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 border border-base-200">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+          <div className="flex items-center gap-4">
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${hasPin ? 'bg-success/15 text-success' : 'bg-base-200 text-base-content/50'}`}>
+              <span className="material-symbols-outlined text-[24px]">dialpad</span>
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-base-content tracking-tight">PIN Quick Login</h2>
+              <p className="text-sm text-base-content/60 mt-0.5">
+                {hasPin ? (
+                  <span className="text-success font-medium flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">check_circle</span> PIN aktif</span>
+                ) : (
+                  'Bypass kata sandi otomatis saat sesi habis'
+                )}
+              </p>
+            </div>
           </div>
+
+          {/* PUSAT BANTUAN & INFO KONTAK ADMIN */}
+          <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 border border-base-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-base-200 pb-5">
+          <div>
+            <h2 className="text-lg font-semibold text-base-content flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary">support_agent</span> Kontak Pusat Bantuan
+            </h2>
+            <p className="text-sm text-base-content/60 mt-1">Muncul di UI pendaftaran dan gelembung chat bantuan pengguna</p>
+          </div>
+          <button onClick={saveAdminContact} className="btn btn-primary flex items-center gap-2 px-6">
+            <span className="material-symbols-outlined text-[18px]">save</span> Simpan
+          </button>
         </div>
 
-        {botStatus === 'qr' && botQr && (
-          <div className="flex flex-col items-center py-6 bg-base-200/50 rounded-xl border border-base-200 mb-6">
-            <div className="bg-white p-3 rounded-xl shadow-sm">
-              <img src={botQr} alt="QR Code" className="w-56 h-56" />
-            </div>
-            <p className="text-sm text-base-content/60 font-medium mt-4">Hubungkan melalui Linked Devices di pengaturan WhatsApp Anda.</p>
-            <div className="flex items-center gap-1.5 mt-2 text-xs text-primary">
-              <span className="material-symbols-outlined animate-spin text-[14px]">sync</span> Mengonfirmasi sinyal perangkat...
-            </div>
-          </div>
-        )}
-
-        {botStatus === 'connected' && (
-          <div className="bg-base-200/50 rounded-xl p-5 border border-base-200">
-            <label className="block text-sm font-medium text-base-content/70 mb-3 flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[18px]">bug_report</span> Diagnostik Transmisi
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-base-content/70 mb-2">
+              1. Nomor Publik (Pusat Bantuan)
             </label>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input
-                type="text"
-                value={botTestPhone}
-                onChange={(e) => setBotTestPhone(e.target.value)}
-                placeholder="Nomor ponsel penerima"
-                className="input input-bordered w-full sm:w-2/3"
-              />
-              <button
-                onClick={async () => {
-                  if (!botTestPhone.trim()) return toast.error('Nomor wajib diisi');
-                  setBotLoading(true); setBotTestResult(null);
-                  try {
-                    const r = await api.post('/wabot/test', { phone: botTestPhone.trim() });
-                    setBotTestResult(r);
-                    if (r.success) toast.success('Transmisi terkirim');
-                    else toast.error(r.message);
-                  } catch (e) { setBotTestResult({ success: false, message: e.message }); }
-                  finally { setBotLoading(false); }
-                }}
-                disabled={botLoading}
-                className="btn btn-outline sm:w-1/3 flex justify-center items-center gap-2"
-              >
-                {botLoading ? <span className="loading loading-spinner text-[18px]"></span> : <span className="material-symbols-outlined text-[18px]">send</span>}
-                Inject Payload
-              </button>
-            </div>
-            {botTestResult && (
-              <div className={`mt-4 p-3 rounded-xl text-sm font-medium border ${botTestResult.success ? 'bg-success/10 text-success border-success/20' : 'bg-error/10 text-error border-error/20'}`}>
-                {botTestResult.message}
-              </div>
-            )}
+            <input
+              type="text"
+              value={adminPhone}
+              onChange={(e) => setAdminPhone(e.target.value)}
+              placeholder="Contoh: 081234567890"
+              className="input input-bordered w-full"
+            />
+            <p className="text-xs text-base-content/50 mt-2">
+              Ditampilkan ke publik sebagai tautan chat bantuan. Boleh dikosongkan.
+            </p>
           </div>
-        )}
-      </div>
 
-
-
+          <div>
+            <label className="block text-sm font-medium text-base-content/70 mb-2">
+              2. Nomor Privat (Alert Sistem & Notifikasi)
+            </label>
+            <input
+              type="text"
+              value={systemAlertPhone}
+              onChange={(e) => setSystemAlertPhone(e.target.value)}
+              placeholder="Contoh: 0822..."
+              className="input input-bordered w-full"
+            />
+            <p className="text-xs text-base-content/50 mt-2">
+              <span className="text-warning font-bold">Privat.</span> Sistem akan mengirim pesan crash (500), eror midtrans, dan tarik dana HANYA ke nomor ini. Tidak disebar ke publik.
+            </p>
+          </div>
+        </div>
         </div>
       </div>
-    </div>
-  );
+      </div>
+    );
 }
