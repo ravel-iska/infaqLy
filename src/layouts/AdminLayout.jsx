@@ -35,11 +35,19 @@ export default function AdminLayout() {
   }, [isAdminDark]);
 
   return (
-    <div data-theme={isAdminDark ? "dark" : "light"} className="bg-base-200 text-base-content min-h-screen flex w-full overflow-hidden transition-colors duration-300">
+    <div data-theme={isAdminDark ? "dark" : "light"} className="bg-admin-bg text-base-content min-h-screen flex w-full overflow-hidden transition-colors duration-300 relative">
+      
+      {/* ── Premium Admin Background ── */}
+      <div className="absolute inset-0 admin-grid-bg opacity-40 pointer-events-none -z-20"></div>
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[150px] pointer-events-none"></div>
+        <div className="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none"></div>
+      </div>
+
       {/* Overlay for mobile */}
       {!sidebarCollapsed && (
         <div 
-          className="fixed inset-0 bg-black/60 z-30 md:hidden animate-fade-in backdrop-blur-sm"
+          className="fixed inset-0 bg-slate-950/80 z-30 md:hidden animate-fade-in backdrop-blur-md"
           onClick={() => setSidebarCollapsed(true)}
         />
       )}
@@ -47,7 +55,7 @@ export default function AdminLayout() {
         collapsed={sidebarCollapsed} 
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
       />
-      <div className={`flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 ${sidebarCollapsed ? 'md:ml-[72px] ml-0' : 'md:ml-[240px] ml-0'}`}>
+      <div className={`flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 relative z-10 ${sidebarCollapsed ? 'md:ml-[72px] ml-0' : 'md:ml-[240px] ml-0'}`}>
         <Topbar onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
         <main className="flex-1 p-4 sm:p-6 overflow-x-hidden overflow-y-auto scrollbar-admin w-full">
           <Outlet />

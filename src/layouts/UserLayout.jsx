@@ -104,9 +104,17 @@ export default function UserLayout() {
   }, [isUserDark]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 relative overflow-hidden">
+      
+      {/* ── Premium Mesh Background ── */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/10 dark:bg-emerald-500/10 rounded-full blur-[100px] animate-pulse glow-flow"></div>
+        <div className="absolute top-[30%] right-[-10%] w-[500px] h-[500px] bg-teal-500/5 dark:bg-teal-400/5 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute bottom-[-10%] left-[20%] w-[600px] h-[600px] bg-emerald-500/10 dark:bg-emerald-600/10 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '4s' }}></div>
+      </div>
+
       <Navbar />
-      <main className="flex-1 w-full relative">
+      <main className="flex-1 w-full relative z-10">
         <Outlet />
       </main>
       <Footer />
