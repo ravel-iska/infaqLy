@@ -170,31 +170,6 @@ export default function HomePage() {
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtvLNhQLwSvJ39x5VIL3RdjIq7aIRowq59uuy8WHLxJLbsuJYRQb-wnxUfKG4QpoHhYNp1hgH0UtFv9-coaYSyRKtyWkaLuWPWCjHM9dhtslpu8Z2wk_8tH30MyMs89oljB-QbX6YydPjoQ4rv_hW-xMW0QJwzwaRrTgqTAurVy2pWuNmHX6Sumk9OWOlN5oRlehvw9XQZkIxq5pF0L36j_RXkloIbGT5T3joE9knYsdg0fOgz-hMkkpULym054L3WtPu9j4RPPa0=s600"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/80 via-transparent to-transparent"></div>
-                </div>
-                {/* Floating Card: Verified */}
-                <div className="absolute -bottom-6 -left-6 bg-white/10 backdrop-blur-xl px-6 py-4 rounded-2xl border border-white/20 shadow-2xl animate-slide-up" style={{ animationDelay: '0.6s' }}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                      <span className="material-symbols-outlined text-emerald-400 text-[22px]">verified</span>
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-400 font-medium">Donasi Terverifikasi</p>
-                      <p className="text-sm font-bold text-white">99.9% Transparansi</p>
-                    </div>
-                  </div>
-                </div>
-                {/* Floating Card: Info Amanah */}
-                <div className="absolute -top-4 -right-4 bg-white/10 backdrop-blur-xl px-5 py-4 rounded-2xl border border-white/20 shadow-2xl animate-slide-down" style={{ animationDelay: '0.8s' }}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-teal-500/20 flex items-center justify-center border border-teal-500/30">
-                      <span className="material-symbols-outlined text-teal-400 text-[20px]">volunteer_activism</span>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-white leading-tight">Tanpa Potongan</p>
-                      <p className="text-[11px] text-slate-300 font-medium tracking-wide mt-0.5">100% AMANAH DISALURKAN</p>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
