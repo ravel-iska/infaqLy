@@ -14,6 +14,7 @@ Sentry.init({
   tracesSampleRate: 0.2,
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
+  release: 'infaqly@1.0.0',
   environment: import.meta.env.MODE,
   enabled: import.meta.env.PROD,
 
