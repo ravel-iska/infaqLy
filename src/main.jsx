@@ -11,14 +11,36 @@ Sentry.init({
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration({ maskAllText: false, blockAllMedia: false }),
   ],
-  // Capture 20% of transactions for performance monitoring
   tracesSampleRate: 0.2,
-  // Capture 10% of sessions for replay
   replaysSessionSampleRate: 0.1,
-  // Capture 100% of error sessions for replay
   replaysOnErrorSampleRate: 1.0,
-  environment: import.meta.env.MODE, // 'development' or 'production'
-  enabled: import.meta.env.PROD, // Only active in production builds
+  environment: import.meta.env.MODE,
+  enabled: import.meta.env.PROD,
+
+  // ═══ Auto-forward errors to WhatsApp via backend ═══
+  beforeSend(event) {
+    // Fire-and-forget: send error summary to our backend → WA
+    try {
+      const errorData = {
+        data: {
+          event: {
+            title: event.exception?.values?.[0]?.value || event.message || 'Unknown Error',
+            level: event.level || 'error',
+            environment: event.environment || 'production',
+            project: 'infaqly',
+            web_url: `https://sentry.io`, // Sentry link placeholder
+            exception: event.exception,
+          }
+        }
+      };
+      fetch('/api/bugs/sentry-webhook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(errorData),
+      }).catch(() => {}); // Silent fail — don't block error reporting
+    } catch {}
+    return event; // Always return event so Sentry still receives it
+  },
 })
 
 createRoot(document.getElementById('root')).render(
