@@ -44,6 +44,9 @@ Sentry.init({
   },
 })
 
+// ═══ Sentry Verify Test (hapus setelah verified) ═══
+Sentry.captureMessage('✅ InfaqLy Sentry Connected — Test v1.0.0');
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Sentry.ErrorBoundary fallback={<SentryFallback />}>
