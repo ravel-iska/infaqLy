@@ -81,37 +81,71 @@ router.delete('/:id', async (req, res) => {
 });
 
 // ═══ Sentry Webhook — Forward errors to WhatsApp ═══
+const recentSentryAlerts = new Map<string, number>();
+const SENTRY_SPAM_COOLDOWN = 10 * 60 * 1000; // 10 menit cooldown untuk error yang persis sama
+
 router.post('/sentry-webhook', async (req, res) => {
   try {
     const payload = req.body;
     
     // Parse Sentry webhook payload
-    const eventTitle = payload?.data?.event?.title || payload?.message || 'Unknown Error';
-    const eventUrl = payload?.data?.event?.web_url || payload?.url || '-';
-    const projectName = payload?.data?.event?.project || payload?.project_name || 'infaqLy';
-    const level = payload?.data?.event?.level || payload?.level || 'error';
-    const environment = payload?.data?.event?.environment || 'production';
+    const event = payload?.data?.event || {};
+    const eventTitle = event?.title || payload?.message || 'Unknown Error';
+    const eventUrl = event?.web_url || payload?.url || '-';
+    const projectName = event?.project || payload?.project_name || 'infaqLy';
+    const level = event?.level || payload?.level || 'error';
+    const environment = event?.environment || 'production';
     const timestamp = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
     
-    // Extract error location if available
-    const exception = payload?.data?.event?.exception?.values?.[0];
-    const errorType = exception?.type || 'Error';
+    // Extract error location and stack trace
+    const exception = event?.exception?.values?.[0] || {};
+    const errorType = exception?.type || payload?.level || 'Error';
     const errorValue = exception?.value || eventTitle;
-    const stackFrame = exception?.stacktrace?.frames?.slice(-1)?.[0];
-    const errorFile = stackFrame?.filename || '-';
-    const errorLine = stackFrame?.lineno || '-';
+    
+    let stackInfo = 'Tidak ada stack trace terdeteksi';
+    let errorFile = '-';
+    let errorLine = '-';
+    
+    // Sentry frames usually have the most recent call at the end of the array
+    const frames = exception?.stacktrace?.frames || event?.stacktrace?.frames || [];
+    if (frames && frames.length > 0) {
+      // Mengambil maksimal 4 urutan proses terakhir untuk memudahkan navigasi eror (dari mana ke mana)
+      const topFrames = frames.slice(-4).reverse();
+      stackInfo = topFrames.map((f: any) => `  ↳ ${f.filename || f.module || 'Unknown'}:${f.lineno || '?'}`).join('\n');
+      
+      errorFile = topFrames[0].filename || '-';
+      errorLine = String(topFrames[0].lineno || '-');
+    }
+
+    // 🛑 Anti-Spam System (Deduplikasi)
+    const alertKey = `${projectName}:${errorType}:${errorFile}:${errorLine}`;
+    const now = Date.now();
+    const lastSeen = recentSentryAlerts.get(alertKey);
+    
+    if (lastSeen && (now - lastSeen) < SENTRY_SPAM_COOLDOWN) {
+        console.log(`[Sentry→WA] 🚫 Spam Alert Prevented for: ${alertKey} (Cooldown: 10m)`);
+        return res.status(200).json({ ok: true, spam_prevented: true });
+    }
+    
+    // Set we've just seen this alert
+    recentSentryAlerts.set(alertKey, now);
 
     // Format WhatsApp message
     const waMessage = [
-      `🚨 *SENTRY ALERT — ${projectName.toUpperCase()}*`,
+      `🚨 *SENTRY ALERT — ${String(projectName).toUpperCase()}*`,
       ``,
-      `⚠️ *Level:* ${level.toUpperCase()}`,
+      `⚠️ *Level:* ${String(level).toUpperCase()}`,
       `🌐 *Environment:* ${environment}`,
       `⏰ *Waktu:* ${timestamp}`,
       ``,
       `📛 *Error:* ${errorType}`,
       `📝 *Detail:* ${errorValue.substring(0, 300)}`,
-      `📂 *File:* ${errorFile}:${errorLine}`,
+      ``,
+      `📂 *File Utama (Penyebab):*`,
+      `${errorFile}:${errorLine}`,
+      ``,
+      `🔄 *Execution Path (Jejak Proses):*`,
+      stackInfo,
       ``,
       `🔗 *Sentry Link:*`,
       eventUrl,
