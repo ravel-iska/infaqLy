@@ -1,9 +1,38 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { formatCurrency, formatCurrencyShort } from '@/utils/formatCurrency';
 import { getActiveCampaigns, daysRemaining } from '@/services/campaignService';
 import { optimizeImageUrl } from '@/utils/optimizeImage';
 import { useAuth } from '@/contexts/AuthContext';
+
+// ═══ Animated Counter Hook ═══
+function useCountUp(target, duration = 2000) {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  const counted = useRef(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !counted.current) {
+        counted.current = true;
+        const start = performance.now();
+        const step = (now) => {
+          const elapsed = now - start;
+          const progress = Math.min(elapsed / duration, 1);
+          // Ease-out cubic
+          const eased = 1 - Math.pow(1 - progress, 3);
+          setCount(Math.floor(eased * target));
+          if (progress < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }
+    }, { threshold: 0.3 });
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [target, duration]);
+
+  return { count, ref };
+}
 
 export default function HomePage() {
   const { isAuthenticated } = useAuth();
@@ -28,72 +57,111 @@ export default function HomePage() {
   useEffect(() => {
     const handleFocus = () => loadData();
     window.addEventListener('focus', handleFocus);
-    
-    // Background polling for mobile/real-time updates (every 30 seconds)
-    const interval = setInterval(() => {
-      loadData();
-    }, 30000);
-
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-      clearInterval(interval);
-    };
+    const interval = setInterval(() => { loadData(); }, 30000);
+    return () => { window.removeEventListener('focus', handleFocus); clearInterval(interval); };
   }, [loadData]);
 
-  // Jika data belum ada dari backend, gunakan fallback/dummy stats seperti di desain awal
   const totalCollected = campaigns.length > 0 ? campaigns.reduce((s, c) => s + c.collected, 0) : 12400000000;
   const totalDonors = campaigns.length > 0 ? campaigns.reduce((s, c) => s + c.donors, 0) : 15800;
   const totalPrograms = campaigns.length > 0 ? campaigns.length : 420;
-
   const featured = campaigns.slice(0, 3);
 
   return (
-    <div className="animate-fade-in bg-surface dark:bg-slate-900 text-on-surface dark:text-slate-100 font-body pb-20 transition-colors duration-300">
+    <div className="bg-surface dark:bg-slate-900 text-on-surface dark:text-slate-100 font-body transition-colors duration-300">
       
-      {/* Hero Section */}
-      <section className="relative overflow-hidden px-8 py-20 md:py-32 max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="z-10">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-secondary-container dark:bg-emerald-900/30 text-on-secondary-container dark:text-emerald-400 text-xs font-bold tracking-widest uppercase mb-6 border border-emerald-500/20">
-              #BerbagiItuIndah
-            </span>
-            <h1 className="font-headline text-5xl md:text-6xl font-extrabold text-on-surface dark:text-slate-50 leading-tight mb-8 tracking-tight">
-              Berbagi Kebaikan Lewat <br className="hidden lg:block"/><span className="text-primary dark:text-emerald-400 italic">Infaq & Wakaf</span> Digital
-            </h1>
-            <p className="text-lg text-on-surface-variant dark:text-slate-300 mb-10 max-w-lg leading-relaxed">
-              Platform amanah untuk menyalurkan kepedulian Anda. Ubah masa depan mereka dengan kontribusi nyata yang berkelanjutan.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link to="/explore" className="hero-gradient text-white px-8 py-4 rounded-xl font-bold text-lg ambient-shadow transition-transform hover:scale-[1.02] text-center dark:shadow-emerald-900/20">
-                Mulai Berdonasi
-              </Link>
-              <button onClick={() => setIsImpactOpen(true)} className="flex items-center justify-center gap-2 border-2 border-outline-variant/30 dark:border-slate-700 text-primary dark:text-emerald-400 px-8 py-4 rounded-xl font-bold text-lg hover:bg-surface-container dark:hover:bg-slate-800 transition-colors">
-                <span className="material-symbols-outlined text-[24px]">play_circle</span>
-                Lihat Dampak
-              </button>
-            </div>
-          </div>
-          <div className="relative">
-            <div className="aspect-[4/5] rounded-[2.5rem] overflow-hidden ambient-shadow rotate-3 scale-95 md:scale-100">
-              <img 
-                alt="Donasi InfaqLy" 
-                loading="eager"
-                fetchpriority="high"
-                decoding="async"
-                width="400"
-                height="500"
-                className="w-full h-full object-cover" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtvLNhQLwSvJ39x5VIL3RdjIq7aIRowq59uuy8WHLxJLbsuJYRQb-wnxUfKG4QpoHhYNp1hgH0UtFv9-coaYSyRKtyWkaLuWPWCjHM9dhtslpu8Z2wk_8tH30MyMs89oljB-QbX6YydPjoQ4rv_hW-xMW0QJwzwaRrTgqTAurVy2pWuNmHX6Sumk9OWOlN5oRlehvw9XQZkIxq5pF0L36j_RXkloIbGT5T3joE9knYsdg0fOgz-hMkkpULym054L3WtPu9j4RPPa0=s400"
-              />
-            </div>
-            <div className="absolute -bottom-8 -left-8 bg-surface-container-lowest dark:bg-slate-800 p-6 rounded-2xl shadow-2xl max-w-xs border border-white/50 dark:border-slate-700 backdrop-blur-sm hidden sm:block">
-              <div className="flex items-center gap-4 mb-3">
-                <div className="w-12 h-12 rounded-full bg-primary-container dark:bg-emerald-500/20 flex items-center justify-center text-on-primary dark:text-emerald-400">
-                  <span className="material-symbols-outlined">verified</span>
+      {/* ═══════════════════════════════════════════════
+          HERO SECTION — Immersive Premium
+         ═══════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden min-h-[90vh] flex items-center">
+        {/* Animated gradient backdrop */}
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-950 via-slate-900 to-emerald-900 dark:from-slate-950 dark:via-emerald-950 dark:to-slate-900">
+          {/* Floating orbs */}
+          <div className="absolute top-[10%] left-[5%] w-96 h-96 bg-emerald-500/20 rounded-full blur-[120px] animate-pulse"></div>
+          <div className="absolute bottom-[10%] right-[5%] w-80 h-80 bg-teal-400/15 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-[50%] left-[40%] w-64 h-64 bg-emerald-300/10 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '4s' }}></div>
+          {/* Grid pattern overlay */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)', backgroundSize: '60px 60px' }}></div>
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 py-20 md:py-28 w-full">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <div className="animate-fade-in">
+              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-emerald-300 text-xs font-bold tracking-widest uppercase mb-8">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                #BerbagiItuIndah
+              </div>
+              <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.1] mb-8 tracking-tight">
+                Berbagi Kebaikan
+                <br />
+                <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">Lewat Digital</span>
+              </h1>
+              <p className="text-lg md:text-xl text-slate-300 mb-10 max-w-lg leading-relaxed">
+                Platform amanah untuk menyalurkan infaq & wakaf Anda. Ubah masa depan mereka dengan kontribusi nyata yang transparan dan terukur.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link to="/explore" className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-lg rounded-2xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 transition-all hover:-translate-y-0.5 overflow-hidden">
+                  <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  <span className="relative">Mulai Berdonasi</span>
+                  <span className="material-symbols-outlined text-[20px] relative group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </Link>
+                <button onClick={() => setIsImpactOpen(true)} className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold text-lg rounded-2xl hover:bg-white/20 transition-all">
+                  <span className="material-symbols-outlined text-[22px] text-emerald-400">play_circle</span>
+                  Lihat Dampak
+                </button>
+              </div>
+
+              {/* Trust Row */}
+              <div className="flex items-center gap-6 mt-12 pt-8 border-t border-white/10">
+                <div className="flex -space-x-3">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className={`w-10 h-10 rounded-full border-2 border-slate-900 ${['bg-emerald-400', 'bg-teal-400', 'bg-cyan-400', 'bg-emerald-300'][i]} flex items-center justify-center`}>
+                      <span className="text-[10px] font-bold text-slate-900">{'😊🤲💚✨'[i]}</span>
+                    </div>
+                  ))}
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-on-surface-variant dark:text-slate-400">Donasi Terverifikasi</p>
-                  <p className="text-sm font-bold text-on-surface dark:text-slate-200">99.9% Transparansi</p>
+                  <p className="text-sm font-bold text-white">15,000+ Donatur</p>
+                  <p className="text-xs text-slate-400">Sudah menyalurkan kebaikan</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Hero Visual */}
+            <div className="relative hidden lg:block animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              <div className="relative">
+                {/* Main Card */}
+                <div className="relative rounded-[2rem] overflow-hidden shadow-2xl shadow-black/40 border border-white/10">
+                  <img 
+                    alt="Donasi InfaqLy" 
+                    loading="eager"
+                    fetchpriority="high"
+                    decoding="async"
+                    width="500"
+                    height="600"
+                    className="w-full aspect-[4/5] object-cover" 
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtvLNhQLwSvJ39x5VIL3RdjIq7aIRowq59uuy8WHLxJLbsuJYRQb-wnxUfKG4QpoHhYNp1hgH0UtFv9-coaYSyRKtyWkaLuWPWCjHM9dhtslpu8Z2wk_8tH30MyMs89oljB-QbX6YydPjoQ4rv_hW-xMW0QJwzwaRrTgqTAurVy2pWuNmHX6Sumk9OWOlN5oRlehvw9XQZkIxq5pF0L36j_RXkloIbGT5T3joE9knYsdg0fOgz-hMkkpULym054L3WtPu9j4RPPa0=s600"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/80 via-transparent to-transparent"></div>
+                </div>
+                {/* Floating Card: Verified */}
+                <div className="absolute -bottom-6 -left-6 bg-white/10 backdrop-blur-xl px-6 py-4 rounded-2xl border border-white/20 shadow-2xl animate-slide-up" style={{ animationDelay: '0.6s' }}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-emerald-400 text-[22px]">verified</span>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-400 font-medium">Donasi Terverifikasi</p>
+                      <p className="text-sm font-bold text-white">99.9% Transparansi</p>
+                    </div>
+                  </div>
+                </div>
+                {/* Floating Card: Live */}
+                <div className="absolute -top-4 -right-4 bg-white/10 backdrop-blur-xl px-5 py-3 rounded-2xl border border-white/20 shadow-2xl animate-slide-down" style={{ animationDelay: '0.8s' }}>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span className="text-sm font-bold text-white">Live</span>
+                    <span className="text-xs text-slate-400">Real-time</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -101,144 +169,162 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Impact Stats (Bento Grid) */}
-      <section className="bg-surface-container-low dark:bg-slate-900/50 py-20">
-        <div className="max-w-7xl mx-auto px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-surface-container-lowest dark:bg-slate-800 p-8 rounded-3xl ambient-shadow border border-white/40 dark:border-slate-700 flex flex-col items-center text-center">
-              <span className="material-symbols-outlined text-primary dark:text-emerald-400 text-4xl mb-4">account_balance_wallet</span>
-              <h3 className="text-4xl font-headline font-bold text-on-surface dark:text-slate-100 mb-2">{formatCurrencyShort(totalCollected)}+</h3>
-              <p className="text-on-surface-variant dark:text-slate-400 text-sm font-medium">Total Terkumpul</p>
-            </div>
-            <div className="bg-surface-container-lowest dark:bg-slate-800 p-8 rounded-3xl ambient-shadow border border-white/40 dark:border-slate-700 flex flex-col items-center text-center">
-              <span className="material-symbols-outlined text-primary dark:text-emerald-400 text-4xl mb-4">group</span>
-              <h3 className="text-4xl font-headline font-bold text-on-surface dark:text-slate-100 mb-2">{totalDonors >= 1000 ? (totalDonors/1000).toFixed(1) + 'K' : totalDonors}</h3>
-              <p className="text-on-surface-variant dark:text-slate-400 text-sm font-medium">Total Donatur</p>
-            </div>
-            <div className="bg-surface-container-lowest dark:bg-slate-800 p-8 rounded-3xl ambient-shadow border border-white/40 dark:border-slate-700 flex flex-col items-center text-center">
-              <span className="material-symbols-outlined text-primary dark:text-emerald-400 text-4xl mb-4">volunteer_activism</span>
-              <h3 className="text-4xl font-headline font-bold text-on-surface dark:text-slate-100 mb-2">{totalPrograms}+</h3>
-              <p className="text-on-surface-variant dark:text-slate-400 text-sm font-medium">Program Aktif</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ═══════════════════════════════════════════════
+          IMPACT STATS — Animated Counters
+         ═══════════════════════════════════════════════ */}
+      <ImpactStats totalCollected={totalCollected} totalDonors={totalDonors} totalPrograms={totalPrograms} />
 
-      {/* Program Unggulan Section */}
-      <section className="py-24 px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
-          <div className="max-w-xl">
-            <h2 className="font-headline text-4xl font-bold mb-4 dark:text-white">Program Unggulan</h2>
-            <p className="text-on-surface-variant dark:text-slate-300 text-lg">Pilih program yang paling sesuai dengan kepedulian Anda dan mulailah menebar manfaat hari ini.</p>
+      {/* ═══════════════════════════════════════════════
+          MENGAPA INFAQLY — Trust Section
+         ═══════════════════════════════════════════════ */}
+      <section className="py-24 px-6 sm:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold tracking-widest uppercase mb-4 border border-emerald-500/20">Kenapa Kami?</span>
+            <h2 className="font-headline text-3xl md:text-5xl font-bold mb-4 dark:text-white">Mengapa Memilih <span className="text-primary dark:text-emerald-400">infaqLy</span>?</h2>
+            <p className="text-on-surface-variant dark:text-slate-400 text-lg max-w-2xl mx-auto">Platform kami dirancang dengan prinsip keamanan, transparansi, dan kemudahan untuk memberikan pengalaman berdonasi terbaik.</p>
           </div>
-          <Link to="/explore" className="flex items-center gap-2 text-primary dark:text-emerald-400 font-bold hover:gap-3 transition-[gap]">
-            Lihat Semua <span className="material-symbols-outlined">arrow_forward</span>
-          </Link>
-        </div>
-        
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-surface-container-lowest dark:bg-slate-800 rounded-[2rem] overflow-hidden ambient-shadow h-[450px] animate-pulse">
-                <div className="h-64 bg-slate-200 dark:bg-slate-700 w-full mb-6"></div>
-                <div className="px-8 flex flex-col gap-4">
-                  <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded-full w-3/4"></div>
-                  <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full w-full"></div>
-                  <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full w-5/6"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: 'shield', title: 'Aman & Terpercaya', desc: 'Dilindungi enkripsi end-to-end dan sistem keamanan berlapis.', color: 'emerald' },
+              { icon: 'speed', title: 'Proses Instan', desc: 'Donasi tersalurkan secara real-time tanpa perlu menunggu lama.', color: 'teal' },
+              { icon: 'visibility', title: '100% Transparan', desc: 'Pantau penggunaan dana secara real-time dari dashboard Anda.', color: 'cyan' },
+              { icon: 'devices', title: 'Multi-Platform', desc: 'Akses dari mana saja — desktop, tablet, atau smartphone.', color: 'emerald' },
+            ].map((item, i) => (
+              <div key={i} className="group bg-white dark:bg-slate-800/60 backdrop-blur-sm p-8 rounded-3xl border border-slate-100 dark:border-slate-700/60 hover:border-emerald-200 dark:hover:border-emerald-500/30 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/5">
+                <div className={`w-14 h-14 rounded-2xl bg-${item.color}-500/10 dark:bg-${item.color}-500/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                  <span className={`material-symbols-outlined text-${item.color}-600 dark:text-${item.color}-400 text-[28px]`}>{item.icon}</span>
                 </div>
+                <h3 className="font-headline text-lg font-bold mb-3 dark:text-white">{item.title}</h3>
+                <p className="text-sm text-on-surface-variant dark:text-slate-400 leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
-        ) : featured.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {featured.map((campaign, idx) => (
-              <CampaignCardHome key={campaign.id} campaign={campaign} idx={idx} />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 opacity-50">
-            <div className="text-center py-12 text-on-surface-variant col-span-3">
-              <p>Belum ada program aktif saat ini</p>
-            </div>
-          </div>
-        )}
+        </div>
       </section>
 
-      {/* Cara Berdonasi Section */}
-      <section id="cara-donasi" className="bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 border-b py-24 transition-colors">
-        <div className="max-w-7xl mx-auto px-8">
+      {/* ═══════════════════════════════════════════════
+          PROGRAM UNGGULAN — Featured Campaigns
+         ═══════════════════════════════════════════════ */}
+      <section className="py-24 px-6 sm:px-8 bg-slate-50 dark:bg-slate-900/50 border-y border-slate-100 dark:border-slate-800">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
+            <div className="max-w-xl">
+              <span className="inline-block px-4 py-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold tracking-widest uppercase mb-4 border border-emerald-500/20">Program Pilihan</span>
+              <h2 className="font-headline text-3xl md:text-5xl font-bold mb-4 dark:text-white">Program Unggulan</h2>
+              <p className="text-on-surface-variant dark:text-slate-300 text-lg">Pilih program yang paling sesuai dengan kepedulian Anda dan mulailah menebar manfaat hari ini.</p>
+            </div>
+            <Link to="/explore" className="group flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-lg hover:gap-3 transition-all">
+              Lihat Semua <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            </Link>
+          </div>
+          
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="bg-white dark:bg-slate-800 rounded-3xl overflow-hidden shadow-lg h-[460px] animate-pulse">
+                  <div className="h-56 bg-slate-200 dark:bg-slate-700 w-full"></div>
+                  <div className="p-8 flex flex-col gap-4">
+                    <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded-full w-3/4"></div>
+                    <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full w-full"></div>
+                    <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded-full w-2/3"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : featured.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featured.map((campaign, idx) => (
+                <CampaignCardHome key={campaign.id} campaign={campaign} idx={idx} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20 text-on-surface-variant">
+              <span className="material-symbols-outlined text-6xl mb-4 text-slate-300 dark:text-slate-600">campaign</span>
+              <p className="text-lg">Belum ada program aktif saat ini</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════
+          CARA BERDONASI — Steps
+         ═══════════════════════════════════════════════ */}
+      <section id="cara-donasi" className="py-24 px-6 sm:px-8 transition-colors">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="font-headline text-4xl font-bold mb-4 text-on-surface dark:text-white">Cara Mudah Berdonasi</h2>
-            <p className="text-on-surface-variant dark:text-slate-400 text-lg max-w-2xl mx-auto">Hanya butuh beberapa menit untuk mulai memberikan dampak bagi sesama.</p>
+            <span className="inline-block px-4 py-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold tracking-widest uppercase mb-4 border border-emerald-500/20">Panduan</span>
+            <h2 className="font-headline text-3xl md:text-5xl font-bold mb-4 text-on-surface dark:text-white">Cara Mudah Berdonasi</h2>
+            <p className="text-on-surface-variant dark:text-slate-400 text-lg max-w-2xl mx-auto">Hanya butuh beberapa langkah untuk memberikan dampak bagi sesama.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-            <div className="relative group text-center">
-              <div className="w-20 h-20 bg-surface-container dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6 text-primary dark:text-emerald-400 transition-colors group-hover:bg-primary dark:group-hover:bg-emerald-500 group-hover:text-white ambient-shadow border border-slate-100 dark:border-slate-700">
-                <span className="material-symbols-outlined text-4xl">search</span>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {[
+              { icon: 'search', title: 'Pilih Program', desc: 'Cari program yang ingin Anda bantu melalui halaman jelajahi.', num: '01' },
+              { icon: 'credit_score', title: 'Pilih Nominal', desc: 'Masukkan jumlah donasi sesuai dengan kemampuan Anda.', num: '02' },
+              { icon: 'payments', title: 'Bayar Donasi', desc: 'Gunakan berbagai metode pembayaran digital yang tersedia.', num: '03' },
+              { icon: 'receipt_long', title: 'Terima Laporan', desc: 'Dapatkan update berkala mengenai penggunaan dana donasi.', num: '04' },
+            ].map((step, i) => (
+              <div key={i} className="relative group text-center">
+                <div className="relative mb-8">
+                  <span className="absolute -top-3 -left-3 text-[4rem] font-headline font-black text-emerald-500/10 dark:text-emerald-400/10 leading-none select-none">{step.num}</span>
+                  <div className="w-20 h-20 bg-white dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400 shadow-lg shadow-emerald-500/5 border border-slate-100 dark:border-slate-700 transition-all group-hover:bg-emerald-500 dark:group-hover:bg-emerald-500 group-hover:text-white group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-emerald-500/20">
+                    <span className="material-symbols-outlined text-[32px]">{step.icon}</span>
+                  </div>
+                </div>
+                <h4 className="font-bold text-lg mb-2 dark:text-white">{step.title}</h4>
+                <p className="text-sm text-on-surface-variant dark:text-slate-400 leading-relaxed max-w-[200px] mx-auto">{step.desc}</p>
+                {i < 3 && (
+                  <div className="hidden md:block absolute top-10 -right-4 text-slate-300 dark:text-slate-700">
+                    <span className="material-symbols-outlined text-[28px]">chevron_right</span>
+                  </div>
+                )}
               </div>
-              <h4 className="font-bold text-lg mb-2 dark:text-white">Pilih Program</h4>
-              <p className="text-sm text-on-surface-variant dark:text-slate-400 leading-relaxed">Cari program yang ingin Anda bantu melalui halaman jelajahi.</p>
-              <div className="hidden md:block absolute top-10 -right-6 text-slate-200 dark:text-slate-700">
-                <span className="material-symbols-outlined">trending_flat</span>
-              </div>
-            </div>
-            <div className="relative group text-center">
-              <div className="w-20 h-20 bg-surface-container dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6 text-primary dark:text-emerald-400 transition-colors group-hover:bg-primary dark:group-hover:bg-emerald-500 group-hover:text-white ambient-shadow border border-slate-100 dark:border-slate-700">
-                <span className="material-symbols-outlined text-4xl">credit_score</span>
-              </div>
-              <h4 className="font-bold text-lg mb-2 dark:text-white">Pilih Nominal</h4>
-              <p className="text-sm text-on-surface-variant dark:text-slate-400 leading-relaxed">Masukkan jumlah donasi sesuai dengan keinginan dan kemampuan.</p>
-              <div className="hidden md:block absolute top-10 -right-6 text-slate-200 dark:text-slate-700">
-                <span className="material-symbols-outlined">trending_flat</span>
-              </div>
-            </div>
-            <div className="relative group text-center">
-              <div className="w-20 h-20 bg-surface-container dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6 text-primary dark:text-emerald-400 transition-colors group-hover:bg-primary dark:group-hover:bg-emerald-500 group-hover:text-white ambient-shadow border border-slate-100 dark:border-slate-700">
-                <span className="material-symbols-outlined text-4xl">payments</span>
-              </div>
-              <h4 className="font-bold text-lg mb-2 dark:text-white">Bayar Donasi</h4>
-              <p className="text-sm text-on-surface-variant dark:text-slate-400 leading-relaxed">Gunakan berbagai metode pembayaran digital yang tersedia.</p>
-              <div className="hidden md:block absolute top-10 -right-6 text-slate-200 dark:text-slate-700">
-                <span className="material-symbols-outlined">trending_flat</span>
-              </div>
-            </div>
-            <div className="group text-center">
-              <div className="w-20 h-20 bg-surface-container dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6 text-primary dark:text-emerald-400 transition-colors group-hover:bg-primary dark:group-hover:bg-emerald-500 group-hover:text-white ambient-shadow border border-slate-100 dark:border-slate-700">
-                <span className="material-symbols-outlined text-4xl">receipt_long</span>
-              </div>
-              <h4 className="font-bold text-lg mb-2 dark:text-white">Terima Laporan</h4>
-              <p className="text-sm text-on-surface-variant dark:text-slate-400 leading-relaxed">Dapatkan update berkala mengenai penggunaan dana donasi Anda.</p>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════
+          CTA SECTION — Premium Gradient
+         ═══════════════════════════════════════════════ */}
+      <section className="max-w-7xl mx-auto px-6 sm:px-8 mb-12 pb-10">
+        <div className="relative rounded-[2.5rem] overflow-hidden">
+          {/* Bg gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-700"></div>
+          {/* Decorative elements */}
+          <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full -mr-40 -mt-40 blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-400/20 rounded-full -ml-48 -mb-48 blur-3xl"></div>
+          <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,.8) 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+          
+          <div className="relative z-10 p-12 md:p-20 lg:p-24 text-center">
+            <h2 className="font-headline text-3xl md:text-5xl font-bold mb-6 max-w-3xl mx-auto text-white leading-tight">Wujudkan Dampak Nyata Hari Ini</h2>
+            <p className="text-lg text-white/80 mb-12 max-w-xl mx-auto leading-relaxed">Bergabunglah dengan ribuan donatur lainnya dalam menebar kebaikan yang terukur dan transparan.</p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              {!isAuthenticated ? (
+                <Link to="/register" className="group bg-white text-emerald-700 px-10 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-black/10 hover:shadow-2xl hover:-translate-y-0.5 transition-all inline-flex items-center justify-center gap-2">
+                  Daftar Sekarang <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </Link>
+              ) : (
+                <Link to="/profile" className="group bg-white text-emerald-700 px-10 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-black/10 hover:shadow-2xl hover:-translate-y-0.5 transition-all inline-flex items-center justify-center gap-2">
+                  Dashboard Anda <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </Link>
+              )}
+              <Link to="/explore" className="bg-white/15 backdrop-blur-md border border-white/25 text-white px-10 py-4 rounded-2xl font-bold text-lg hover:bg-white/25 transition-all inline-flex items-center justify-center gap-2">
+                <span className="material-symbols-outlined text-[20px]">explore</span> Jelajahi Program
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Newsletter / CTA */}
-      <section className="max-w-7xl mx-auto px-8 mb-8 pb-10">
-        <div className="hero-gradient rounded-[3rem] p-12 md:p-24 text-center text-on-primary relative overflow-hidden ambient-shadow">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full -ml-32 -mb-32 blur-3xl"></div>
-          <h2 className="font-headline text-3xl md:text-5xl font-bold mb-6 max-w-3xl mx-auto relative z-10">Wujudkan Dampak Nyata Hari Ini</h2>
-          <p className="text-lg text-white/80 mb-10 max-w-xl mx-auto relative z-10">Bergabunglah dengan ribuan donatur lainnya dalam menebar kebaikan yang terukur dan transparan.</p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
-            {!isAuthenticated ? (
-              <Link to="/register" className="bg-white text-primary px-10 py-4 rounded-xl font-bold text-lg shadow-xl hover:bg-surface transition-colors inline-block text-center">Daftar Sekarang</Link>
-            ) : (
-              <Link to="/profile" className="bg-white text-primary px-10 py-4 rounded-xl font-bold text-lg shadow-xl hover:bg-surface transition-colors inline-block text-center">Dashboard Anda</Link>
-            )}
-            <Link to="/explore" className="bg-primary-container/20 border border-white/30 backdrop-blur-sm text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-white/20 transition-colors inline-block text-center">Mulai Berdonasi</Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Dampak Modal */}
+      {/* Impact Modal */}
       {isImpactOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-surface dark:bg-slate-800 w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden animate-scale-in relative">
-            <button onClick={() => setIsImpactOpen(false)} className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/20 hover:bg-black/40 text-white rounded-full flex items-center justify-center transition-colors">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md animate-fade-in" onClick={() => setIsImpactOpen(false)}>
+          <div className="bg-white dark:bg-slate-800 w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden animate-scale-in relative" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setIsImpactOpen(false)} className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center transition-colors">
               <span className="material-symbols-outlined">close</span>
             </button>
-            <div className="aspect-video w-full bg-slate-200">
+            <div className="aspect-video w-full bg-slate-200 dark:bg-slate-700">
               <iframe 
                 width="100%" 
                 height="100%" 
@@ -251,88 +337,121 @@ export default function HomePage() {
             </div>
             <div className="p-8">
               <h3 className="text-2xl font-bold text-on-surface dark:text-white mb-2">Dampak Nyata Kebaikan Anda</h3>
-              <p className="text-on-surface-variant dark:text-slate-400 mb-6 leading-relaxed">Ribuan senyum telah tercipta berkat gotong royong dan uluran tangan dari para donatur InfaqLy. Bersama-sama, kita membangun masa depan yang lebih cerah untuk mereka yang membutuhkan.</p>
-              
-              <div className="grid grid-cols-3 gap-4 border-t border-outline-variant/20 dark:border-slate-700 pt-6">
+              <p className="text-on-surface-variant dark:text-slate-400 mb-6 leading-relaxed">Ribuan senyum telah tercipta berkat gotong royong dan uluran tangan dari para donatur InfaqLy.</p>
+              <div className="grid grid-cols-3 gap-4 border-t border-slate-100 dark:border-slate-700 pt-6">
                 <div className="text-center">
-                  <p className="text-3xl font-black text-primary dark:text-emerald-400 mb-1">15K+</p>
-                  <p className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wide">Penerima Manfaat</p>
+                  <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-1">15K+</p>
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Penerima</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-3xl font-black text-secondary dark:text-teal-400 mb-1">420</p>
-                  <p className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wide">Program Selesai</p>
+                  <p className="text-3xl font-black text-teal-600 dark:text-teal-400 mb-1">420</p>
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Program</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-3xl font-black text-primary dark:text-emerald-400 mb-1">100%</p>
-                  <p className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wide">Tersalurkan</p>
+                  <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-1">100%</p>
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Tersalurkan</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }
 
+// ═══ Impact Stats Component with Animated Counters ═══
+function ImpactStats({ totalCollected, totalDonors, totalPrograms }) {
+  const collected = useCountUp(Math.round(totalCollected / 1_000_000_000), 2500);
+  const donors = useCountUp(totalDonors >= 1000 ? Math.round(totalDonors / 1000) : totalDonors, 2000);
+  const programs = useCountUp(totalPrograms, 1800);
+
+  return (
+    <section className="py-20 px-6 sm:px-8 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-slate-800">
+      <div className="max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+          <div ref={collected.ref} className="text-center group">
+            <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span className="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[32px]">account_balance_wallet</span>
+            </div>
+            <h3 className="text-5xl md:text-6xl font-headline font-black text-on-surface dark:text-white mb-2">{collected.count}<span className="text-emerald-500">M+</span></h3>
+            <p className="text-on-surface-variant dark:text-slate-400 font-semibold">Total Terkumpul</p>
+          </div>
+          <div ref={donors.ref} className="text-center group">
+            <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span className="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[32px]">group</span>
+            </div>
+            <h3 className="text-5xl md:text-6xl font-headline font-black text-on-surface dark:text-white mb-2">{donors.count}<span className="text-emerald-500">{totalDonors >= 1000 ? 'K+' : '+'}</span></h3>
+            <p className="text-on-surface-variant dark:text-slate-400 font-semibold">Total Donatur</p>
+          </div>
+          <div ref={programs.ref} className="text-center group">
+            <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span className="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[32px]">volunteer_activism</span>
+            </div>
+            <h3 className="text-5xl md:text-6xl font-headline font-black text-on-surface dark:text-white mb-2">{programs.count}<span className="text-emerald-500">+</span></h3>
+            <p className="text-on-surface-variant dark:text-slate-400 font-semibold">Program Aktif</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ═══ Campaign Card Component ═══
 function CampaignCardHome({ campaign, idx }) {
   const progress = campaign.target > 0 ? Math.round((campaign.collected / campaign.target) * 100) : 0;
   const days = daysRemaining(campaign.endDate);
   const categoryLabel = campaign.category === 'infaq' ? 'Infaq' : campaign.category === 'wakaf' ? 'Wakaf' : campaign.category;
   
-  // Rotating colors for cards based on index
-  const tagColorClass = idx % 3 === 0 
-    ? 'bg-primary-container dark:bg-emerald-900/40 text-on-primary-container dark:text-emerald-400 border border-emerald-500/20' 
-    : idx % 3 === 1 
-    ? 'bg-secondary-container dark:bg-blue-900/40 text-on-secondary-container dark:text-blue-400 border border-blue-500/20' 
-    : 'bg-tertiary-container dark:bg-purple-900/40 text-on-tertiary-container dark:text-purple-400 border border-purple-500/20';
+  const tagColors = [
+    'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20',
+    'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20',
+    'bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20',
+  ];
+  const tagColorClass = tagColors[idx % 3];
 
   return (
-    <Link to={`/explore/${campaign.id}`} className="group bg-surface-container-lowest dark:bg-slate-800 rounded-[2rem] overflow-hidden ambient-shadow border border-slate-100 dark:border-slate-700 transition-all hover:-translate-y-2 block">
-      <div className="relative h-64 overflow-hidden">
+    <Link to={`/explore/${campaign.id}`} className="group bg-white dark:bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden shadow-lg shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700/60 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all block">
+      <div className="relative h-56 overflow-hidden">
         <img 
           src={optimizeImageUrl(campaign.imageUrl || campaign.image, 400) || 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=400&h=250&fit=crop&fm=webp&q=75'} 
           alt={campaign.title} 
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
         />
-        <div className={`absolute top-4 left-4 ${tagColorClass} text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest backdrop-blur-md`}>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+        <div className={`absolute top-4 left-4 ${tagColorClass} text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest backdrop-blur-md border bg-white/80 dark:bg-slate-900/80`}>
           {categoryLabel}
         </div>
       </div>
-      <div className="p-8">
-        <h3 className="font-headline text-xl font-bold mb-4 line-clamp-2 text-on-surface dark:text-white h-14">{campaign.title}</h3>
-        <div className="mb-6">
-          <div className="flex justify-between text-xs font-bold mb-2">
-            <span className="text-primary dark:text-emerald-400">{formatCurrency(campaign.collected)}</span>
-            <span className="text-on-surface-variant dark:text-slate-400">Target: {formatCurrencyShort(campaign.target)}</span>
+      <div className="p-7">
+        <h3 className="font-headline text-lg font-bold mb-4 line-clamp-2 text-on-surface dark:text-white h-14 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">{campaign.title}</h3>
+        <div className="mb-5">
+          <div className="flex justify-between text-xs font-bold mb-2.5">
+            <span className="text-emerald-600 dark:text-emerald-400">{formatCurrency(campaign.collected)}</span>
+            <span className="text-slate-500 dark:text-slate-400">Target: {formatCurrencyShort(campaign.target)}</span>
           </div>
-          <div className="w-full h-2 bg-surface-container-highest dark:bg-slate-700 rounded-full overflow-hidden">
-            <div className="bg-primary-container dark:bg-emerald-500 h-full rounded-full transition-all duration-1000" style={{ width: `${Math.min(progress, 100)}%` }}></div>
+          <div className="w-full h-2.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+            <div className="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-1000" style={{ width: `${Math.min(progress, 100)}%` }}></div>
           </div>
         </div>
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex -space-x-3">
-            <div className="w-8 h-8 rounded-full border-2 border-white dark:border-slate-800 bg-slate-200 dark:bg-slate-700"></div>
-            <div className="w-8 h-8 rounded-full border-2 border-white dark:border-slate-800 bg-slate-300 dark:bg-slate-600"></div>
-            <div className="w-8 h-8 rounded-full border-2 border-white dark:border-slate-800 bg-slate-400 dark:bg-slate-500"></div>
-            <div className="w-8 h-8 rounded-full border-2 border-white dark:border-slate-800 bg-primary-container dark:bg-emerald-900/80 text-[10px] flex items-center justify-center font-bold text-on-primary dark:text-emerald-400">
-              +{campaign.donors > 99 ? '99' : campaign.donors}
-            </div>
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[16px] text-slate-400">group</span>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{campaign.donors} donatur</span>
           </div>
           {progress >= 100 ? (
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold">Tercapai!</span>
+            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">check_circle</span> Tercapai!</span>
           ) : days <= 0 ? (
             <span className="text-xs text-red-500 dark:text-red-400 font-bold">Ditutup</span>
           ) : (
-            <span className="text-xs font-medium text-on-surface-variant dark:text-slate-400">{days} Hari Lagi</span>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{days} Hari Lagi</span>
           )}
         </div>
-        <button className="w-full py-3 bg-surface-container dark:bg-emerald-500/10 text-primary dark:text-emerald-400 font-bold rounded-xl transition-colors group-hover:bg-primary dark:group-hover:bg-emerald-500 group-hover:text-white dark:group-hover:text-white block text-center border border-transparent dark:border-emerald-500/20">
+        <div className="w-full py-3 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold rounded-2xl transition-all group-hover:bg-emerald-500 group-hover:text-white dark:group-hover:bg-emerald-500 dark:group-hover:text-white text-center text-sm border border-emerald-100 dark:border-emerald-500/20 group-hover:border-transparent group-hover:shadow-lg group-hover:shadow-emerald-500/20">
           Donasi Sekarang
-        </button>
+        </div>
       </div>
     </Link>
   );
