@@ -155,12 +155,16 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                {/* Floating Card: Live */}
-                <div className="absolute -top-4 -right-4 bg-white/10 backdrop-blur-xl px-5 py-3 rounded-2xl border border-white/20 shadow-2xl animate-slide-down" style={{ animationDelay: '0.8s' }}>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span className="text-sm font-bold text-white">Live</span>
-                    <span className="text-xs text-slate-400">Real-time</span>
+                {/* Floating Card: Info Amanah */}
+                <div className="absolute -top-4 -right-4 bg-white/10 backdrop-blur-xl px-5 py-4 rounded-2xl border border-white/20 shadow-2xl animate-slide-down" style={{ animationDelay: '0.8s' }}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-teal-500/20 flex items-center justify-center border border-teal-500/30">
+                      <span className="material-symbols-outlined text-teal-400 text-[20px]">volunteer_activism</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-white leading-tight">Tanpa Potongan</p>
+                      <p className="text-[11px] text-slate-300 font-medium tracking-wide mt-0.5">100% AMANAH DISALURKAN</p>
+                    </div>
                   </div>
                 </div>
               </div>
