@@ -6,7 +6,7 @@ import App from './App.jsx'
 
 // ═══ Sentry — Error & Performance Monitoring ═══
 Sentry.init({
-  dsn: "https://examplePublicKey@o0.ingest.sentry.io/0", // TODO: Replace with your real Sentry DSN
+  dsn: "https://5840600aa1863e1f3ecb0400ef747e2d@o4511263254904833.ingest.us.sentry.io/4511263260803072",
   integrations: [
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration({ maskAllText: false, blockAllMedia: false }),
