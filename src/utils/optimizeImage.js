@@ -5,20 +5,27 @@
  * - Other: returns as-is
  */
 export function optimizeImageUrl(url, width = 400) {
-  if (!url) return url;
+  if (!url || typeof url !== 'string') return url;
   
   // Unsplash images: request WebP format with quality reduction
   if (url.includes('images.unsplash.com')) {
-    const separator = url.includes('?') ? '&' : '?';
-    // Remove existing fm= and q= params if any, then add optimized ones
-    let cleanUrl = url.replace(/[&?]fm=[^&]*/g, '').replace(/[&?]q=[^&]*/g, '');
+    // Safely escape special regex characters in the URL before manipulating
+    let cleanUrl = url.replace(/[&?]fm=[^&]*/g, '').replace(/[&?]q=[^&]*/g, '').replace(/[&?]w=[^&]*/g, '');
+    // Fix: remove dangling ? or & at the end after param removal
+    cleanUrl = cleanUrl.replace(/[?&]$/, '');
+    const separator = cleanUrl.includes('?') ? '&' : '?';
     return `${cleanUrl}${separator}fm=webp&q=75&w=${width}`;
   }
   
   // Google Photos/lh3: use resize parameter
   if (url.includes('lh3.googleusercontent.com')) {
-    // Replace any existing =s or =w params, or append
-    return url.replace(/=(?:s|w)\d+.*$/, `=s${width}`) || `${url}=s${width}`;
+    // Fix: use non-greedy regex to avoid consuming the entire URL after =s
+    // Only match =s or =w followed by digits, optionally followed by more params
+    if (/=(?:s|w)\d+/.test(url)) {
+      return url.replace(/=(?:s|w)\d+[^/]*$/, `=s${width}`);
+    }
+    // No existing resize param — append one
+    return `${url}=s${width}`;
   }
   
   return url;

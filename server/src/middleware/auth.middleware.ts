@@ -27,7 +27,8 @@ function extractToken(req: Request): string | null {
   // 1. Authorization header FIRST — frontend explicitly sets the right token
   const authHeader = req.headers.authorization;
   if (authHeader?.startsWith('Bearer ')) {
-    return authHeader.slice(7);
+    const token = authHeader.slice(7).trim();
+    if (token.length > 0) return token;
   }
 
   // 2. Cookies as fallback (for httpOnly cookie-based auth)

@@ -4,6 +4,17 @@ import { donations, campaigns, settings } from '../db/schema.js';
 import { eq, sql } from 'drizzle-orm';
 import crypto from 'crypto';
 
+// ═══ Per-Order Mutex Lock — prevents race condition on concurrent webhook + poll ═══
+const orderLocks = new Map<string, Promise<any>>();
+function withOrderLock<T>(orderId: string, fn: () => Promise<T>): Promise<T> {
+  const prev = orderLocks.get(orderId) || Promise.resolve();
+  const next = prev.then(fn, fn); // always run fn even if prev rejects
+  orderLocks.set(orderId, next);
+  // Cleanup after completion to avoid memory leak
+  next.finally(() => { if (orderLocks.get(orderId) === next) orderLocks.delete(orderId); });
+  return next;
+}
+
 /**
  * Get Midtrans config from database settings → env fallback.
  * Admin saves keys via /api/settings (persisted in DB).
@@ -136,6 +147,13 @@ export async function getClientConfig() {
  * Handle Midtrans Webhook Notification
  */
 export async function handleNotification(body: any) {
+  const orderId = body.order_id;
+
+  // Serialize concurrent calls for the same orderId to prevent double-counting
+  return withOrderLock(orderId, () => _handleNotificationUnsafe(body));
+}
+
+async function _handleNotificationUnsafe(body: any) {
   const orderId = body.order_id;
   const transactionStatus = body.transaction_status;
   const fraudStatus = body.fraud_status;

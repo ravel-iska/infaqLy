@@ -23,4 +23,5 @@ export async function getCurrentEnv(): Promise<'sandbox' | 'production'> {
 
 export function invalidateEnvCache() {
   cachedEnv = null;
+  cachedEnvAt = 0; // Fix: also reset timestamp to prevent stale TTL comparison
 }
