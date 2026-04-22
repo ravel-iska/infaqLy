@@ -80,4 +80,63 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// ═══ Sentry Webhook — Forward errors to WhatsApp ═══
+router.post('/sentry-webhook', async (req, res) => {
+  try {
+    const payload = req.body;
+    
+    // Parse Sentry webhook payload
+    const eventTitle = payload?.data?.event?.title || payload?.message || 'Unknown Error';
+    const eventUrl = payload?.data?.event?.web_url || payload?.url || '-';
+    const projectName = payload?.data?.event?.project || payload?.project_name || 'infaqLy';
+    const level = payload?.data?.event?.level || payload?.level || 'error';
+    const environment = payload?.data?.event?.environment || 'production';
+    const timestamp = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
+    
+    // Extract error location if available
+    const exception = payload?.data?.event?.exception?.values?.[0];
+    const errorType = exception?.type || 'Error';
+    const errorValue = exception?.value || eventTitle;
+    const stackFrame = exception?.stacktrace?.frames?.slice(-1)?.[0];
+    const errorFile = stackFrame?.filename || '-';
+    const errorLine = stackFrame?.lineno || '-';
+
+    // Format WhatsApp message
+    const waMessage = [
+      `🚨 *SENTRY ALERT — ${projectName.toUpperCase()}*`,
+      ``,
+      `⚠️ *Level:* ${level.toUpperCase()}`,
+      `🌐 *Environment:* ${environment}`,
+      `⏰ *Waktu:* ${timestamp}`,
+      ``,
+      `📛 *Error:* ${errorType}`,
+      `📝 *Detail:* ${errorValue.substring(0, 300)}`,
+      `📂 *File:* ${errorFile}:${errorLine}`,
+      ``,
+      `🔗 *Sentry Link:*`,
+      eventUrl,
+      ``,
+      `_Laporan otomatis dari Sentry × infaqLy Bot_`,
+    ].join('\n');
+
+    // Send to admin WhatsApp
+    let adminPhone = '';
+    const [row] = await db.select().from(settings).where(eq(settings.key, 'system_alert_phone')).limit(1);
+    adminPhone = row?.value || '';
+    if (!adminPhone) adminPhone = env.ADMIN_PHONE || '';
+
+    if (adminPhone) {
+      await sendWhatsApp(adminPhone, waMessage);
+      console.log(`[Sentry→WA] ✅ Alert sent to ${adminPhone}: ${errorType}`);
+    } else {
+      console.warn('[Sentry→WA] No admin phone configured');
+    }
+
+    res.status(200).json({ ok: true });
+  } catch (error) {
+    console.error('[Sentry→WA] Webhook error:', error);
+    res.status(200).json({ ok: true }); // Always return 200 to Sentry
+  }
+});
+
 export default router;
