@@ -19,7 +19,6 @@ function useCountUp(target, duration = 2000) {
         const step = (now) => {
           const elapsed = now - start;
           const progress = Math.min(elapsed / duration, 1);
-          // Ease-out cubic
           const eased = 1 - Math.pow(1 - progress, 3);
           setCount(Math.floor(eased * target));
           if (progress < 1) requestAnimationFrame(step);
@@ -32,6 +31,35 @@ function useCountUp(target, duration = 2000) {
   }, [target, duration]);
 
   return { count, ref };
+}
+
+// ═══ Reveal On Scroll Wrapper ═══
+function RevealOnScroll({ children, className = "", delay = 0, direction = 'up' }) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => setIsVisible(true), delay);
+        observer.unobserve(entry.target);
+      }
+    }, { threshold: 0.15 });
+    
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [delay]);
+
+  const dirClass = direction === 'up' ? 'translate-y-12' : direction === 'left' ? 'translate-x-12' : direction === 'right' ? '-translate-x-12' : 'scale-95';
+
+  return (
+    <div 
+      ref={ref} 
+      className={`transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0 translate-x-0 scale-100' : `opacity-0 ${dirClass}`} ${className}`}
+    >
+      {children}
+    </div>
+  );
 }
 
 export default function HomePage() {
@@ -181,13 +209,15 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════
           MENGAPA INFAQLY — Trust Section
          ═══════════════════════════════════════════════ */}
-      <section className="py-24 px-6 sm:px-8">
+      <section className="py-24 px-6 sm:px-8 overflow-hidden">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold tracking-widest uppercase mb-4 border border-emerald-500/20">Kenapa Kami?</span>
-            <h2 className="font-headline text-3xl md:text-5xl font-bold mb-4 dark:text-white">Mengapa Memilih <span className="text-primary dark:text-emerald-400">infaqLy</span>?</h2>
-            <p className="text-on-surface-variant dark:text-slate-400 text-lg max-w-2xl mx-auto">Platform kami dirancang dengan prinsip keamanan, transparansi, dan kemudahan untuk memberikan pengalaman berdonasi terbaik.</p>
-          </div>
+          <RevealOnScroll direction="up">
+            <div className="text-center mb-16">
+              <span className="inline-block px-4 py-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold tracking-widest uppercase mb-4 border border-emerald-500/20 hover:scale-105 transition-transform cursor-default">Kenapa Kami?</span>
+              <h2 className="font-headline text-3xl md:text-5xl font-bold mb-4 dark:text-white hover:text-emerald-500 transition-colors cursor-default">Mengapa Memilih <span className="text-primary dark:text-emerald-400">infaqLy</span>?</h2>
+              <p className="text-on-surface-variant dark:text-slate-400 text-lg max-w-2xl mx-auto">Platform kami dirancang dengan prinsip keamanan, transparansi, dan kemudahan untuk memberikan pengalaman berdonasi terbaik.</p>
+            </div>
+          </RevealOnScroll>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { icon: 'shield', title: 'Aman & Terpercaya', desc: 'Dilindungi enkripsi end-to-end dan sistem keamanan berlapis.', color: 'emerald' },
@@ -195,13 +225,16 @@ export default function HomePage() {
               { icon: 'visibility', title: '100% Transparan', desc: 'Pantau penggunaan dana secara real-time dari dashboard Anda.', color: 'cyan' },
               { icon: 'devices', title: 'Multi-Platform', desc: 'Akses dari mana saja — desktop, tablet, atau smartphone.', color: 'emerald' },
             ].map((item, i) => (
-              <div key={i} className="group bg-white dark:bg-slate-800/60 backdrop-blur-sm p-8 rounded-3xl border border-slate-100 dark:border-slate-700/60 hover:border-emerald-200 dark:hover:border-emerald-500/30 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/5">
-                <div className={`w-14 h-14 rounded-2xl bg-${item.color}-500/10 dark:bg-${item.color}-500/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                  <span className={`material-symbols-outlined text-${item.color}-600 dark:text-${item.color}-400 text-[28px]`}>{item.icon}</span>
+              <RevealOnScroll key={i} delay={i * 150} direction="up">
+                <div className="group bg-white dark:bg-slate-800/60 backdrop-blur-sm p-8 rounded-[2rem] border border-slate-100 dark:border-slate-700/60 hover:border-transparent transition-all hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20 relative overflow-hidden cursor-pointer h-full">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-500/0 to-emerald-500/0 group-hover:from-emerald-500/10 group-hover:to-transparent rounded-full blur-2xl -mr-16 -mt-16 transition-all duration-700"></div>
+                  <div className={`w-14 h-14 rounded-2xl bg-${item.color}-500/10 dark:bg-${item.color}-500/15 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 relative z-10`}>
+                    <span className={`material-symbols-outlined text-${item.color}-600 dark:text-${item.color}-400 text-[28px]`}>{item.icon}</span>
+                  </div>
+                  <h3 className="font-headline text-lg font-bold mb-3 dark:text-white relative z-10 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors">{item.title}</h3>
+                  <p className="text-sm text-on-surface-variant dark:text-slate-400 leading-relaxed relative z-10">{item.desc}</p>
                 </div>
-                <h3 className="font-headline text-lg font-bold mb-3 dark:text-white">{item.title}</h3>
-                <p className="text-sm text-on-surface-variant dark:text-slate-400 leading-relaxed">{item.desc}</p>
-              </div>
+              </RevealOnScroll>
             ))}
           </div>
         </div>
@@ -254,13 +287,15 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════
           CARA BERDONASI — Steps
          ═══════════════════════════════════════════════ */}
-      <section id="cara-donasi" className="py-24 px-6 sm:px-8 transition-colors">
+      <section id="cara-donasi" className="py-24 px-6 sm:px-8 transition-colors overflow-hidden">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold tracking-widest uppercase mb-4 border border-emerald-500/20">Panduan</span>
-            <h2 className="font-headline text-3xl md:text-5xl font-bold mb-4 text-on-surface dark:text-white">Cara Mudah Berdonasi</h2>
-            <p className="text-on-surface-variant dark:text-slate-400 text-lg max-w-2xl mx-auto">Hanya butuh beberapa langkah untuk memberikan dampak bagi sesama.</p>
-          </div>
+          <RevealOnScroll direction="scale">
+            <div className="text-center mb-20">
+              <span className="inline-block px-4 py-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold tracking-widest uppercase mb-4 border border-emerald-500/20 hover:scale-105 transition-transform cursor-default">Panduan</span>
+              <h2 className="font-headline text-3xl md:text-5xl font-bold mb-4 text-on-surface dark:text-white">Cara Mudah <span className="bg-gradient-to-r from-emerald-500 to-teal-400 bg-clip-text text-transparent">Berdonasi</span></h2>
+              <p className="text-on-surface-variant dark:text-slate-400 text-lg max-w-2xl mx-auto">Hanya butuh beberapa langkah untuk memberikan dampak bagi sesama.</p>
+            </div>
+          </RevealOnScroll>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {[
               { icon: 'search', title: 'Pilih Program', desc: 'Cari program yang ingin Anda bantu melalui halaman jelajahi.', num: '01' },
@@ -268,21 +303,23 @@ export default function HomePage() {
               { icon: 'payments', title: 'Bayar Donasi', desc: 'Gunakan berbagai metode pembayaran digital yang tersedia.', num: '03' },
               { icon: 'receipt_long', title: 'Terima Laporan', desc: 'Dapatkan update berkala mengenai penggunaan dana donasi.', num: '04' },
             ].map((step, i) => (
-              <div key={i} className="relative group text-center">
-                <div className="relative mb-8">
-                  <span className="absolute -top-3 -left-3 text-[4rem] font-headline font-black text-emerald-500/10 dark:text-emerald-400/10 leading-none select-none">{step.num}</span>
-                  <div className="w-20 h-20 bg-white dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400 shadow-lg shadow-emerald-500/5 border border-slate-100 dark:border-slate-700 transition-all group-hover:bg-emerald-500 dark:group-hover:bg-emerald-500 group-hover:text-white group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-emerald-500/20">
-                    <span className="material-symbols-outlined text-[32px]">{step.icon}</span>
+              <RevealOnScroll key={i} delay={i * 200} direction="left">
+                <div className="relative group text-center cursor-default pt-4">
+                  <div className="relative mb-8">
+                    <span className="absolute -top-6 -left-2 text-[4.5rem] font-headline font-black text-emerald-500/10 dark:text-emerald-400/10 leading-none select-none group-hover:text-emerald-500/20 transition-colors duration-500">{step.num}</span>
+                    <div className="w-20 h-20 bg-white dark:bg-slate-800 rounded-[2rem] flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400 shadow-lg shadow-emerald-500/5 border border-slate-100 dark:border-slate-700 transition-all duration-500 group-hover:bg-emerald-500 dark:group-hover:bg-emerald-500 group-hover:text-white group-hover:-translate-y-3 group-hover:shadow-2xl group-hover:shadow-emerald-500/30">
+                      <span className="material-symbols-outlined text-[32px]">{step.icon}</span>
+                    </div>
                   </div>
+                  <h4 className="font-bold text-lg mb-2 dark:text-white group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors">{step.title}</h4>
+                  <p className="text-sm text-on-surface-variant dark:text-slate-400 leading-relaxed max-w-[200px] mx-auto">{step.desc}</p>
+                  {i < 3 && (
+                    <div className="hidden md:block absolute top-12 -right-4 text-slate-200 dark:text-slate-800 group-hover:text-emerald-300 dark:group-hover:text-emerald-700 transition-colors group-hover:translate-x-2 duration-300">
+                      <span className="material-symbols-outlined text-[28px]">chevron_right</span>
+                    </div>
+                  )}
                 </div>
-                <h4 className="font-bold text-lg mb-2 dark:text-white">{step.title}</h4>
-                <p className="text-sm text-on-surface-variant dark:text-slate-400 leading-relaxed max-w-[200px] mx-auto">{step.desc}</p>
-                {i < 3 && (
-                  <div className="hidden md:block absolute top-10 -right-4 text-slate-300 dark:text-slate-700">
-                    <span className="material-symbols-outlined text-[28px]">chevron_right</span>
-                  </div>
-                )}
-              </div>
+              </RevealOnScroll>
             ))}
           </div>
         </div>
