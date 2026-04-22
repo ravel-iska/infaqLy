@@ -14,7 +14,7 @@ export function errorHandler(err: Error, req: Request, res: Response, _next: Nex
 
   // Jika error adalah error internal server 500, kirim alert WA ke admin
   const isProd = process.env.NODE_ENV === 'production';
-  if (isProd || true) {
+  if (isProd) {
     const endpoint = `${req.method} ${req.originalUrl}`;
     sendErrorAlert(endpoint, err.message).catch(() => {});
   }

@@ -53,7 +53,11 @@ router.get('/monthly-stats', requireAdmin, async (_req: Request, res: Response) 
 // GET /api/campaigns/:id — single campaign (public)
 router.get('/:id', async (req: Request, res: Response) => {
   try {
-    const campaign = await campaignService.getCampaignById(Number(req.params.id));
+    const id = Number(req.params.id);
+    // Guard: reject non-numeric IDs to prevent swallowing named routes like /active
+    if (isNaN(id)) return res.status(400).json({ error: 'ID kampanye harus berupa angka' });
+
+    const campaign = await campaignService.getCampaignById(id);
     if (!campaign) return res.status(404).json({ error: 'Kampanye tidak ditemukan' });
     return res.json({ campaign });
   } catch (err: any) {
