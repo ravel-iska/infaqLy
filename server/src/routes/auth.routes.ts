@@ -17,8 +17,8 @@ router.post('/register', async (req: Request, res: Response) => {
     if (!username || !email || !whatsapp || !password) {
       return res.status(400).json({ error: 'Semua field wajib diisi' });
     }
-    if (password.length < 6) {
-      return res.status(400).json({ error: 'Password minimal 6 karakter' });
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'Password minimal 8 karakter' });
     }
 
     const result = await authService.registerUser({ username, email, whatsapp, password });

@@ -12,6 +12,24 @@ import { sql } from 'drizzle-orm';
 import { env } from './config/env.js';
 import { errorHandler } from './middleware/error.middleware.js';
 import { expirePendingDonations } from './services/donation.service.js';
+import rateLimit from 'express-rate-limit';
+
+// ═══ Rate Limiters ═══
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 15, // 15 attempts per window
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Terlalu banyak percobaan. Coba lagi dalam 15 menit.' },
+});
+
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 100, // 100 req/min per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Rate limit tercapai. Tunggu sebentar.' },
+});
 
 // Routes
 import authRoutes from './routes/auth.routes.js';
@@ -50,7 +68,8 @@ app.use(cookieParser());
 app.use('/uploads', express.static(path.resolve(env.UPLOAD_DIR)));
 
 // ═══ API Routes ═══
-app.use('/api/auth', authRoutes);
+app.use('/api', apiLimiter); // General rate limit for all API
+app.use('/api/auth', authLimiter, authRoutes); // Stricter limit for auth
 app.use('/api/users', userRoutes);
 app.use('/api/campaigns', campaignRoutes);
 app.use('/api/donations', donationRoutes);

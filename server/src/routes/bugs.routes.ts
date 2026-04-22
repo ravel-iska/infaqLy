@@ -5,6 +5,7 @@ import { eq, desc } from 'drizzle-orm';
 import { settings } from '../db/schema.js';
 import { sendWhatsApp } from '../services/whatsapp.service.js';
 import { env } from '../config/env.js';
+import { requireAdmin } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
@@ -48,7 +49,7 @@ router.post('/', async (req, res) => {
 });
 
 // Admin gets bug reports
-router.get('/', async (req, res) => {
+router.get('/', requireAdmin, async (req, res) => {
   try {
     const reports = await db.select().from(bugReports).orderBy(desc(bugReports.createdAt));
     res.json(reports);
@@ -59,9 +60,9 @@ router.get('/', async (req, res) => {
 });
 
 // Admin marks a report as read/resolved
-router.patch('/:id/read', async (req, res) => {
+router.patch('/:id/read', requireAdmin, async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     await db.update(bugReports).set({ isRead: true }).where(eq(bugReports.id, id));
     res.json({ success: true });
   } catch (error) {
@@ -70,9 +71,9 @@ router.patch('/:id/read', async (req, res) => {
 });
 
 // Admin deletes a report
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAdmin, async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     await db.delete(bugReports).where(eq(bugReports.id, id));
     res.json({ success: true });
   } catch (error) {
@@ -86,6 +87,11 @@ const SENTRY_SPAM_COOLDOWN = 10 * 60 * 1000; // 10 menit cooldown untuk error ya
 
 router.post('/sentry-webhook', async (req, res) => {
   try {
+    // Basic Webhook Auth
+    if (req.query.secret && req.query.secret !== env.BETTER_AUTH_SECRET) {
+      return res.status(401).json({ error: 'Unauthorized webhook request' });
+    }
+
     const payload = req.body;
     
     // Parse Sentry webhook payload

@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import * as campaignService from '../services/campaign.service.js';
 import { requireAdmin } from '../middleware/auth.middleware.js';
 import { upload } from '../middleware/upload.middleware.js';
+import sanitizeHtml from 'sanitize-html';
 
 const router = Router();
 
@@ -87,8 +88,13 @@ router.post('/', requireAdmin, upload.single('image'), async (req: Request, res:
       imageUrl = `data:${req.file.mimetype};base64,${b64}`;
     }
 
+    const safeDesc = description ? sanitizeHtml(description, {
+      allowedTags: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h2', 'h3', 'a', 'span'],
+      allowedAttributes: { a: ['href', 'target', 'rel'] },
+    }) : undefined;
+
     const campaign = await campaignService.createCampaign({
-      title, category, target: Number(target), status, imageUrl, description, endDate,
+      title, category, target: Number(target), status, imageUrl, description: safeDesc, endDate,
     });
     return res.status(201).json({ campaign });
   } catch (err: any) {
@@ -104,6 +110,13 @@ router.patch('/:id', requireAdmin, upload.single('image'), async (req: Request, 
     if (req.file) {
       const b64 = req.file.buffer.toString('base64');
       data.imageUrl = `data:${req.file.mimetype};base64,${b64}`;
+    }
+
+    if (data.description) {
+      data.description = sanitizeHtml(data.description, {
+        allowedTags: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h2', 'h3', 'a', 'span'],
+        allowedAttributes: { a: ['href', 'target', 'rel'] },
+      });
     }
 
     const campaign = await campaignService.updateCampaign(Number(req.params.id), data);

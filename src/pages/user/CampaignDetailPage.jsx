@@ -8,6 +8,7 @@ import { openSnapPopup, loadSnapScript } from '@/services/midtrans';
 import { useAuth } from '@/contexts/AuthContext';
 import api from '@/services/api';
 import toast from 'react-hot-toast';
+import DOMPurify from 'dompurify';
 
 export default function CampaignDetailPage() {
   const { campaignId } = useParams();
@@ -308,7 +309,7 @@ export default function CampaignDetailPage() {
                 <div 
                   className="text-on-surface-variant dark:text-slate-300 leading-relaxed text-sm prose prose-sm dark:prose-invert max-w-none 
                     [&_p]:mb-4 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_li]:mb-1 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:text-on-surface dark:[&_h2]:text-slate-100 [&_h2]:mt-6 [&_h2]:mb-3 [&_strong]:text-on-surface dark:[&_strong]:text-slate-200"
-                  dangerouslySetInnerHTML={{ __html: campaign.description || '<p>Detail deskripsi belum tersedia.</p>' }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(campaign.description || '<p>Detail deskripsi belum tersedia.</p>', { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h2', 'h3', 'a', 'span'], ALLOWED_ATTR: ['href', 'target', 'rel', 'class'] }) }}
                 />
               </div>
             </div>
