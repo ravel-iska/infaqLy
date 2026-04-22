@@ -4,6 +4,8 @@ import { requireAuth, requireAdmin } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
+// ═══ Named routes FIRST (before /:orderId param catch-all) ═══
+
 // GET /api/donations — admin list all
 router.get('/', requireAdmin, async (req: Request, res: Response) => {
   try {
@@ -53,29 +55,7 @@ router.get('/export', requireAdmin, async (_req: Request, res: Response) => {
   }
 });
 
-// GET /api/donations/:orderId — public status check for payment verification page
-router.get('/:orderId', async (req: Request, res: Response) => {
-  try {
-    const donation = await donationService.getDonationByOrderId(req.params.orderId as string);
-    if (!donation) return res.status(404).json({ error: 'Transaksi tidak ditemukan' });
-    // Return only safe public fields (no email, phone, or internal data)
-    return res.json({
-      donation: {
-        orderId: donation.orderId,
-        campaignId: donation.campaignId,
-        donorName: donation.isAnonymous ? 'Hamba Allah' : donation.donorName,
-        amount: donation.amount,
-        paymentMethod: donation.paymentMethod,
-        paymentStatus: donation.paymentStatus,
-        isAnonymous: donation.isAnonymous,
-        paidAt: donation.paidAt,
-        createdAt: donation.createdAt,
-      }
-    });
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
+// ═══ POST routes (before param routes) ═══
 
 // POST /api/donations — create new donation (user)
 router.post('/', requireAuth, async (req: Request, res: Response) => {
@@ -101,6 +81,18 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
   }
 });
 
+// POST /api/donations/expire — manually expire old pending donations (admin)
+router.post('/expire', requireAdmin, async (_req: Request, res: Response) => {
+  try {
+    const count = await donationService.expirePendingDonations();
+    return res.json({ message: `${count} donasi expired`, count });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// ═══ Param routes LAST ═══
+
 // PATCH /api/donations/:orderId/status — update donation status
 router.patch('/:orderId/status', requireAuth, async (req: Request, res: Response) => {
   try {
@@ -114,11 +106,32 @@ router.patch('/:orderId/status', requireAuth, async (req: Request, res: Response
   }
 });
 
-// POST /api/donations/expire — manually expire old pending donations (admin)
-router.post('/expire', requireAdmin, async (_req: Request, res: Response) => {
+// GET /api/donations/:orderId — public status check for payment verification page
+// ⚠️ MUST be LAST — catches any unmatched path as an orderId param
+router.get('/:orderId', async (req: Request, res: Response) => {
   try {
-    const count = await donationService.expirePendingDonations();
-    return res.json({ message: `${count} donasi expired`, count });
+    const orderId = req.params.orderId as string;
+    // Guard: reject reserved route names that somehow slipped through
+    if (['me', 'stats', 'export', 'expire'].includes(orderId)) {
+      return res.status(400).json({ error: 'Invalid orderId' });
+    }
+
+    const donation = await donationService.getDonationByOrderId(orderId);
+    if (!donation) return res.status(404).json({ error: 'Transaksi tidak ditemukan' });
+    // Return only safe public fields (no email, phone, or internal data)
+    return res.json({
+      donation: {
+        orderId: donation.orderId,
+        campaignId: donation.campaignId,
+        donorName: donation.isAnonymous ? 'Hamba Allah' : donation.donorName,
+        amount: donation.amount,
+        paymentMethod: donation.paymentMethod,
+        paymentStatus: donation.paymentStatus,
+        isAnonymous: donation.isAnonymous,
+        paidAt: donation.paidAt,
+        createdAt: donation.createdAt,
+      }
+    });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }

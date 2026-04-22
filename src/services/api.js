@@ -48,7 +48,7 @@ async function request(endpoint, options = {}) {
       const isAdmin = window.location.pathname.includes('/admin-panel');
       if (isAdmin) {
         localStorage.removeItem('infaqly_admin_token');
-        // Keep 'infaqly_admin' so PIN quick re-login knows the username
+        // Admin profile is now cleaned on logout; PIN re-login uses 'infaqly_admin_pin_user'
         if (!window.location.pathname.includes('/login')) {
           window.location.href = '/admin-panel/login';
         }

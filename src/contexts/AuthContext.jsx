@@ -104,8 +104,16 @@ export function AuthProvider({ children }) {
       const adminToken = localStorage.getItem('infaqly_admin_token');
       await api.post('/auth/logout', {}, { _token: adminToken });
     } catch {}
+    // Preserve only username for PIN quick re-login, remove full admin profile
+    const adminStr = localStorage.getItem('infaqly_admin');
+    if (adminStr) {
+      try {
+        const admin = JSON.parse(adminStr);
+        if (admin?.username) localStorage.setItem('infaqly_admin_pin_user', admin.username);
+      } catch {}
+    }
     localStorage.removeItem('infaqly_admin_token');
-    // NOTE: Keep 'infaqly_admin' so PIN quick re-login knows the username
+    localStorage.removeItem('infaqly_admin');
     dispatch({ type: 'LOGOUT_ADMIN' });
   };
 

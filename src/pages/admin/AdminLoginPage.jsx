@@ -27,9 +27,12 @@ export default function AdminLoginPage() {
         setHasPin(data.hasPin);
       } catch {}
 
-      // Check if there's a cached admin from a previous session
+      // Check if there's a cached admin username from a previous session (for PIN re-login)
+      const pinUser = localStorage.getItem('infaqly_admin_pin_user');
       const adminStr = localStorage.getItem('infaqly_admin');
-      if (adminStr) {
+      if (pinUser) {
+        setCachedAdmin({ username: pinUser });
+      } else if (adminStr) {
         try {
           const admin = JSON.parse(adminStr);
           setCachedAdmin(admin);
