@@ -269,7 +269,7 @@ export default function SettingsPage() {
       </div>
 
       {/* MIDTRANS CONFIGURATION */}
-      <div className={`bg-base-100 shadow rounded-2xl p-6 sm:p-8 border border-base-200 relative overflow-hidden transition-all duration-300 ${activePaymentGateway === 'midtrans' ? 'ring-1 ring-primary/30 shadow-md shadow-primary/10' : 'opacity-80'}`}>
+      <div className={`bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl shadow-lg shadow-slate-200/30 dark:shadow-black/20 rounded-[1.5rem] p-6 sm:p-8 border border-slate-100 dark:border-slate-800/60 relative overflow-hidden transition-all duration-300 ${activePaymentGateway === 'midtrans' ? 'ring-1 ring-primary/30 shadow-md shadow-primary/10' : 'opacity-80'}`}>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-base-200 pb-5">
           <div>
@@ -433,7 +433,7 @@ export default function SettingsPage() {
       </div>
 
       {/* DOKU PAYMENT GATEWAY */}
-      <div className={`bg-base-100 shadow rounded-2xl p-6 sm:p-8 border border-base-200 relative overflow-hidden transition-all duration-300 ${activePaymentGateway === 'doku' ? 'ring-1 ring-info/30 shadow-md shadow-info/10' : 'opacity-80'}`}>
+      <div className={`bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl shadow-lg shadow-slate-200/30 dark:shadow-black/20 rounded-[1.5rem] p-6 sm:p-8 border border-slate-100 dark:border-slate-800/60 relative overflow-hidden transition-all duration-300 ${activePaymentGateway === 'doku' ? 'ring-1 ring-info/30 shadow-md shadow-info/10' : 'opacity-80'}`}>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-base-200 pb-5">
           <div>
@@ -578,7 +578,7 @@ export default function SettingsPage() {
       </div>
 
       {/* WHATSAPP BOT (BAILEYS) */}
-      <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 border border-base-200">
+      <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl shadow-lg shadow-slate-200/30 dark:shadow-black/20 rounded-[1.5rem] p-6 sm:p-8 border border-slate-100 dark:border-slate-800/60">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-base-200 pb-5">
           <div>
             <h2 className="text-lg font-semibold text-base-content flex items-center gap-2">
@@ -698,7 +698,7 @@ export default function SettingsPage() {
       </div>
 
       {/* PIN QUICK RE-LOGIN */}
-      <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 border border-base-200">
+      <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl shadow-lg shadow-slate-200/30 dark:shadow-black/20 rounded-[1.5rem] p-6 sm:p-8 border border-slate-100 dark:border-slate-800/60">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
           <div className="flex items-center gap-4">
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${hasPin ? 'bg-success/15 text-success' : 'bg-base-200 text-base-content/50'}`}>
@@ -768,7 +768,7 @@ export default function SettingsPage() {
       </div>
 
       {/* PUSAT BANTUAN & INFO KONTAK ADMIN */}
-      <div className="bg-base-100 shadow rounded-2xl p-6 sm:p-8 border border-base-200">
+      <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl shadow-lg shadow-slate-200/30 dark:shadow-black/20 rounded-[1.5rem] p-6 sm:p-8 border border-slate-100 dark:border-slate-800/60">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-base-200 pb-5">
           <div>
             <h2 className="text-lg font-semibold text-base-content flex items-center gap-2">

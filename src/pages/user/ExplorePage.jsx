@@ -54,20 +54,31 @@ export default function ExplorePage() {
   const uniqueCategories = ['all', ...new Set(campaigns.map(c => c.category))];
 
   return (
-    <div className="animate-fade-in pt-24 pb-12 bg-surface dark:bg-slate-900 font-body text-on-surface dark:text-slate-100 min-h-screen transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 md:px-8">
-        
-        {/* Header */}
-        <div className="mb-10 text-center md:text-left">
-          <h1 className="font-headline text-4xl md:text-5xl font-bold mb-4 dark:text-white">Jelajahi Program</h1>
-          <p className="text-on-surface-variant dark:text-slate-400 text-lg">Temukan program donasi yang sesuai dengan hati dan kepedulian Anda.</p>
+    <div className="animate-fade-in bg-surface dark:bg-slate-900 font-body text-on-surface dark:text-slate-100 min-h-screen transition-colors duration-300">
+      
+      {/* Premium Header */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-emerald-950 via-slate-900 to-teal-900 pt-28 pb-16 px-4 md:px-8">
+        <div className="absolute inset-0">
+          <div className="absolute top-[-20%] right-[-10%] w-96 h-96 bg-emerald-500/15 rounded-full blur-[120px]"></div>
+          <div className="absolute bottom-[-20%] left-[-10%] w-80 h-80 bg-teal-400/10 rounded-full blur-[100px]"></div>
+          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)', backgroundSize: '60px 60px' }}></div>
         </div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-emerald-300 text-xs font-bold tracking-widest uppercase mb-6">
+            <span className="material-symbols-outlined text-[16px]">explore</span> Jelajahi
+          </span>
+          <h1 className="font-headline text-4xl md:text-5xl font-bold mb-4 text-white">Jelajahi Program</h1>
+          <p className="text-slate-300 text-lg max-w-xl">Temukan program donasi yang sesuai dengan hati dan kepedulian Anda.</p>
+        </div>
+      </div>
 
-        {/* Search & Filters */}
-        <div className="bg-surface-container-low dark:bg-slate-800 p-4 md:p-6 rounded-[2rem] ambient-shadow border border-white/40 dark:border-slate-700 flex flex-col md:flex-row gap-4 mb-12">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 -mt-8 relative z-20">
+
+        {/* Glassmorphic Search & Filters */}
+        <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl p-5 md:p-6 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-white/60 dark:border-slate-700/60 flex flex-col md:flex-row gap-4 mb-12">
           {/* Search Input */}
           <div className="relative flex-1">
-            <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-slate-500 opacity-70">
+            <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-emerald-500 dark:text-emerald-400">
               search
             </span>
             <input
@@ -75,17 +86,17 @@ export default function ExplorePage() {
               placeholder="Cari nama program..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-14 pr-6 py-4 rounded-full border border-outline-variant/30 dark:border-slate-600 bg-surface-container-lowest dark:bg-slate-900 text-on-surface dark:text-slate-100 placeholder:text-on-surface-variant focus:outline-none focus:border-primary dark:focus:border-emerald-500 focus:ring-2 focus:ring-primary/20 transition-all font-medium text-sm md:text-base"
+              className="w-full pl-14 pr-6 py-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-on-surface dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all font-medium text-sm md:text-base"
             />
           </div>
 
           {/* Select dropdowns */}
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative w-full sm:w-auto">
               <select 
                 value={category} 
                 onChange={(e) => setCategory(e.target.value)} 
-                className="w-full sm:min-w-[180px] appearance-none pl-6 pr-12 py-4 rounded-full border border-outline-variant/30 dark:border-slate-600 bg-surface-container-lowest dark:bg-slate-900 text-on-surface dark:text-slate-200 focus:outline-none focus:border-primary dark:focus:border-emerald-500 focus:ring-2 focus:ring-primary/20 transition-all font-medium text-sm md:text-base cursor-pointer capitalize"
+                className="w-full sm:min-w-[170px] appearance-none pl-5 pr-12 py-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-on-surface dark:text-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all font-medium text-sm cursor-pointer capitalize"
               >
                 {uniqueCategories.map(cat => (
                   <option key={cat} value={cat}>
@@ -93,7 +104,7 @@ export default function ExplorePage() {
                   </option>
                 ))}
               </select>
-              <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-slate-500 pointer-events-none">
+              <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]">
                 expand_more
               </span>
             </div>
@@ -102,13 +113,13 @@ export default function ExplorePage() {
               <select 
                 value={sortBy} 
                 onChange={(e) => setSortBy(e.target.value)} 
-                className="w-full sm:min-w-[220px] appearance-none pl-6 pr-12 py-4 rounded-full border border-outline-variant/30 dark:border-slate-600 bg-surface-container-lowest dark:bg-slate-900 text-on-surface dark:text-slate-200 focus:outline-none focus:border-primary dark:focus:border-emerald-500 focus:ring-2 focus:ring-primary/20 transition-all font-medium text-sm md:text-base cursor-pointer"
+                className="w-full sm:min-w-[200px] appearance-none pl-5 pr-12 py-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-on-surface dark:text-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all font-medium text-sm cursor-pointer"
               >
                 <option value="newest">Terbaru</option>
                 <option value="most-donors">Paling Banyak Donasi</option>
                 <option value="ending-soon">Segera Berakhir</option>
               </select>
-              <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-slate-500 pointer-events-none">
+              <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]">
                 sort
               </span>
             </div>
@@ -117,14 +128,14 @@ export default function ExplorePage() {
 
         {/* Results */}
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-12">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-surface-container-lowest dark:bg-slate-800 rounded-[2rem] overflow-hidden ambient-shadow h-[450px] animate-pulse">
-                <div className="h-64 bg-slate-200 dark:bg-slate-700 w-full mb-6"></div>
-                <div className="px-8 flex flex-col gap-4">
+              <div key={i} className="bg-white dark:bg-slate-800 rounded-3xl overflow-hidden shadow-lg h-[450px] animate-pulse">
+                <div className="h-56 bg-slate-200 dark:bg-slate-700 w-full"></div>
+                <div className="p-7 flex flex-col gap-4">
                   <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded-full w-3/4"></div>
                   <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full w-full"></div>
-                  <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full w-5/6"></div>
+                  <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded-full w-2/3"></div>
                 </div>
               </div>
             ))}
