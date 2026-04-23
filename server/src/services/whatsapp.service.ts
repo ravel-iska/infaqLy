@@ -128,20 +128,12 @@ export async function sendWelcomeNotification(name: string, phone: string) {
 /** Donation success notification */
 export async function sendDonationNotification(donorName: string, donorPhone: string, program: string, amount: number, orderId: string) {
   const fmt = new Intl.NumberFormat('id-ID').format(amount);
-  const msg = `🕌 *infaqLy — Konfirmasi Donasi*\n\nAssalamu'alaikum ${donorName},\n\nTerima kasih atas donasi Anda! ❤️\n\n📋 *Detail:*\n• Program: ${program}\n• Nominal: Rp ${fmt}\n• Order ID: ${orderId}\n• Status: ✅ Berhasil\n\n_Kuitansi donasi PDF terlampir._\n\nSemoga Allah membalas kebaikan Anda. Aamiin. 🤲\n\n_Pesan otomatis dari infaqLy_`;
-  console.log(`[WA] 📤 Sending donation receipt to ${donorName} (${donorPhone})...`);
+  const receiptUrl = `${env.FRONTEND_URL}/receipt/${orderId}`;
   
-  // Generate PDF locally, then upload directly to Fonnte via form-data
-  try {
-    const localPdfPath = await generateCertificatePDF({
-      orderId, donorName, amount, programName: program, date: new Date()
-    });
-    console.log(`[WA] 📄 PDF generated at: ${localPdfPath}`);
-    return sendWhatsAppWithFile(donorPhone, msg, localPdfPath, `Kuitansi_InfaqLy_${orderId}.pdf`);
-  } catch (err) {
-    console.error('[WA Fonnte] ⚠️ PDF generation failed, sending text-only:', err);
-    return sendWhatsApp(donorPhone, msg);
-  }
+  const msg = `🕌 *infaqLy — Konfirmasi Donasi*\\n\\nAssalamu'alaikum ${donorName},\\n\\nTerima kasih atas donasi Anda! ❤️\\n\\n📋 *Detail:*\\n• Program: ${program}\\n• Nominal: Rp ${fmt}\\n• Order ID: ${orderId}\\n• Status: ✅ Berhasil\\n\\n📜 *Kuitansi Digital Anda:*\\n${receiptUrl}\\n\\n_Klik link di atas untuk melihat, mencetak, atau mengunduh kuitansi donasi Anda dalam format PDF._\\n\\nSemoga Allah membalas kebaikan Anda. Aamiin. 🤲\\n\\n_Pesan otomatis dari infaqLy_`;
+  console.log(`[WA] 📤 Sending donation receipt link to ${donorName} (${donorPhone}): ${receiptUrl}`);
+  
+  return sendWhatsApp(donorPhone, msg);
 }
 
 /** OTP notification for password reset */

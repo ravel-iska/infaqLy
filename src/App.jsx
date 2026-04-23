@@ -52,6 +52,7 @@ const ProfilePage = lazy(() => import('@/pages/user/ProfilePage'));
 const HowToDonatePage = lazy(() => import('@/pages/user/HowToDonatePage'));
 const MaintenancePage = lazy(() => import('@/pages/user/MaintenancePage'));
 const PaymentVerificationPage = lazy(() => import('@/pages/user/PaymentVerificationPage'));
+const ReceiptPage = lazy(() => import('@/pages/user/ReceiptPage'));
 
 // Admin Pages
 const AdminLoginPage = lazy(() => import('@/pages/admin/AdminLoginPage'));
@@ -186,6 +187,7 @@ function AppRoutes() {
           <Route path="/cara-donasi" element={<HowToDonatePage />} />
           <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
           <Route path="/payment-verification" element={<PaymentVerificationPage />} />
+            <Route path="/receipt/:orderId" element={<ReceiptPage />} />
         </Route>
 
         {/* ── Auth Routes (Minimal Layout) ── */}
