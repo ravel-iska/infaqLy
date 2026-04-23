@@ -24,10 +24,10 @@ async function getFonnteToken(): Promise<string> {
 
 /**
  * Send WhatsApp message — Powered by Fonnte 3rd Party API
- * Codingan Khusus: Mengirim file via Native Blob secara langsung (upload 100% lokal),
- * menghindari bug Fonnte di mana crawler mereka gagal download URL.
+ * Memakai parameter `url` di Native FormData (Fonnte Free plan HANYA mendukung URL,
+ * file fisik tipe statis/blob sering di-drop diam-diam).
  */
-export async function sendWhatsApp(target: string, message: string, fileBuffer?: Buffer, filename?: string) {
+export async function sendWhatsApp(target: string, message: string, fileUrl?: string, filename?: string) {
   const phone = sanitizePhone(target);
   const token = await getFonnteToken();
 
@@ -39,14 +39,13 @@ export async function sendWhatsApp(target: string, message: string, fileBuffer?:
   try {
     let response;
 
-    if (fileBuffer) {
-      // Use FormData with a Native Blob for physical file uploads
+    if (fileUrl) {
+      // Use FormData with url for Free Accounts
       const form = new FormData();
       form.append('target', phone);
       form.append('message', message);
-      
-      const blob = new Blob([fileBuffer as any], { type: 'application/pdf' });
-      form.append('file', blob, filename || 'Document.pdf');
+      form.append('url', fileUrl);
+      if (filename) form.append('filename', filename);
 
       response = await fetch('https://api.fonnte.com/send', {
         method: 'POST',
@@ -76,7 +75,7 @@ export async function sendWhatsApp(target: string, message: string, fileBuffer?:
     } else {
       console.warn(`[WA Fonnte] ❌ Failed for ${phone}:`, result.reason);
       // Fallback to text-only if file fails
-      if (fileBuffer) {
+      if (fileUrl) {
          console.log(`[WA Fonnte] 🔁 Fallback: attempting to send text-only without attachment`);
          return sendWhatsApp(target, message);
       }
@@ -84,7 +83,7 @@ export async function sendWhatsApp(target: string, message: string, fileBuffer?:
     }
   } catch (err: any) {
     console.error(`[WA Fonnte] ❌ Crash API for ${phone}:`, err.message);
-    if (fileBuffer) {
+    if (fileUrl) {
        console.log(`[WA Fonnte] 🔁 Fallback: attempting to send text-only without attachment`);
        return sendWhatsApp(target, message);
     }
@@ -104,7 +103,15 @@ export async function sendWelcomeNotification(name: string, phone: string) {
 /** Donation success notification */
 export async function sendDonationNotification(donorName: string, donorPhone: string, program: string, amount: number, orderId: string) {
   const fmt = new Intl.NumberFormat('id-ID').format(amount);
-  const baseUrl = env.FRONTEND_URL.replace(/\/+$/, '');
+  
+  // FIX: Dynamic domain patcher. If user renamed their railway domain, FRONTEND_URL becomes a 404 dead link!
+  let baseUrl = env.FRONTEND_URL.replace(/\/+$/, '');
+  if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+      baseUrl = `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
+  } else if (baseUrl.includes('infaqly-production.up.railway.app')) {
+      baseUrl = baseUrl.replace('infaqly-production', 'infaqly');
+  }
+
   const receiptUrl = `${baseUrl}/receipt/${orderId}`;
   
   const msg = [
@@ -130,23 +137,12 @@ export async function sendDonationNotification(donorName: string, donorPhone: st
     `_Pesan otomatis dari infaqLy_`,
   ].join('\n');
   
-  // Codingan Khusus: Buat file PDF di memory secara lokal lalu tembak blob-nya langsung
-  let pdfBuffer: Buffer | undefined;
-  try {
-    pdfBuffer = await generateCertificatePDF({
-      orderId,
-      donorName,
-      amount,
-      programName: program,
-      date: new Date()
-    });
-  } catch (err: any) {
-    console.error(`[WA] ❌ Failed to generate PDF Buffer for ${orderId}:`, err.message);
-  }
-  
+  // We use URL parameter because Fonnte drops buffers on free plans. 
+  // (Our Express /pdf route is already fixed to stream from Memory Buffer to avoid disk read errors)
+  const pdfUrl = `${baseUrl}/api/donations/${orderId}/pdf`;
   const filename = `Kuitansi-InfaqLy-${orderId}.pdf`;
   console.log(`[WA] 📤 Sending donation receipt link + attachment request to ${donorName} (${donorPhone})`);
-  return sendWhatsApp(donorPhone, msg, pdfBuffer, filename);
+  return sendWhatsApp(donorPhone, msg, pdfUrl, filename);
 }
 
 /** OTP notification for password reset */
