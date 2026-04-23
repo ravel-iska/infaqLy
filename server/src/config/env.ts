@@ -33,6 +33,10 @@ export const env = {
   PORT: parseInt(process.env.PORT || '5000', 10),
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
 
+  // Email Notification Features
+  SMTP_USER: process.env.SMTP_USER || '',
+  SMTP_PASS: process.env.SMTP_PASS || '',
+
   // Upload
   UPLOAD_DIR: process.env.UPLOAD_DIR || './uploads',
   MAX_FILE_SIZE: parseInt(process.env.MAX_FILE_SIZE || '10485760', 10),

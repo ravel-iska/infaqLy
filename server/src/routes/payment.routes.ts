@@ -116,7 +116,7 @@ router.post('/notification', async (req: Request, res: Response) => {
     if (result.status === 'success' && result.isNewSuccess && result.donation) {
       const d = result.donation;
       sendDonationNotification(
-        d.donorName, d.donorPhone || '', programTitle, d.amount, d.orderId
+        d.donorName, d.donorEmail, d.donorPhone || '', programTitle, d.amount, d.orderId
       ).catch(() => {});
     }
 
@@ -146,7 +146,7 @@ router.post('/simulate-success/:orderId', requireAdmin, async (req: Request, res
       const d = result.donation;
       const campaign = await campaignService.getCampaignById(d.campaignId);
       sendDonationNotification(
-        d.donorName, d.donorPhone || '', campaign?.title || '', d.amount, d.orderId
+        d.donorName, d.donorEmail, d.donorPhone || '', campaign?.title || '', d.amount, d.orderId
       ).catch(() => {});
     }
 
@@ -178,7 +178,7 @@ router.post('/doku-notification', async (req: Request, res: Response) => {
     if (result.status === 'success' && result.isNewSuccess && result.donation) {
       const d = result.donation;
       sendDonationNotification(
-        d.donorName, d.donorPhone || '', programTitle, d.amount, d.orderId
+        d.donorName, d.donorEmail, d.donorPhone || '', programTitle, d.amount, d.orderId
       ).catch(() => {});
     }
 
@@ -231,7 +231,7 @@ router.get('/check-status/:orderId', requireAuth, async (req: Request, res: Resp
         const d = result.donation;
         const campaign = await campaignService.getCampaignById(d.campaignId);
         sendDonationNotification(
-          d.donorName, d.donorPhone || '', campaign?.title || '', d.amount, d.orderId
+          d.donorName, d.donorEmail, d.donorPhone || '', campaign?.title || '', d.amount, d.orderId
         ).catch(() => {});
       }
       

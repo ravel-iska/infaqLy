@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import fs from 'fs';
 import path from 'path';
 import { generateCertificatePDF } from './pdf.service.js';
+import { sendDonationReceiptEmail } from './email.service.js';
 
 function sanitizePhone(phone: string): string {
   let num = phone.replace(/[\s\-\+]/g, '');
@@ -101,7 +102,7 @@ export async function sendWelcomeNotification(name: string, phone: string) {
 }
 
 /** Donation success notification */
-export async function sendDonationNotification(donorName: string, donorPhone: string, program: string, amount: number, orderId: string) {
+export async function sendDonationNotification(donorName: string, donorEmail: string | null, donorPhone: string, program: string, amount: number, orderId: string) {
   const fmt = new Intl.NumberFormat('id-ID').format(amount);
   
   // FIX: Dynamic domain patcher. If user renamed their railway domain, FRONTEND_URL becomes a 404 dead link!
@@ -141,7 +142,24 @@ export async function sendDonationNotification(donorName: string, donorPhone: st
   // Why? Fonnte Free Accounts STRICTLY forbid file attachments. If we inject a file/url parameter,
   // Fonnte API queues the message but its background worker will SILENTLY DROP the entire message!
   console.log(`[WA] 📤 Sending donation receipt link (text-only due to Fonnte Free limits) to ${donorName} (${donorPhone})`);
-  return sendWhatsApp(donorPhone, msg);
+  const waPromise = sendWhatsApp(donorPhone, msg);
+  
+
+  // PARALLEL: Fire off physical PDF to their Email if they provided it!
+  if (donorEmail) {
+    generateCertificatePDF({
+      orderId,
+      donorName,
+      amount,
+      programName: program,
+      date: new Date()
+    }).then((pdfBuffer) => {
+      console.log(`[Email] 📧 Triggering email receipt to ${donorEmail}...`);
+      return sendDonationReceiptEmail(donorEmail, donorName, program, amount, orderId, pdfBuffer);
+    }).catch(e => console.error(`[Email] ❌ Failed to generate or send PDF:`, e));
+  }
+  
+  return waPromise;
 }
 
 /** OTP notification for password reset */
