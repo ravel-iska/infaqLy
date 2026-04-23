@@ -24,9 +24,10 @@ async function getFonnteToken(): Promise<string> {
 
 /**
  * Send WhatsApp message — Powered by Fonnte 3rd Party API
- * Allows sending files via `url` parameter (works on Free plan according to Fonnte JS SDK)
+ * Codingan Khusus: Mengirim file via Native Blob secara langsung (upload 100% lokal),
+ * menghindari bug Fonnte di mana crawler mereka gagal download URL.
  */
-export async function sendWhatsApp(target: string, message: string, fileUrl?: string, filename?: string) {
+export async function sendWhatsApp(target: string, message: string, fileBuffer?: Buffer, filename?: string) {
   const phone = sanitizePhone(target);
   const token = await getFonnteToken();
 
@@ -38,13 +39,14 @@ export async function sendWhatsApp(target: string, message: string, fileUrl?: st
   try {
     let response;
 
-    if (fileUrl) {
-      // Use FormData for attachments (Fonnte's documented way for JS)
+    if (fileBuffer) {
+      // Use FormData with a Native Blob for physical file uploads
       const form = new FormData();
       form.append('target', phone);
       form.append('message', message);
-      form.append('url', fileUrl);
-      if (filename) form.append('filename', filename);
+      
+      const blob = new Blob([fileBuffer as any], { type: 'application/pdf' });
+      form.append('file', blob, filename || 'Document.pdf');
 
       response = await fetch('https://api.fonnte.com/send', {
         method: 'POST',
@@ -74,7 +76,7 @@ export async function sendWhatsApp(target: string, message: string, fileUrl?: st
     } else {
       console.warn(`[WA Fonnte] ❌ Failed for ${phone}:`, result.reason);
       // Fallback to text-only if file fails
-      if (fileUrl) {
+      if (fileBuffer) {
          console.log(`[WA Fonnte] 🔁 Fallback: attempting to send text-only without attachment`);
          return sendWhatsApp(target, message);
       }
@@ -82,7 +84,7 @@ export async function sendWhatsApp(target: string, message: string, fileUrl?: st
     }
   } catch (err: any) {
     console.error(`[WA Fonnte] ❌ Crash API for ${phone}:`, err.message);
-    if (fileUrl) {
+    if (fileBuffer) {
        console.log(`[WA Fonnte] 🔁 Fallback: attempting to send text-only without attachment`);
        return sendWhatsApp(target, message);
     }
@@ -128,11 +130,23 @@ export async function sendDonationNotification(donorName: string, donorPhone: st
     `_Pesan otomatis dari infaqLy_`,
   ].join('\n');
   
-  const pdfUrl = `${baseUrl}/api/donations/${orderId}/pdf`;
-  const filename = `Kuitansi-InfaqLy-${orderId}.pdf`;
+  // Codingan Khusus: Buat file PDF di memory secara lokal lalu tembak blob-nya langsung
+  let pdfBuffer: Buffer | undefined;
+  try {
+    pdfBuffer = await generateCertificatePDF({
+      orderId,
+      donorName,
+      amount,
+      programName: program,
+      date: new Date()
+    });
+  } catch (err: any) {
+    console.error(`[WA] ❌ Failed to generate PDF Buffer for ${orderId}:`, err.message);
+  }
   
+  const filename = `Kuitansi-InfaqLy-${orderId}.pdf`;
   console.log(`[WA] 📤 Sending donation receipt link + attachment request to ${donorName} (${donorPhone})`);
-  return sendWhatsApp(donorPhone, msg, pdfUrl, filename);
+  return sendWhatsApp(donorPhone, msg, pdfBuffer, filename);
 }
 
 /** OTP notification for password reset */
