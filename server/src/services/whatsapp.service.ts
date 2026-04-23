@@ -4,7 +4,6 @@ import { settings } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 import fs from 'fs';
 import path from 'path';
-import FormData from 'form-data';
 import { generateCertificatePDF } from './pdf.service.js';
 
 function sanitizePhone(phone: string): string {
@@ -50,10 +49,9 @@ export async function sendWhatsApp(target: string, message: string, fileUrl?: st
       response = await fetch('https://api.fonnte.com/send', {
         method: 'POST',
         headers: {
-          'Authorization': token,
-          ...form.getHeaders()
+          'Authorization': token
         },
-        body: form as any
+        body: form
       });
     } else {
       // Use URLSearchParams for text-only
