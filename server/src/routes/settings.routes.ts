@@ -159,4 +159,24 @@ router.get('/whatsapp-redirect', async (req: Request, res: Response) => {
   }
 });
 
+// POST /api/settings/test-fonnte - Test Fonnte configuration
+router.post('/test-fonnte', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const { phone } = req.body;
+    if (!phone) return res.status(400).json({ error: 'Nomor telepon wajib diisi' });
+
+    // Import the whatsapp service dynamically or explicitly
+    const wa = await import('../services/whatsapp.service.js');
+    const result = await wa.sendWhatsApp(phone, `🧪 *Test dari infaqLy Bot*\n\nJika Anda menerima pesan ini, Fonnte Gateway sudah terhubung! ✅\n\n_${new Date().toLocaleString('id-ID')}_`);
+    
+    if (result.success) {
+      return res.json({ success: true, message: 'Berhasil terkirim via Fonnte!' });
+    } else {
+      return res.status(500).json({ success: false, message: result.message });
+    }
+  } catch (err: any) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 export default router;

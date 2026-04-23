@@ -15,8 +15,15 @@ function sanitizePhone(phone: string): string {
  */
 export async function sendWhatsApp(target: string, message: string) {
   const phone = sanitizePhone(target);
-  const token = env.FONNTE_TOKEN;
   
+  let token = env.FONNTE_TOKEN;
+  try {
+    const [row] = await db.select().from(settings).where(eq(settings.key, 'fonnte_token')).limit(1);
+    if (row && row.value) {
+      token = row.value;
+    }
+  } catch {}
+
   if (!token) {
     console.warn(`[WA Fonnte] ❌ FONNTE_TOKEN is not set. Cannot send to ${phone}`);
     return { success: false, message: 'Fonnte Token tidak ditemukan' };
