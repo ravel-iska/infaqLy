@@ -4,6 +4,7 @@ import { settings } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 import fs from 'fs';
 import path from 'path';
+import FormData from 'form-data';
 import { generateCertificatePDF } from './pdf.service.js';
 
 function sanitizePhone(phone: string): string {
@@ -13,19 +14,21 @@ function sanitizePhone(phone: string): string {
   return num;
 }
 
-/**
- * Send WhatsApp message — Powered by Fonnte 3rd Party API
- */
-export async function sendWhatsApp(target: string, message: string, localFilePath?: string) {
-  const phone = sanitizePhone(target);
-  
+async function getFonnteToken(): Promise<string> {
   let token = env.FONNTE_TOKEN;
   try {
     const [row] = await db.select().from(settings).where(eq(settings.key, 'fonnte_token')).limit(1);
-    if (row && row.value) {
-      token = row.value;
-    }
+    if (row && row.value) token = row.value;
   } catch {}
+  return token;
+}
+
+/**
+ * Send WhatsApp text message — Powered by Fonnte 3rd Party API
+ */
+export async function sendWhatsApp(target: string, message: string) {
+  const phone = sanitizePhone(target);
+  const token = await getFonnteToken();
 
   if (!token) {
     console.warn(`[WA Fonnte] ❌ FONNTE_TOKEN is not set. Cannot send to ${phone}`);
@@ -33,58 +36,19 @@ export async function sendWhatsApp(target: string, message: string, localFilePat
   }
 
   try {
-    let response;
-
-    // 1. Send via Raw Buffer Multipart/Form-Data if File exists
-    if (localFilePath && fs.existsSync(localFilePath)) {
-      const boundary = '----FonnteBoundary' + Date.now();
-      let formPayload = `--${boundary}\r\n`;
-      formPayload += `Content-Disposition: form-data; name="target"\r\n\r\n${phone}\r\n`;
-      formPayload += `--${boundary}\r\n`;
-      formPayload += `Content-Disposition: form-data; name="message"\r\n\r\n${message}\r\n`;
-
-      const fileBuffer = fs.readFileSync(localFilePath);
-      const filename = path.basename(localFilePath);
-      const fileHeader = `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="${filename}"\r\nContent-Type: application/pdf\r\n\r\n`;
-      const tail = `\r\n--${boundary}--\r\n`;
-
-      const bodyBuffer = Buffer.concat([
-        Buffer.from(formPayload),
-        Buffer.from(fileHeader),
-        fileBuffer,
-        Buffer.from(tail)
-      ]);
-
-      response = await fetch('https://api.fonnte.com/send', {
-        method: 'POST',
-        headers: {
-          'Authorization': token,
-          'Content-Type': `multipart/form-data; boundary=${boundary}`
-        },
-        body: bodyBuffer
-      });
-
-      // Cleanup local temp file
-      fs.unlink(localFilePath, () => {});
-    } 
-    // 2. Standard Text Message if no file
-    else {
-      response = await fetch('https://api.fonnte.com/send', {
-        method: 'POST',
-        headers: {
-          'Authorization': token,
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-          target: phone,
-          message: message,
-        })
-      });
-    }
+    const response = await fetch('https://api.fonnte.com/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({ target: phone, message })
+    });
 
     const result = await response.json();
+    console.log(`[WA Fonnte] Response for ${phone}:`, JSON.stringify(result));
     if (result.status) {
-      console.log(`[WA Fonnte] ✅ Sent to ${phone}`);
+      console.log(`[WA Fonnte] ✅ Text sent to ${phone}`);
       return { success: true, message: 'Terkirim via Fonnte' };
     } else {
       console.warn(`[WA Fonnte] ❌ Failed for ${phone}:`, result.reason);
@@ -93,6 +57,64 @@ export async function sendWhatsApp(target: string, message: string, localFilePat
   } catch (err: any) {
     console.error(`[WA Fonnte] ❌ Crash API for ${phone}:`, err.message);
     return { success: false, message: 'Kesalahan Jaringan Fonnte' };
+  }
+}
+
+/**
+ * Send WhatsApp message WITH file attachment — using form-data + fs.createReadStream
+ * This is the official documented method for Fonnte file uploads.
+ */
+export async function sendWhatsAppWithFile(target: string, message: string, filePath: string, customFilename?: string) {
+  const phone = sanitizePhone(target);
+  const token = await getFonnteToken();
+
+  if (!token) {
+    console.warn(`[WA Fonnte] ❌ FONNTE_TOKEN is not set. Cannot send file to ${phone}`);
+    return { success: false, message: 'Fonnte Token tidak ditemukan' };
+  }
+
+  if (!fs.existsSync(filePath)) {
+    console.warn(`[WA Fonnte] ❌ File not found: ${filePath}. Sending text only.`);
+    return sendWhatsApp(target, message);
+  }
+
+  try {
+    const form = new FormData();
+    form.append('target', phone);
+    form.append('message', message);
+    form.append('file', fs.createReadStream(filePath), {
+      filename: customFilename || path.basename(filePath),
+      contentType: 'application/pdf',
+    });
+
+    const response = await fetch('https://api.fonnte.com/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': token,
+        ...form.getHeaders(),
+      },
+      body: form as any,
+    });
+
+    const result = await response.json();
+    console.log(`[WA Fonnte] File response for ${phone}:`, JSON.stringify(result));
+
+    // Cleanup temp file after sending
+    fs.unlink(filePath, () => {});
+
+    if (result.status) {
+      console.log(`[WA Fonnte] ✅ File+Text sent to ${phone}`);
+      return { success: true, message: 'Terkirim via Fonnte (dengan PDF)' };
+    } else {
+      console.warn(`[WA Fonnte] ❌ File send failed for ${phone}:`, result.reason);
+      // Fallback: send text-only if file upload fails (e.g. free plan limitation)
+      console.log(`[WA Fonnte] 🔁 Fallback: sending text-only to ${phone}`);
+      return sendWhatsApp(target, message);
+    }
+  } catch (err: any) {
+    console.error(`[WA Fonnte] ❌ File upload crash for ${phone}:`, err.message);
+    // Fallback: send text-only
+    return sendWhatsApp(target, message);
   }
 }
 
@@ -106,20 +128,20 @@ export async function sendWelcomeNotification(name: string, phone: string) {
 /** Donation success notification */
 export async function sendDonationNotification(donorName: string, donorPhone: string, program: string, amount: number, orderId: string) {
   const fmt = new Intl.NumberFormat('id-ID').format(amount);
-  const msg = `🕌 *infaqLy — Konfirmasi Donasi*\n\nAssalamu'alaikum ${donorName},\n\nTerima kasih atas donasi Anda! ❤️\n\n📋 *Detail:*\n• Program: ${program}\n• Nominal: Rp ${fmt}\n• Order ID: ${orderId}\n• Status: ✅ Berhasil\n\n_Sertifikat donasi PDF resmi dari InfaqLy telah kami lampirkan bersama pesan ini._\n\nSemoga Allah membalas kebaikan Anda. Aamiin. 🤲\n\n_Pesan otomatis dari infaqLy_`;
+  const msg = `🕌 *infaqLy — Konfirmasi Donasi*\n\nAssalamu'alaikum ${donorName},\n\nTerima kasih atas donasi Anda! ❤️\n\n📋 *Detail:*\n• Program: ${program}\n• Nominal: Rp ${fmt}\n• Order ID: ${orderId}\n• Status: ✅ Berhasil\n\n_Kuitansi donasi PDF terlampir._\n\nSemoga Allah membalas kebaikan Anda. Aamiin. 🤲\n\n_Pesan otomatis dari infaqLy_`;
   console.log(`[WA] 📤 Sending donation receipt to ${donorName} (${donorPhone})...`);
   
-  // Parse local PDF for direct Fonnte upload bypasses URL routing bugs entirely
-  let localPdfPath: string | undefined = undefined;
+  // Generate PDF locally, then upload directly to Fonnte via form-data
   try {
-    localPdfPath = await generateCertificatePDF({
+    const localPdfPath = await generateCertificatePDF({
       orderId, donorName, amount, programName: program, date: new Date()
     });
+    console.log(`[WA] 📄 PDF generated at: ${localPdfPath}`);
+    return sendWhatsAppWithFile(donorPhone, msg, localPdfPath, `Kuitansi_InfaqLy_${orderId}.pdf`);
   } catch (err) {
-    console.error('[WA Fonnte] Failed to generate PDF:', err);
+    console.error('[WA Fonnte] ⚠️ PDF generation failed, sending text-only:', err);
+    return sendWhatsApp(donorPhone, msg);
   }
-  
-  return sendWhatsApp(donorPhone, msg, localPdfPath);
 }
 
 /** OTP notification for password reset */
