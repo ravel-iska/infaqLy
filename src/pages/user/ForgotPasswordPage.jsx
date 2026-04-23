@@ -40,12 +40,8 @@ export default function ForgotPasswordPage() {
       }, 1000);
     } catch (err) {
       const msg = err.message || 'Gagal mengirim OTP';
-      if (msg.includes('WhatsApp')) {
-        setSendError(msg);
-        toast.error('Gagal mengirim OTP — WhatsApp Bot mungkin sedang offline');
-      } else {
-        toast.error(msg);
-      }
+      setSendError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

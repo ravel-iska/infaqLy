@@ -79,7 +79,7 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
     // Failed
     console.log(`[OTP] Code for ${account.whatsapp}: ${otp} (use manually)`);
     return res.status(500).json({
-      error: 'Gagal mengirim OTP. Pastikan WhatsApp Bot sudah terhubung (scan QR).',
+      error: `Gagal mengirim OTP: ${result.message}`,
     });
   } catch (err: any) {
     return res.status(400).json({ error: err.message });
