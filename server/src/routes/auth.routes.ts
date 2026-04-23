@@ -204,7 +204,7 @@ router.post('/reset-password', async (req: Request, res: Response) => {
 
     // Hash Password Baru & Update di DB
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await db.update(users).set({ password: hashedPassword, updatedAt: new Date() }).where(eq(users.id, dbUser.id));
+    await db.update(users).set({ passwordHash: hashedPassword, updatedAt: new Date() }).where(eq(users.id, dbUser.id));
 
     return res.json({ message: 'Password Anda berhasil diubah! Silakan login dengan password baru.' });
   } catch (err: any) {
