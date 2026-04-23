@@ -137,12 +137,11 @@ export async function sendDonationNotification(donorName: string, donorPhone: st
     `_Pesan otomatis dari infaqLy_`,
   ].join('\n');
   
-  // We use URL parameter because Fonnte drops buffers on free plans. 
-  // (Our Express /pdf route is already fixed to stream from Memory Buffer to avoid disk read errors)
-  const pdfUrl = `${baseUrl}/api/donations/${orderId}/pdf`;
-  const filename = `Kuitansi-InfaqLy-${orderId}.pdf`;
-  console.log(`[WA] 📤 Sending donation receipt link + attachment request to ${donorName} (${donorPhone})`);
-  return sendWhatsApp(donorPhone, msg, pdfUrl, filename);
+  // IMPORTANT: We do NOT append the PDF file or PDF URL to Fonnte API.
+  // Why? Fonnte Free Accounts STRICTLY forbid file attachments. If we inject a file/url parameter,
+  // Fonnte API queues the message but its background worker will SILENTLY DROP the entire message!
+  console.log(`[WA] 📤 Sending donation receipt link (text-only due to Fonnte Free limits) to ${donorName} (${donorPhone})`);
+  return sendWhatsApp(donorPhone, msg);
 }
 
 /** OTP notification for password reset */
