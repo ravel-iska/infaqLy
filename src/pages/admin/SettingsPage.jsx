@@ -216,27 +216,27 @@ export default function SettingsPage() {
         <div className="flex bg-base-200/50 p-1.5 rounded-2xl border border-base-200 w-full md:w-3/4 mx-auto max-w-xl">
           <button
             onClick={() => saveActiveGateway('midtrans')}
-            className={`flex-1 flex flex-col items-center justify-center py-4 rounded-xl font-bold transition-all ${
+            className={`flex-1 flex flex-col items-center justify-center py-3 sm:py-4 px-2 rounded-xl font-bold transition-all ${
               activePaymentGateway === 'midtrans' 
                 ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-100 z-10' 
                 : 'text-base-content/50 hover:bg-base-200 hover:text-base-content scale-95 opacity-80'
             }`}
           >
-            <span className="material-symbols-outlined text-3xl mb-1 mt-1">account_balance</span>
-            MIDTRANS
+            <span className="material-symbols-outlined text-2xl sm:text-3xl mb-1">account_balance</span>
+            <span className="text-[10px] sm:text-xs tracking-wider uppercase text-center leading-tight">MIDTRANS</span>
             {activePaymentGateway === 'midtrans' && <span className="absolute top-2 right-2 flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span></span>}
           </button>
 
           <button
             onClick={() => saveActiveGateway('doku')}
-            className={`flex-1 flex flex-col items-center justify-center py-4 rounded-xl font-bold transition-all ${
+            className={`flex-1 flex flex-col items-center justify-center py-3 sm:py-4 px-2 rounded-xl font-bold transition-all ${
               activePaymentGateway === 'doku' 
                 ? 'bg-info text-white shadow-lg shadow-info/20 scale-100 z-10' 
                 : 'text-base-content/50 hover:bg-base-200 hover:text-base-content scale-95 opacity-80'
             }`}
           >
-            <span className="material-symbols-outlined text-3xl mb-1 mt-1">account_balance_wallet</span>
-            DOKU JOKUL
+            <span className="material-symbols-outlined text-2xl sm:text-3xl mb-1">account_balance_wallet</span>
+            <span className="text-[10px] sm:text-xs tracking-wider uppercase text-center leading-tight">DOKU JOKUL</span>
             {activePaymentGateway === 'doku' && <span className="absolute top-2 right-2 flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span></span>}
           </button>
         </div>
