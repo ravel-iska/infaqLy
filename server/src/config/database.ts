@@ -4,8 +4,14 @@ import { env } from './env.js';
 import * as schema from '../db/schema.js';
 
 let connString = env.DATABASE_URL;
-if (connString.includes('sslmode=require')) {
-  connString = connString.replace('?sslmode=require', '').replace('&sslmode=require', '');
+try {
+  const urlParams = new URL(connString);
+  if (urlParams.searchParams.has('sslmode')) {
+    urlParams.searchParams.delete('sslmode');
+    connString = urlParams.toString();
+  }
+} catch (e) {
+  // Ignore parse errors, fallback to raw
 }
 
 const pool = new pg.Pool({
