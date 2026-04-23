@@ -578,10 +578,10 @@ export default function SettingsPage() {
             <label className="block text-sm font-medium text-base-content/70 mb-2">Token Fonnte Anda</label>
             <input
               type="text"
-              value={fonnteToken}
+              value={fonnteToken || ''}
               onChange={(e) => setFonnteToken(e.target.value)}
-              placeholder="Contoh: SB1zhuTbXpmmhscijiKA"
-              className="input input-bordered w-full font-mono text-primary/80 tracking-wide bg-base-200/50 focus:bg-base-100"
+              placeholder="Paste/Ketik Token Fonnte Anda di sini..."
+              className="input input-bordered w-full font-mono text-base-content font-bold tracking-wide bg-base-100 focus:ring-2 focus:ring-primary focus:border-primary"
             />
             <p className="text-xs text-base-content/50 mt-1.5 flex items-center gap-1">
               <span className="material-symbols-outlined text-[14px]">info</span>
