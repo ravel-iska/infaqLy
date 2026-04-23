@@ -13,7 +13,7 @@ const router = express.Router();
 router.post('/', async (req, res) => {
   try {
     const { userName, userEmail, path, message } = req.body;
-    
+
     if (!userName || !userEmail || !message) {
       return res.status(400).json({ error: 'Data tidak lengkap' });
     }
@@ -27,7 +27,7 @@ router.post('/', async (req, res) => {
 
     // Send WhatsApp notification
     const alertMessage = `🚨 *Laporan Bug Baru [InfaqLy]*\n\n*Pelapor:* ${userName} (${userEmail})\n*URL:* ${path}\n*Keluhan:*\n${message}\n\nMohon segera diperiksa di Admin Panel.`;
-    
+
     try {
       let adminPhone = '';
       const [row] = await db.select().from(settings).where(eq(settings.key, 'system_alert_phone')).limit(1);
@@ -93,18 +93,18 @@ router.post('/sentry-webhook', async (req, res) => {
     }
 
     const payload = req.body;
-    
+
     // Parse Sentry webhook payload (handles different Sentry payload versions/types)
     const event = payload?.data?.event || payload?.event || payload || {};
     const eventTitle = event?.title || payload?.message || 'Unknown Error';
     const eventUrl = event?.web_url || payload?.url || payload?.data?.event?.web_url || '-';
-    
+
     // Extract project metadata
     const projectName = event?.project || payload?.project_name || 'infaqLy';
     const level = event?.level || payload?.level || 'error';
     const environment = event?.environment || payload?.data?.event?.environment || 'production';
     const timestamp = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
-    
+
     // Deep search to find stacktrace frames anywhere in the Sentry payload
     // Sentry webhook formats vary wildly between Issue Alerts, Metric Alerts, and different SDKs.
     function findFrames(obj: any): any[] | null {
@@ -136,11 +136,11 @@ router.post('/sentry-webhook', async (req, res) => {
     const exception = findException(payload) || {};
     const errorType = exception.type || event?.title || payload?.message || 'Error';
     const errorValue = exception.value || eventTitle;
-    
+
     let stackInfo = 'Tidak ada stack trace terdeteksi';
     let errorFile = '-';
     let errorLine = '-';
-    
+
     // Auto-extract frames defensively
     const frames = findFrames(payload) || [];
     if (frames && Array.isArray(frames) && frames.length > 0) {
@@ -150,22 +150,32 @@ router.post('/sentry-webhook', async (req, res) => {
         const file = f.filename || f.abs_path || f.module || 'Unknown';
         return `  ↳ ${file}:${f.lineno || '?'}`;
       }).join('\n');
-      
+
       const primaryFrame = topFrames[0];
       errorFile = primaryFrame.filename || primaryFrame.abs_path || primaryFrame.module || '-';
       errorLine = String(primaryFrame.lineno || '-');
     }
 
-    // 🛑 Anti-Spam System (Deduplikasi)
+    // 🛑 Anti-Spam System (Deduplikasi & Filtering)
+    const normalizedType = String(errorType).toLowerCase();
+    const normalizedValue = String(errorValue).toLowerCase();
+
+    // Ignore test/connectivity messages from Sentry
+    if (normalizedType.includes('connected') || normalizedType.includes('test') ||
+      normalizedValue.includes('connected') || normalizedValue.includes('test')) {
+      console.log(`[Sentry→WA] ℹ️ Ignoring test/connectivity alert: ${errorType}`);
+      return res.status(200).json({ ok: true, ignored: true, reason: 'test_alert' });
+    }
+
     const alertKey = `${projectName}:${errorType}:${errorFile}:${errorLine}`;
     const now = Date.now();
     const lastSeen = recentSentryAlerts.get(alertKey);
-    
+
     if (lastSeen && (now - lastSeen) < SENTRY_SPAM_COOLDOWN) {
-        console.log(`[Sentry→WA] 🚫 Spam Alert Prevented for: ${alertKey} (Cooldown: 10m)`);
-        return res.status(200).json({ ok: true, spam_prevented: true });
+      console.log(`[Sentry→WA] 🚫 Spam Alert Prevented for: ${alertKey} (Cooldown: 10m)`);
+      return res.status(200).json({ ok: true, spam_prevented: true });
     }
-    
+
     // Set we've just seen this alert
     recentSentryAlerts.set(alertKey, now);
 

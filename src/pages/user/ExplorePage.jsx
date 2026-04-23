@@ -16,7 +16,7 @@ export default function ExplorePage() {
     try {
       const data = await getActiveCampaigns();
       setCampaigns(data);
-    } catch {} finally {
+    } catch { } finally {
       setIsLoading(false);
     }
   }, []);
@@ -28,7 +28,7 @@ export default function ExplorePage() {
   useEffect(() => {
     const handleFocus = () => loadData();
     window.addEventListener('focus', handleFocus);
-    
+
     const interval = setInterval(() => {
       loadData();
     }, 30000);
@@ -55,7 +55,7 @@ export default function ExplorePage() {
 
   return (
     <div className="animate-fade-in bg-surface dark:bg-slate-900 font-body text-on-surface dark:text-slate-100 min-h-screen transition-colors duration-300">
-      
+
       {/* Premium Header */}
       <div className="relative overflow-hidden bg-gradient-to-br from-emerald-950 via-slate-900 to-teal-900 pt-28 pb-16 px-4 md:px-8">
         <div className="absolute inset-0">
@@ -93,9 +93,9 @@ export default function ExplorePage() {
           {/* Select dropdowns */}
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative w-full sm:w-auto">
-              <select 
-                value={category} 
-                onChange={(e) => setCategory(e.target.value)} 
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
                 className="w-full sm:min-w-[170px] appearance-none pl-5 pr-12 py-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-on-surface dark:text-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all font-medium text-sm cursor-pointer capitalize"
               >
                 {uniqueCategories.map(cat => (
@@ -110,9 +110,9 @@ export default function ExplorePage() {
             </div>
 
             <div className="relative w-full sm:w-auto">
-              <select 
-                value={sortBy} 
-                onChange={(e) => setSortBy(e.target.value)} 
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
                 className="w-full sm:min-w-[200px] appearance-none pl-5 pr-12 py-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-on-surface dark:text-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all font-medium text-sm cursor-pointer"
               >
                 <option value="newest">Terbaru</option>
@@ -169,19 +169,30 @@ function CampaignListCard({ campaign, idx }) {
   const categoryLabel = campaign.category === 'infaq' ? 'Infaq' : campaign.category === 'wakaf' ? 'Wakaf' : campaign.category;
 
   // Rotating colors for tabs to match the aesthetic from HomePage
-  const tagColorClass = idx % 2 === 0 
-    ? 'bg-primary-container dark:bg-emerald-900/40 text-on-primary-container dark:text-emerald-400 border border-emerald-500/20' 
+  const tagColorClass = idx % 2 === 0
+    ? 'bg-primary-container dark:bg-emerald-900/40 text-on-primary-container dark:text-emerald-400 border border-emerald-500/20'
     : 'bg-tertiary-container dark:bg-purple-900/40 text-on-tertiary-container dark:text-purple-400 border border-purple-500/20';
+
+  const rawImageUrl = campaign.imageUrl || campaign.image;
+  const hasValidImage = rawImageUrl && typeof rawImageUrl === 'string' && rawImageUrl.length > 5 && rawImageUrl !== 'null' && rawImageUrl !== 'undefined';
+  const displayImageUrl = hasValidImage
+    ? optimizeImageUrl(rawImageUrl, 400)
+    : 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=400&h=250&fit=crop&fm=webp&q=75';
 
   return (
     <Link to={`/explore/${campaign.id}`} className="group bg-surface-container-lowest dark:bg-slate-800 rounded-[2rem] overflow-hidden ambient-shadow border border-slate-100 dark:border-slate-700 transition-all hover:-translate-y-2 block h-full">
       <div className="relative h-64 overflow-hidden">
-        <img 
-          src={optimizeImageUrl(campaign.imageUrl || campaign.image, 400) || 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=400&h=250&fit=crop&fm=webp&q=75'} 
-          alt={campaign.title} 
+        <img
+          src={displayImageUrl}
+          alt={campaign.title}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          onError={(e) => {
+            if (e.target.src !== 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=400&h=250&fit=crop&fm=webp&q=75') {
+              e.target.src = 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=400&h=250&fit=crop&fm=webp&q=75';
+            }
+          }}
         />
         <div className={`absolute top-4 left-4 ${tagColorClass} text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest backdrop-blur-md`}>
           {categoryLabel}

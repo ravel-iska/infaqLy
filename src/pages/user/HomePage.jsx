@@ -45,7 +45,7 @@ function RevealOnScroll({ children, className = "", delay = 0, direction = 'up' 
         observer.unobserve(entry.target);
       }
     }, { threshold: 0.15 });
-    
+
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, [delay]);
@@ -53,8 +53,8 @@ function RevealOnScroll({ children, className = "", delay = 0, direction = 'up' 
   const dirClass = direction === 'up' ? 'translate-y-12' : direction === 'left' ? 'translate-x-12' : direction === 'right' ? '-translate-x-12' : 'scale-95';
 
   return (
-    <div 
-      ref={ref} 
+    <div
+      ref={ref}
       className={`transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0 translate-x-0 scale-100' : `opacity-0 ${dirClass}`} ${className}`}
     >
       {children}
@@ -73,7 +73,7 @@ export default function HomePage() {
     try {
       const data = await getActiveCampaigns();
       setCampaigns(data);
-    } catch {} finally {
+    } catch { } finally {
       setIsLoading(false);
     }
   }, []);
@@ -96,7 +96,7 @@ export default function HomePage() {
 
   return (
     <div className="bg-surface dark:bg-slate-900 text-on-surface dark:text-slate-100 font-body transition-colors duration-300">
-      
+
       {/* ═══════════════════════════════════════════════
           HERO SECTION — Immersive Premium
          ═══════════════════════════════════════════════ */}
@@ -159,14 +159,14 @@ export default function HomePage() {
               <div className="relative">
                 {/* Main Card */}
                 <div className="relative rounded-[2rem] overflow-hidden shadow-2xl shadow-black/40 border border-white/10">
-                  <img 
-                    alt="Donasi InfaqLy" 
+                  <img
+                    alt="Donasi InfaqLy"
                     loading="eager"
                     fetchpriority="high"
                     decoding="async"
                     width="500"
                     height="600"
-                    className="w-full aspect-[4/5] object-cover" 
+                    className="w-full aspect-[4/5] object-cover"
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtvLNhQLwSvJ39x5VIL3RdjIq7aIRowq59uuy8WHLxJLbsuJYRQb-wnxUfKG4QpoHhYNp1hgH0UtFv9-coaYSyRKtyWkaLuWPWCjHM9dhtslpu8Z2wk_8tH30MyMs89oljB-QbX6YydPjoQ4rv_hW-xMW0QJwzwaRrTgqTAurVy2pWuNmHX6Sumk9OWOlN5oRlehvw9XQZkIxq5pF0L36j_RXkloIbGT5T3joE9knYsdg0fOgz-hMkkpULym054L3WtPu9j4RPPa0=s600"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/80 via-transparent to-transparent"></div>
@@ -231,7 +231,7 @@ export default function HomePage() {
               Lihat Semua <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </Link>
           </div>
-          
+
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(3)].map((_, i) => (
@@ -312,7 +312,7 @@ export default function HomePage() {
           <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full -mr-40 -mt-40 blur-3xl"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-400/20 rounded-full -ml-48 -mb-48 blur-3xl"></div>
           <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,.8) 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
-          
+
           <div className="relative z-10 p-12 md:p-20 lg:p-24 text-center">
             <h2 className="font-headline text-3xl md:text-5xl font-bold mb-6 max-w-3xl mx-auto text-white leading-tight">Wujudkan Dampak Nyata Hari Ini</h2>
             <p className="text-lg text-white/80 mb-12 max-w-xl mx-auto leading-relaxed">Bergabunglah dengan ribuan donatur lainnya dalam menebar kebaikan yang terukur dan transparan.</p>
@@ -342,13 +342,13 @@ export default function HomePage() {
               <span className="material-symbols-outlined">close</span>
             </button>
             <div className="aspect-video w-full bg-slate-200 dark:bg-slate-700">
-              <iframe 
-                width="100%" 
-                height="100%" 
-                src="https://www.youtube.com/embed/P6bH3sP0FkI?autoplay=1&mute=1" 
-                title="Dampak Donasi" 
-                frameBorder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/P6bH3sP0FkI?autoplay=1&mute=1"
+                title="Dampak Donasi"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               ></iframe>
             </div>
@@ -419,7 +419,7 @@ function CampaignCardHome({ campaign, idx }) {
   const progress = campaign.target > 0 ? Math.round((campaign.collected / campaign.target) * 100) : 0;
   const days = daysRemaining(campaign.endDate);
   const categoryLabel = campaign.category === 'infaq' ? 'Infaq' : campaign.category === 'wakaf' ? 'Wakaf' : campaign.category;
-  
+
   const tagColors = [
     'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20',
     'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20',
@@ -427,15 +427,26 @@ function CampaignCardHome({ campaign, idx }) {
   ];
   const tagColorClass = tagColors[idx % 3];
 
+  const rawImageUrl = campaign.imageUrl || campaign.image;
+  const hasValidImage = rawImageUrl && typeof rawImageUrl === 'string' && rawImageUrl.length > 5 && rawImageUrl !== 'null' && rawImageUrl !== 'undefined';
+  const displayImageUrl = hasValidImage
+    ? optimizeImageUrl(rawImageUrl, 400)
+    : 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=400&h=250&fit=crop&fm=webp&q=75';
+
   return (
     <Link to={`/explore/${campaign.id}`} className="group bg-white dark:bg-slate-800/80 backdrop-blur-sm rounded-3xl overflow-hidden shadow-lg shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700/60 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all block">
       <div className="relative h-56 overflow-hidden">
-        <img 
-          src={optimizeImageUrl(campaign.imageUrl || campaign.image, 400) || 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=400&h=250&fit=crop&fm=webp&q=75'} 
-          alt={campaign.title} 
+        <img
+          src={displayImageUrl}
+          alt={campaign.title}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          onError={(e) => {
+            if (e.target.src !== 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=400&h=250&fit=crop&fm=webp&q=75') {
+              e.target.src = 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=400&h=250&fit=crop&fm=webp&q=75';
+            }
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
         <div className={`absolute top-4 left-4 ${tagColorClass} text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest backdrop-blur-md border bg-white/80 dark:bg-slate-900/80`}>

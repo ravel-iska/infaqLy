@@ -22,7 +22,7 @@ export default function CampaignFormPage() {
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  
+
   // Ambil dari constants agar konsisten
   const baseCats = CAMPAIGN_CATEGORIES.map(c => c.value);
   const [existingCategories, setExistingCategories] = useState(baseCats);
@@ -34,7 +34,7 @@ export default function CampaignFormPage() {
         const cats = new Set(baseCats);
         campaigns.forEach(c => cats.add(c.category));
         setExistingCategories([...cats]);
-      } catch {}
+      } catch { }
     })();
   }, []);
 
@@ -134,7 +134,7 @@ export default function CampaignFormPage() {
       formData.append('status', form.status);
       formData.append('description', form.description.trim());
       if (form.endDate) formData.append('endDate', form.endDate);
-      
+
       // If a new file was chosen, append it
       if (imageFile) {
         formData.append('image', imageFile);
@@ -208,17 +208,17 @@ export default function CampaignFormPage() {
                 {isCustomCategory ? (
                   <div className="relative">
                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40 text-[20px]">category</span>
-                    <input 
-                      type="text" 
-                      value={form.category} 
-                      onChange={(e) => update('category', e.target.value)} 
-                      placeholder="Ketikan kategori..." 
-                      className="input input-bordered w-full pl-12 pr-10 font-medium" 
+                    <input
+                      type="text"
+                      value={form.category}
+                      onChange={(e) => update('category', e.target.value)}
+                      placeholder="Ketikan kategori..."
+                      className="input input-bordered w-full pl-12 pr-10 font-medium"
                       autoFocus
                     />
-                    <button 
-                      type="button" 
-                      onClick={() => { setIsCustomCategory(false); update('category', 'infaq'); }} 
+                    <button
+                      type="button"
+                      onClick={() => { setIsCustomCategory(false); update('category', 'infaq'); }}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-error rounded-full p-1"
                       title="Batalkan Kategori Kustom"
                     >
@@ -257,7 +257,7 @@ export default function CampaignFormPage() {
               <div>
                 <label className="block text-sm font-semibold text-base-content/70 mb-2">Status Penayangan</label>
                 <div className="relative">
-                   <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40 text-[20px]">visibility</span>
+                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40 text-[20px]">visibility</span>
                   <select value={form.status} onChange={(e) => update('status', e.target.value)} className="select select-bordered w-full pl-12 font-medium">
                     <option value="draft">Mode Draft (Tersembunyi)</option>
                     <option value="active">Mode Aktif (Publik)</option>
@@ -279,7 +279,7 @@ export default function CampaignFormPage() {
                     { icon: 'link', label: 'Link', action: () => wrapText('<a href="">', '</a>') },
                   ].map((btn, i) => (
                     <button key={i} type="button" onClick={btn.action} className="p-1 min-w-8 flex items-center justify-center rounded text-base-content/60 hover:bg-base-300 hover:text-base-content transition-colors" title={btn.label}>
-                       <span className="material-symbols-outlined text-[18px]">{btn.icon}</span>
+                      <span className="material-symbols-outlined text-[18px]">{btn.icon}</span>
                     </button>
                   ))}
                 </div>
@@ -298,14 +298,23 @@ export default function CampaignFormPage() {
         {/* Right — Image Upload & Preview */}
         <div className="space-y-6">
           <div className="bg-base-100 shadow rounded-2xl p-6 border border-base-200">
-             <div className="flex items-center gap-2 mb-4">
-                <span className="material-symbols-outlined text-primary">add_photo_alternate</span>
-                <h3 className="text-sm font-semibold text-base-content">Thumbnail Visual <span className="text-error">*</span></h3>
-             </div>
-            
+            <div className="flex items-center gap-2 mb-4">
+              <span className="material-symbols-outlined text-primary">add_photo_alternate</span>
+              <h3 className="text-sm font-semibold text-base-content">Thumbnail Visual <span className="text-error">*</span></h3>
+            </div>
+
             {imagePreview ? (
               <div className="relative group rounded-xl overflow-hidden border border-base-200 shadow-inner">
-                <img src={imagePreview} alt="Preview" className="w-full h-48 sm:h-56 object-cover" />
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-full h-48 sm:h-56 object-cover"
+                  onError={(e) => {
+                    if (e.target.src !== 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=400&h=250&fit=crop&fm=webp&q=75') {
+                      e.target.src = 'https://images.unsplash.com/photo-1585036156171-384164a8c675?w=400&h=250&fit=crop&fm=webp&q=75';
+                    }
+                  }}
+                />
                 <div className="absolute inset-0 bg-base-100/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                   <button onClick={() => fileInputRef.current?.click()} className="btn btn-circle bg-base-200 border border-base-300 text-base-content hover:text-primary transition-colors shadow-lg" title="Ganti Visual">
                     <span className="material-symbols-outlined text-[20px]">find_replace</span>
@@ -342,8 +351,8 @@ export default function CampaignFormPage() {
           {/* Quick Info */}
           <div className="bg-base-100 shadow rounded-2xl p-5 border border-base-200 border-l-4 border-l-warning">
             <div className="flex items-center gap-2 mb-3">
-               <span className="material-symbols-outlined text-warning text-[20px]">lightbulb</span>
-               <h3 className="text-sm font-bold text-base-content">Petunjuk Singkat</h3>
+              <span className="material-symbols-outlined text-warning text-[20px]">lightbulb</span>
+              <h3 className="text-sm font-bold text-base-content">Petunjuk Singkat</h3>
             </div>
             <ul className="text-xs text-base-content/60 space-y-2.5 font-medium">
               <li className="flex items-start gap-1.5"><span className="material-symbols-outlined text-[14px] mt-0.5 opacity-50">check</span> Proporsi optimal gambar landscape (16:9) direkomendasikan.</li>

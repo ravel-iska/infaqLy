@@ -20,7 +20,7 @@ export default function CampaignsPage() {
     try {
       const data = await getAllCampaigns();
       setCampaigns(data);
-    } catch {} finally {
+    } catch { } finally {
       setIsLoading(false);
     }
   };
@@ -145,13 +145,27 @@ export default function CampaignsPage() {
                         <td>
                           <div className="flex items-center gap-4">
                             <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-base-300 border border-base-200">
-                              {(c.imageUrl || c.image) ? (
-                                <img src={c.imageUrl || c.image} alt="" className="w-full h-full object-cover" />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center text-base-content/40 bg-base-200">
-                                  <span className="material-symbols-outlined text-[20px]">image</span>
-                                </div>
-                              )}
+                              {(() => {
+                                const rawImageUrl = c.imageUrl || c.image;
+                                const hasValidImage = rawImageUrl && typeof rawImageUrl === 'string' && rawImageUrl.length > 5 && rawImageUrl !== 'null' && rawImageUrl !== 'undefined';
+                                if (hasValidImage) {
+                                  return (
+                                    <img
+                                      src={rawImageUrl}
+                                      alt=""
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        e.target.style.display = 'none';
+                                        e.target.nextSibling.style.display = 'flex';
+                                      }}
+                                    />
+                                  );
+                                }
+                                return null;
+                              })()}
+                              <div className="w-full h-full flex items-center justify-center text-base-content/40 bg-base-200" style={{ display: (c.imageUrl || c.image) ? 'none' : 'flex' }}>
+                                <span className="material-symbols-outlined text-[20px]">image</span>
+                              </div>
                             </div>
                             <div>
                               <span className="text-base-content font-bold block mb-0.5 line-clamp-1 max-w-[200px]">{c.title}</span>
@@ -160,15 +174,14 @@ export default function CampaignsPage() {
                           </div>
                         </td>
                         <td>
-                          <span className={`px-2.5 py-1 text-[11px] font-bold rounded flex items-center w-max gap-1.5 uppercase tracking-wider ${
-                            c.category === 'infaq' ? 'bg-primary/10 text-primary border border-primary/20' 
-                            : c.category === 'wakaf' ? 'bg-secondary/10 text-secondary border border-secondary/20'
-                            : 'bg-accent/10 text-accent border border-accent/20'
-                          }`}>
+                          <span className={`px-2.5 py-1 text-[11px] font-bold rounded flex items-center w-max gap-1.5 uppercase tracking-wider ${c.category === 'infaq' ? 'bg-primary/10 text-primary border border-primary/20'
+                              : c.category === 'wakaf' ? 'bg-secondary/10 text-secondary border border-secondary/20'
+                                : 'bg-accent/10 text-accent border border-accent/20'
+                            }`}>
                             <span className="material-symbols-outlined text-[14px]">
-                              {c.category === 'infaq' ? 'volunteer_activism' 
-                               : c.category === 'wakaf' ? 'real_estate_agent' 
-                               : 'loyalty'}
+                              {c.category === 'infaq' ? 'volunteer_activism'
+                                : c.category === 'wakaf' ? 'real_estate_agent'
+                                  : 'loyalty'}
                             </span>
                             {c.category === 'infaq' ? 'Infaq' : c.category === 'wakaf' ? 'Wakaf' : c.category}
                           </span>
@@ -186,10 +199,9 @@ export default function CampaignsPage() {
                           </div>
                         </td>
                         <td className="text-center">
-                          <span className={`px-2.5 py-1 rounded inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider border ${
-                            c.status === 'active' ? 'bg-success/10 text-success border-success/20' :
-                            c.status === 'draft' ? 'bg-warning/10 text-warning border-warning/20' : 'bg-base-200 text-base-content/50 border-base-300'
-                          }`}>
+                          <span className={`px-2.5 py-1 rounded inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider border ${c.status === 'active' ? 'bg-success/10 text-success border-success/20' :
+                              c.status === 'draft' ? 'bg-warning/10 text-warning border-warning/20' : 'bg-base-200 text-base-content/50 border-base-300'
+                            }`}>
                             {c.status === 'active' ? 'Aktif' : c.status === 'draft' ? 'Draft' : 'Selesai'}
                           </span>
                         </td>
