@@ -165,17 +165,18 @@ router.post('/test-fonnte', requireAdmin, async (req: Request, res: Response) =>
     const { phone } = req.body;
     if (!phone) return res.status(400).json({ error: 'Nomor telepon wajib diisi' });
 
-    // Import the whatsapp service dynamically or explicitly
-    const wa = await import('../services/whatsapp.service.js');
-    const result = await wa.sendWhatsApp(phone, `🧪 *Test dari infaqLy Bot*\n\nJika Anda menerima pesan ini, Fonnte Gateway sudah terhubung! ✅\n\n_${new Date().toLocaleString('id-ID')}_`);
+    // Use static import equivalent or directly reference the imported function
+    const { sendWhatsApp } = await import('../services/whatsapp.service.js');
+    const result = await sendWhatsApp(phone, `🧪 *Test dari infaqLy Bot*\n\nJika Anda menerima pesan ini, Fonnte Gateway sudah terhubung! ✅\n\n_${new Date().toLocaleString('id-ID')}_`);
     
     if (result.success) {
       return res.json({ success: true, message: 'Berhasil terkirim via Fonnte!' });
     } else {
-      return res.status(500).json({ success: false, message: result.message });
+      return res.status(500).json({ success: false, message: result.message || 'Fonnte API error' });
     }
   } catch (err: any) {
-    return res.status(500).json({ success: false, message: err.message });
+    console.error('[Fonnte Test Error]', err);
+    return res.status(500).json({ success: false, message: err.message || 'Server error during test' });
   }
 });
 
