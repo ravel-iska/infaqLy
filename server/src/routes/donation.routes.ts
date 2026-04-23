@@ -1,5 +1,8 @@
 import { Router, Request, Response } from 'express';
+import fs from 'fs';
 import * as donationService from '../services/donation.service.js';
+import * as campaignService from '../services/campaign.service.js';
+import { generateCertificatePDF } from '../services/pdf.service.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.middleware.js';
 
 const router = Router();
@@ -103,6 +106,33 @@ router.patch('/:orderId/status', requireAuth, async (req: Request, res: Response
     return res.json({ donation });
   } catch (err: any) {
     return res.status(400).json({ error: err.message });
+  }
+});
+
+// GET /api/donations/:orderId/pdf — generate and serve PDF receipt publicly (for Fonnte / WhatsApp)
+router.get('/:orderId/pdf', async (req: Request, res: Response) => {
+  try {
+    const orderId = req.params.orderId as string;
+    const donation = await donationService.getDonationByOrderId(orderId);
+    if (!donation || donation.paymentStatus !== 'success') {
+      return res.status(404).send('Kuitansi tidak ditemukan atau pembayaran belum berhasil.');
+    }
+
+    const campaign = await campaignService.getCampaignById(donation.campaignId);
+    const pdfPath = await generateCertificatePDF({
+      orderId: donation.orderId,
+      donorName: donation.isAnonymous ? 'Hamba Allah' : donation.donorName,
+      amount: donation.amount,
+      programName: campaign?.title || 'Program Donasi InfaqLy',
+      date: new Date(donation.paidAt || donation.createdAt)
+    });
+
+    res.download(pdfPath, `Kuitansi-${orderId}.pdf`, (err) => {
+      // Cleanup file after download so it doesn't inflate the server
+      if (!err) fs.unlink(pdfPath, () => {});
+    });
+  } catch (err: any) {
+    return res.status(500).send('Gagal membuat PDF: ' + err.message);
   }
 });
 

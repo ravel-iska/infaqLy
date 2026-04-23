@@ -13,7 +13,7 @@ function sanitizePhone(phone: string): string {
 /**
  * Send WhatsApp message — Powered by Fonnte 3rd Party API
  */
-export async function sendWhatsApp(target: string, message: string) {
+export async function sendWhatsApp(target: string, message: string, fileUrl?: string) {
   const phone = sanitizePhone(target);
   
   let token = env.FONNTE_TOKEN;
@@ -30,16 +30,22 @@ export async function sendWhatsApp(target: string, message: string) {
   }
 
   try {
+    const payload: Record<string, string> = {
+      target: phone,
+      message: message,
+    };
+    
+    if (fileUrl) {
+      payload.url = fileUrl;
+    }
+
     const response = await fetch('https://api.fonnte.com/send', {
       method: 'POST',
       headers: {
         'Authorization': token,
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: new URLSearchParams({
-        target: phone,
-        message: message,
-      })
+      body: new URLSearchParams(payload)
     });
 
     const result = await response.json();
@@ -66,10 +72,13 @@ export async function sendWelcomeNotification(name: string, phone: string) {
 /** Donation success notification */
 export async function sendDonationNotification(donorName: string, donorPhone: string, program: string, amount: number, orderId: string) {
   const fmt = new Intl.NumberFormat('id-ID').format(amount);
-  const msg = `🕌 *infaqLy — Konfirmasi Donasi*\n\nAssalamu'alaikum ${donorName},\n\nTerima kasih atas donasi Anda! ❤️\n\n📋 *Detail:*\n• Program: ${program}\n• Nominal: Rp ${fmt}\n• Order ID: ${orderId}\n• Status: ✅ Berhasil\n\n_Catatan: Kuitansi digital donasi berformat PDF dapat Anda unduh kapan saja melalui Dasbor Profil Akun Anda._\n\nSemoga Allah membalas kebaikan Anda. Aamiin. 🤲\n\n_Pesan otomatis dari infaqLy_`;
+  const msg = `🕌 *infaqLy — Konfirmasi Donasi*\n\nAssalamu'alaikum ${donorName},\n\nTerima kasih atas donasi Anda! ❤️\n\n📋 *Detail:*\n• Program: ${program}\n• Nominal: Rp ${fmt}\n• Order ID: ${orderId}\n• Status: ✅ Berhasil\n\n_Sertifikat donasi PDF resmi dari InfaqLy telah kami lampirkan bersama pesan ini._\n\nSemoga Allah membalas kebaikan Anda. Aamiin. 🤲\n\n_Pesan otomatis dari infaqLy_`;
   console.log(`[WA] 📤 Sending donation receipt to ${donorName} (${donorPhone})...`);
   
-  return sendWhatsApp(donorPhone, msg);
+  // Public URL to generate and serve the PDF receipt on the fly
+  const publicPdfUrl = `${env.FRONTEND_URL}/api/donations/${orderId}/pdf`;
+  
+  return sendWhatsApp(donorPhone, msg, publicPdfUrl);
 }
 
 /** OTP notification for password reset */
