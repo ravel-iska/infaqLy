@@ -2,9 +2,6 @@ import { env } from '../config/env.js';
 import { db } from '../config/database.js';
 import { settings } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
-import fs from 'fs';
-import path from 'path';
-import { generateCertificatePDF } from './pdf.service.js';
 
 function sanitizePhone(phone: string): string {
   let num = phone.replace(/[\s\-\+]/g, '');
@@ -16,7 +13,7 @@ function sanitizePhone(phone: string): string {
 /**
  * Send WhatsApp message — Powered by Fonnte 3rd Party API
  */
-export async function sendWhatsApp(target: string, message: string, localFilePath?: string) {
+export async function sendWhatsApp(target: string, message: string, fileUrl?: string, filename?: string) {
   const phone = sanitizePhone(target);
   
   let token = env.FONNTE_TOKEN;
@@ -33,40 +30,24 @@ export async function sendWhatsApp(target: string, message: string, localFilePat
   }
 
   try {
-    let response;
-
-    if (localFilePath && fs.existsSync(localFilePath)) {
-      // 1. Direct File Upload via FormData
-      const form = new FormData();
-      form.append('target', phone);
-      form.append('message', message);
-      
-      const fileBuffer = fs.readFileSync(localFilePath);
-      const blob = new Blob([fileBuffer], { type: 'application/pdf' });
-      form.append('file', blob, path.basename(localFilePath));
-
-      response = await fetch('https://api.fonnte.com/send', {
-        method: 'POST',
-        headers: { 'Authorization': token },
-        body: form as any
-      });
-
-      // Cleanup local temp file
-      fs.unlink(localFilePath, () => {});
-    } else {
-      // 2. Standard Text Message via URL encoded
-      response = await fetch('https://api.fonnte.com/send', {
-        method: 'POST',
-        headers: {
-          'Authorization': token,
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-          target: phone,
-          message: message,
-        })
-      });
+    const payload: Record<string, string> = {
+      target: phone,
+      message: message,
+    };
+    
+    if (fileUrl) {
+      payload.url = fileUrl;
+      payload.filename = filename || 'document.pdf';
     }
+
+    const response = await fetch('https://api.fonnte.com/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams(payload)
+    });
 
     const result = await response.json();
     if (result.status) {
@@ -95,17 +76,11 @@ export async function sendDonationNotification(donorName: string, donorPhone: st
   const msg = `🕌 *infaqLy — Konfirmasi Donasi*\n\nAssalamu'alaikum ${donorName},\n\nTerima kasih atas donasi Anda! ❤️\n\n📋 *Detail:*\n• Program: ${program}\n• Nominal: Rp ${fmt}\n• Order ID: ${orderId}\n• Status: ✅ Berhasil\n\n_Sertifikat donasi PDF resmi dari InfaqLy telah kami lampirkan bersama pesan ini._\n\nSemoga Allah membalas kebaikan Anda. Aamiin. 🤲\n\n_Pesan otomatis dari infaqLy_`;
   console.log(`[WA] 📤 Sending donation receipt to ${donorName} (${donorPhone})...`);
   
-  // Parse local PDF for direct Fonnte upload (bypasses localhost URL restriction)
-  let localPdfPath: string | undefined = undefined;
-  try {
-    localPdfPath = await generateCertificatePDF({
-      orderId, donorName, amount, programName: program, date: new Date()
-    });
-  } catch (err) {
-    console.error('[WA Fonnte] Failed to generate PDF:', err);
-  }
+  // Public URL to serve the dynamic PDF
+  const publicPdfUrl = `${env.FRONTEND_URL}/api/donations/${orderId}/pdf`;
+  const pdfFilename = `Kuitansi_InfaqLy_${orderId}.pdf`;
   
-  return sendWhatsApp(donorPhone, msg, localPdfPath);
+  return sendWhatsApp(donorPhone, msg, publicPdfUrl, pdfFilename);
 }
 
 /** OTP notification for password reset */
