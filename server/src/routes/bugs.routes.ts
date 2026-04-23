@@ -105,24 +105,44 @@ router.post('/sentry-webhook', async (req, res) => {
     const environment = event?.environment || payload?.data?.event?.environment || 'production';
     const timestamp = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
     
-    // Extract error location and stack trace robustly
-    // Sometimes exception is in entries array instead of direct property
-    let exception = event?.exception?.values?.[0];
-    if (!exception && event?.entries) {
-      const exceptionEntry = event.entries.find((e: any) => e.type === 'exception');
-      if (exceptionEntry) exception = exceptionEntry.data?.values?.[0];
+    // Deep search to find stacktrace frames anywhere in the Sentry payload
+    // Sentry webhook formats vary wildly between Issue Alerts, Metric Alerts, and different SDKs.
+    function findFrames(obj: any): any[] | null {
+      if (!obj || typeof obj !== 'object') return null;
+      if (Array.isArray(obj.frames) && obj.frames.length > 0) return obj.frames;
+      for (const key of Object.keys(obj)) {
+        if (typeof obj[key] === 'object') {
+          const res = findFrames(obj[key]);
+          if (res) return res;
+        }
+      }
+      return null;
     }
-    exception = exception || {};
 
-    const errorType = exception?.type || payload?.level || 'Error';
-    const errorValue = exception?.value || eventTitle;
+    // Find the primary exception object info
+    function findException(obj: any): any {
+      if (!obj || typeof obj !== 'object') return null;
+      if (obj.type && obj.value && (obj.stacktrace || obj.mechanism)) return obj;
+      if (Array.isArray(obj.values) && obj.values[0]?.type) return obj.values[0];
+      for (const key of Object.keys(obj)) {
+        if (typeof obj[key] === 'object') {
+          const res = findException(obj[key]);
+          if (res) return res;
+        }
+      }
+      return null;
+    }
+
+    const exception = findException(payload) || {};
+    const errorType = exception.type || event?.title || payload?.message || 'Error';
+    const errorValue = exception.value || eventTitle;
     
     let stackInfo = 'Tidak ada stack trace terdeteksi';
     let errorFile = '-';
     let errorLine = '-';
     
-    // Extract frames defensively
-    const frames = exception?.stacktrace?.frames || event?.stacktrace?.frames || [];
+    // Auto-extract frames defensively
+    const frames = findFrames(payload) || [];
     if (frames && Array.isArray(frames) && frames.length > 0) {
       // Sentry frames usually have the most recent call at the end of the array
       const topFrames = frames.slice(-4).reverse();
