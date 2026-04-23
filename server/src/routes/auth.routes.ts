@@ -26,6 +26,21 @@ router.post('/register', async (req: Request, res: Response) => {
     if (!username || !email || !whatsapp || !password) {
       return res.status(400).json({ error: 'Semua field wajib diisi' });
     }
+
+    // Filter email domain publik yang valid (Anti Fake/Disposable Email)
+    const allowedDomains = [
+      'gmail.com', 'yahoo.com', 'yahoo.co.id', 'outlook.com', 
+      'hotmail.com', 'icloud.com', 'protonmail.com', 'proton.me',
+      'ymail.com', 'rocketmail.com', 'live.com'
+    ];
+    
+    const emailDomain = email.split('@')[1]?.toLowerCase();
+    if (!emailDomain || !allowedDomains.includes(emailDomain)) {
+      return res.status(400).json({ 
+        error: 'Pendaftaran ditolak. Silakan gunakan email resmi yang umum digunakan (seperti Gmail, Yahoo, Outlook, atau iCloud).' 
+      });
+    }
+
     if (password.length < 8) {
       return res.status(400).json({ error: 'Password minimal 8 karakter' });
     }
