@@ -164,6 +164,9 @@ export async function getClientConfig() {
  */
 export async function handleNotification(body: any) {
   const orderId = body.order_id;
+  if (!orderId) {
+    throw new Error(`Midtrans Exception: Invalid Payload. ${body.status_message || 'Missing order_id'}`);
+  }
 
   // Serialize concurrent calls for the same orderId to prevent double-counting
   return withOrderLock(orderId, () => _handleNotificationUnsafe(body));
@@ -268,6 +271,9 @@ export async function checkTransactionStatus(orderId: string) {
     if (!response.ok) return null;
 
     const data = await response.json();
+    // Jika Snap belum dibayar sama sekali, Midtrans akan membalas 404 API "Transaction doesn't exist".
+    // Kita harus membiarkan order_id tetap PENDING di database lokal secara wajar tanpa melempar error.
+    if (data.status_code === '404' || !data.order_id) return null;
     return data;
   } catch {
     return null;
