@@ -24,9 +24,10 @@ async function getFonnteToken(): Promise<string> {
 }
 
 /**
- * Send WhatsApp text message — Powered by Fonnte 3rd Party API
+ * Send WhatsApp message — Powered by Fonnte 3rd Party API
+ * Allows sending files via `url` parameter (works on Free plan according to Fonnte JS SDK)
  */
-export async function sendWhatsApp(target: string, message: string) {
+export async function sendWhatsApp(target: string, message: string, fileUrl?: string, filename?: string) {
   const phone = sanitizePhone(target);
   const token = await getFonnteToken();
 
@@ -36,87 +37,62 @@ export async function sendWhatsApp(target: string, message: string) {
   }
 
   try {
-    const response = await fetch('https://api.fonnte.com/send', {
-      method: 'POST',
-      headers: {
-        'Authorization': token,
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: new URLSearchParams({ target: phone, message })
-    });
+    let response;
+
+    if (fileUrl) {
+      // Use FormData for attachments (Fonnte's documented way for JS)
+      const form = new FormData();
+      form.append('target', phone);
+      form.append('message', message);
+      form.append('url', fileUrl);
+      if (filename) form.append('filename', filename);
+
+      response = await fetch('https://api.fonnte.com/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': token,
+          ...form.getHeaders()
+        },
+        body: form as any
+      });
+    } else {
+      // Use URLSearchParams for text-only
+      response = await fetch('https://api.fonnte.com/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({ target: phone, message })
+      });
+    }
 
     const result = await response.json();
     console.log(`[WA Fonnte] Response for ${phone}:`, JSON.stringify(result));
+    
     if (result.status) {
-      console.log(`[WA Fonnte] ✅ Text sent to ${phone}`);
+      console.log(`[WA Fonnte] ✅ Message sent to ${phone}`);
       return { success: true, message: 'Terkirim via Fonnte' };
     } else {
       console.warn(`[WA Fonnte] ❌ Failed for ${phone}:`, result.reason);
+      // Fallback to text-only if file fails
+      if (fileUrl) {
+         console.log(`[WA Fonnte] 🔁 Fallback: attempting to send text-only without attachment`);
+         return sendWhatsApp(target, message);
+      }
       return { success: false, message: result.reason || 'Gagal API Fonnte' };
     }
   } catch (err: any) {
     console.error(`[WA Fonnte] ❌ Crash API for ${phone}:`, err.message);
+    if (fileUrl) {
+       console.log(`[WA Fonnte] 🔁 Fallback: attempting to send text-only without attachment`);
+       return sendWhatsApp(target, message);
+    }
     return { success: false, message: 'Kesalahan Jaringan Fonnte' };
   }
 }
 
-/**
- * Send WhatsApp message WITH file attachment — using form-data + fs.createReadStream
- * This is the official documented method for Fonnte file uploads.
- */
-export async function sendWhatsAppWithFile(target: string, message: string, filePath: string, customFilename?: string) {
-  const phone = sanitizePhone(target);
-  const token = await getFonnteToken();
 
-  if (!token) {
-    console.warn(`[WA Fonnte] ❌ FONNTE_TOKEN is not set. Cannot send file to ${phone}`);
-    return { success: false, message: 'Fonnte Token tidak ditemukan' };
-  }
-
-  if (!fs.existsSync(filePath)) {
-    console.warn(`[WA Fonnte] ❌ File not found: ${filePath}. Sending text only.`);
-    return sendWhatsApp(target, message);
-  }
-
-  try {
-    const form = new FormData();
-    form.append('target', phone);
-    form.append('message', message);
-    form.append('file', fs.createReadStream(filePath), {
-      filename: customFilename || path.basename(filePath),
-      contentType: 'application/pdf',
-    });
-
-    const response = await fetch('https://api.fonnte.com/send', {
-      method: 'POST',
-      headers: {
-        'Authorization': token,
-        ...form.getHeaders(),
-      },
-      body: form as any,
-    });
-
-    const result = await response.json();
-    console.log(`[WA Fonnte] File response for ${phone}:`, JSON.stringify(result));
-
-    // Cleanup temp file after sending
-    fs.unlink(filePath, () => {});
-
-    if (result.status) {
-      console.log(`[WA Fonnte] ✅ File+Text sent to ${phone}`);
-      return { success: true, message: 'Terkirim via Fonnte (dengan PDF)' };
-    } else {
-      console.warn(`[WA Fonnte] ❌ File send failed for ${phone}:`, result.reason);
-      // Fallback: send text-only if file upload fails (e.g. free plan limitation)
-      console.log(`[WA Fonnte] 🔁 Fallback: sending text-only to ${phone}`);
-      return sendWhatsApp(target, message);
-    }
-  } catch (err: any) {
-    console.error(`[WA Fonnte] ❌ File upload crash for ${phone}:`, err.message);
-    // Fallback: send text-only
-    return sendWhatsApp(target, message);
-  }
-}
 
 /** Welcome notification for new users */
 export async function sendWelcomeNotification(name: string, phone: string) {
@@ -128,12 +104,37 @@ export async function sendWelcomeNotification(name: string, phone: string) {
 /** Donation success notification */
 export async function sendDonationNotification(donorName: string, donorPhone: string, program: string, amount: number, orderId: string) {
   const fmt = new Intl.NumberFormat('id-ID').format(amount);
-  const receiptUrl = `${env.FRONTEND_URL}/receipt/${orderId}`;
+  const baseUrl = env.FRONTEND_URL.replace(/\/+$/, '');
+  const receiptUrl = `${baseUrl}/receipt/${orderId}`;
   
-  const msg = `🕌 *infaqLy — Konfirmasi Donasi*\\n\\nAssalamu'alaikum ${donorName},\\n\\nTerima kasih atas donasi Anda! ❤️\\n\\n📋 *Detail:*\\n• Program: ${program}\\n• Nominal: Rp ${fmt}\\n• Order ID: ${orderId}\\n• Status: ✅ Berhasil\\n\\n📜 *Kuitansi Digital Anda:*\\n${receiptUrl}\\n\\n_Klik link di atas untuk melihat, mencetak, atau mengunduh kuitansi donasi Anda dalam format PDF._\\n\\nSemoga Allah membalas kebaikan Anda. Aamiin. 🤲\\n\\n_Pesan otomatis dari infaqLy_`;
-  console.log(`[WA] 📤 Sending donation receipt link to ${donorName} (${donorPhone}): ${receiptUrl}`);
+  const msg = [
+    `🕌 *infaqLy — Konfirmasi Donasi*`,
+    ``,
+    `Assalamu'alaikum ${donorName},`,
+    ``,
+    `Terima kasih atas donasi Anda! ❤️`,
+    ``,
+    `📋 *Detail:*`,
+    `• Program: ${program}`,
+    `• Nominal: Rp ${fmt}`,
+    `• Order ID: ${orderId}`,
+    `• Status: ✅ Berhasil`,
+    ``,
+    `📜 *Kuitansi Digital Anda:*`,
+    `${receiptUrl}`,
+    ``,
+    `_Klik link di atas untuk melihat, mencetak, atau mengunduh kuitansi donasi Anda dalam format PDF._`,
+    ``,
+    `Semoga Allah membalas kebaikan Anda. Aamiin. 🤲`,
+    ``,
+    `_Pesan otomatis dari infaqLy_`,
+  ].join('\n');
   
-  return sendWhatsApp(donorPhone, msg);
+  const pdfUrl = `${baseUrl}/api/donations/${orderId}/pdf`;
+  const filename = `Kuitansi-InfaqLy-${orderId}.pdf`;
+  
+  console.log(`[WA] 📤 Sending donation receipt link + attachment request to ${donorName} (${donorPhone})`);
+  return sendWhatsApp(donorPhone, msg, pdfUrl, filename);
 }
 
 /** OTP notification for password reset */
