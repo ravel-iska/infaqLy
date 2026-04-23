@@ -36,6 +36,7 @@ router.post('/register', async (req: Request, res: Response) => {
 
     return res.status(201).json({ user: result.user, token: result.token, message: 'OTP terkirim ke WhatsApp' });
   } catch (err: any) {
+    console.error('[Register Error]', err);
     return res.status(400).json({ error: err.message });
   }
 });
@@ -58,6 +59,7 @@ router.post('/verify-registration', requireAuth, async (req: Request, res: Respo
 
     return res.json({ message: 'Verifikasi berhasil' });
   } catch (err: any) {
+    console.error('[Verify OTP Error]', err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -94,6 +96,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
     return res.json({ user: result.user, token: result.token });
   } catch (err: any) {
+    console.error('[Login Error]', err);
     return res.status(401).json({ error: err.message });
   }
 });
@@ -115,6 +118,7 @@ router.post('/admin/login', async (req: Request, res: Response) => {
 
     return res.json({ user: result.user, token: result.token });
   } catch (err: any) {
+    console.error('[Admin Login Error]', err);
     return res.status(401).json({ error: err.message });
   }
 });

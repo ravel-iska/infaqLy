@@ -49,6 +49,9 @@ import { startBot } from './services/wabot.service.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
+// Trust proxy for rate limiting (since we're behind Vercel/Railway reverse proxies)
+app.set('trust proxy', 1);
+
 // ═══ Global Middleware ═══
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },

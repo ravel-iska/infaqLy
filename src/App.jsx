@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
@@ -9,6 +9,36 @@ import { SpeedInsights } from "@vercel/speed-insights/react";
 import UserLayout from '@/layouts/UserLayout';
 import AdminLayout from '@/layouts/AdminLayout';
 import MinimalLayout from '@/layouts/MinimalLayout';
+
+// ═══ Error Boundary for Lazy Load Chunks ═══
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error('Lazy loading failed:', error, errorInfo);
+    // If chunk fetch error, reload page to get fresh assets
+    if (error.name === 'ChunkLoadError' || error.message.includes('fetch dynamically imported module') || error.message.includes('Importing a module script failed')) {
+      window.location.reload();
+    }
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
+          <h2 className="text-xl font-bold mb-2">Terjadi Kesalahan Jaringan</h2>
+          <p className="text-gray-500 mb-4">Mohon segarkan halaman untuk memuat versi terbaru aplikasi.</p>
+          <button onClick={() => window.location.reload()} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-bold">Segarkan Halaman</button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 // ═══ Lazy-loaded Pages (code-split per route) ═══
 // User Pages
@@ -145,7 +175,8 @@ function AppRoutes() {
   }
 
   return (
-    <Suspense fallback={<LoadingScreen />}>
+    <ErrorBoundary>
+      <Suspense fallback={<LoadingScreen />}>
       <Routes>
         {/* ── User Public Routes ── */}
         <Route element={<UserLayout />}>
@@ -182,6 +213,7 @@ function AppRoutes() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>
+    </ErrorBoundary>
   );
 }
 
