@@ -94,17 +94,26 @@ router.post('/sentry-webhook', async (req, res) => {
 
     const payload = req.body;
     
-    // Parse Sentry webhook payload
-    const event = payload?.data?.event || {};
+    // Parse Sentry webhook payload (handles different Sentry payload versions/types)
+    const event = payload?.data?.event || payload?.event || payload || {};
     const eventTitle = event?.title || payload?.message || 'Unknown Error';
-    const eventUrl = event?.web_url || payload?.url || '-';
+    const eventUrl = event?.web_url || payload?.url || payload?.data?.event?.web_url || '-';
+    
+    // Extract project metadata
     const projectName = event?.project || payload?.project_name || 'infaqLy';
     const level = event?.level || payload?.level || 'error';
-    const environment = event?.environment || 'production';
+    const environment = event?.environment || payload?.data?.event?.environment || 'production';
     const timestamp = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
     
-    // Extract error location and stack trace
-    const exception = event?.exception?.values?.[0] || {};
+    // Extract error location and stack trace robustly
+    // Sometimes exception is in entries array instead of direct property
+    let exception = event?.exception?.values?.[0];
+    if (!exception && event?.entries) {
+      const exceptionEntry = event.entries.find((e: any) => e.type === 'exception');
+      if (exceptionEntry) exception = exceptionEntry.data?.values?.[0];
+    }
+    exception = exception || {};
+
     const errorType = exception?.type || payload?.level || 'Error';
     const errorValue = exception?.value || eventTitle;
     
@@ -112,15 +121,19 @@ router.post('/sentry-webhook', async (req, res) => {
     let errorFile = '-';
     let errorLine = '-';
     
-    // Sentry frames usually have the most recent call at the end of the array
+    // Extract frames defensively
     const frames = exception?.stacktrace?.frames || event?.stacktrace?.frames || [];
-    if (frames && frames.length > 0) {
-      // Mengambil maksimal 4 urutan proses terakhir untuk memudahkan navigasi eror (dari mana ke mana)
+    if (frames && Array.isArray(frames) && frames.length > 0) {
+      // Sentry frames usually have the most recent call at the end of the array
       const topFrames = frames.slice(-4).reverse();
-      stackInfo = topFrames.map((f: any) => `  ↳ ${f.filename || f.module || 'Unknown'}:${f.lineno || '?'}`).join('\n');
+      stackInfo = topFrames.map((f: any) => {
+        const file = f.filename || f.abs_path || f.module || 'Unknown';
+        return `  ↳ ${file}:${f.lineno || '?'}`;
+      }).join('\n');
       
-      errorFile = topFrames[0].filename || '-';
-      errorLine = String(topFrames[0].lineno || '-');
+      const primaryFrame = topFrames[0];
+      errorFile = primaryFrame.filename || primaryFrame.abs_path || primaryFrame.module || '-';
+      errorLine = String(primaryFrame.lineno || '-');
     }
 
     // 🛑 Anti-Spam System (Deduplikasi)
