@@ -1,39 +1,21 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { env } from '../config/env.js';
 
-let transporter: nodemailer.Transporter | null = null;
+let resendClient: Resend | null = null;
 
-function getTransporter() {
-  if (transporter) return transporter;
+function getResendClient() {
+  if (resendClient) return resendClient;
 
-  const { SMTP_USER, SMTP_PASS } = env;
+  // We enforce the Resend API Key inside SMTP_PASS since the user configured it there
+  const resendApiKey = env.SMTP_PASS;
 
-  if (!SMTP_USER || !SMTP_PASS) {
-    console.warn('[Email] ⚠️ SMTP_USER atau SMTP_PASS belum dikonfigurasi. Pengiriman email akan di-skip.');
+  if (!resendApiKey || !resendApiKey.startsWith('re_')) {
+    console.warn('[Email] ⚠️ Kunci Resend API (SMTP_PASS) belum diset/tidak diawali "re_". Pengiriman email di-skip.');
     return null;
   }
 
-  // Auto-detect SMTP Host based on provided username
-  let smtpHost = 'smtp.gmail.com';
-  let smtpPort = 465;
-  if (SMTP_USER === 'resend') {
-    smtpHost = 'smtp.resend.com';
-  } else if (SMTP_USER.includes('brevo') || SMTP_USER.includes('sendinblue')) {
-    smtpHost = 'smtp-relay.brevo.com';
-    smtpPort = 587;
-  }
-
-  transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure: smtpPort === 465, // true for 465, false for 587
-    auth: {
-      user: SMTP_USER,
-      pass: SMTP_PASS,
-    },
-  });
-
-  return transporter;
+  resendClient = new Resend(resendApiKey);
+  return resendClient;
 }
 
 /**
@@ -47,8 +29,8 @@ export async function sendDonationReceiptEmail(
   orderId: string,
   pdfBuffer: Buffer
 ) {
-  const mailer = getTransporter();
-  if (!mailer) return; // Skip silently if no email config is provided
+  const resend = getResendClient();
+  if (!resend) return { success: false, error: 'Api key missing' };
 
   try {
     const fmt = new Intl.NumberFormat('id-ID').format(amount);
@@ -91,28 +73,30 @@ export async function sendDonationReceiptEmail(
       </div>
     `;
 
-    // Untuk Resend, SMTP_USER adalah "resend", bukan alamat email.
-    // Jika SMTP_USER berbentuk email (ada '@'), pakai itu. Jika tidak, gunakan domain pengirim khusus.
     const senderEmail = env.SMTP_USER.includes('@') ? env.SMTP_USER : 'no-reply@tugasskripsibagus.web.id';
 
-    const info = await mailer.sendMail({
-      from: `"infaqLy Platform" <${senderEmail}>`,
-      to: donorEmail,
+    const { data, error } = await resend.emails.send({
+      from: `infaqLy Platform <${senderEmail}>`,
+      to: [donorEmail],
       subject: `Kuitansi Donasi Anda: ${programName}`,
       html: htmlBody,
       attachments: [
         {
           filename: `Kuitansi-InfaqLy-${orderId}.pdf`,
           content: pdfBuffer,
-          contentType: 'application/pdf',
         },
       ],
     });
 
-    console.log(`[Email] ✅ Berhasil mengirim kuitansi ke ${donorEmail} (ID: ${info.messageId})`);
-    return { success: true, messageId: info.messageId };
+    if (error) {
+      console.error(`[Email Resend] ❌ Gagal mengirim ke ${donorEmail}:`, error);
+      return { success: false, error };
+    }
+
+    console.log(`[Email Resend] ✅ Berhasil terkirim! ID: ${data?.id}`);
+    return { success: true, messageId: data?.id };
   } catch (error: any) {
-    console.error(`[Email] ❌ Gagal mengirim kuitansi ke ${donorEmail}:`, error.message);
+    console.error(`[Email Resend] ❌ Crash gagal mengirim ke ${donorEmail}:`, error.message);
     return { success: false, error: error.message };
   }
 }
