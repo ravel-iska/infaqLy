@@ -81,8 +81,12 @@ export async function sendDonationReceiptEmail(
       </div>
     `;
 
+    // Untuk Resend, SMTP_USER adalah "resend", bukan alamat email.
+    // Jika SMTP_USER berbentuk email (ada '@'), pakai itu. Jika tidak, gunakan domain pengirim khusus.
+    const senderEmail = env.SMTP_USER.includes('@') ? env.SMTP_USER : 'no-reply@tugasskripsibagus.web.id';
+
     const info = await mailer.sendMail({
-      from: `"infaqLy Platform" <${env.SMTP_USER}>`,
+      from: `"infaqLy Platform" <${senderEmail}>`,
       to: donorEmail,
       subject: `Kuitansi Donasi Anda: ${programName}`,
       html: htmlBody,
