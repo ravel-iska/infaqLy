@@ -1,7 +1,8 @@
 import { Router, Request, Response } from 'express';
 import * as authService from '../services/auth.service.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.middleware.js';
-import { sendWelcomeNotification, sendRegistrationOtpNotification } from '../services/whatsapp.service.js';
+import { sendWelcomeNotification, sendRegistrationOtpNotification, sendOtpNotification } from '../services/whatsapp.service.js';
+import { sendResetOtpEmail } from '../services/email.service.js';
 import * as otpService from '../services/otp.service.js';
 import { db } from '../config/database.js';
 import { settings, users } from '../db/schema.js';
@@ -146,6 +147,72 @@ router.post('/admin/login', async (req: Request, res: Response) => {
     return res.status(401).json({ error: err.message });
   }
 });
+
+// ═══════════════════════════════════════
+// FORGOT PASSWORD / RESET PASSWORD
+// ═══════════════════════════════════════
+
+// POST /api/auth/forgot-password
+router.post('/forgot-password', otpLimiter, async (req: Request, res: Response) => {
+  try {
+    const { emailOrPhone } = req.body;
+    if (!emailOrPhone) return res.status(400).json({ error: 'Email atau No WhatsApp wajib diisi' });
+
+    // Cari User di DB (Bisa via Email, WA, atau Username jika inputnya fleksibel)
+    const dbUser = await db.select().from(users).where(eq(users.email, emailOrPhone)).limit(1).then(r => r[0]) 
+                || await db.select().from(users).where(eq(users.whatsapp, emailOrPhone)).limit(1).then(r => r[0]);
+
+    // Anti-Enumeration: Jangan katakan apakah user ditemukan atau tidak
+    // Tapi untuk keperluan skripsi, berikan indikator jelas saja
+    if (!dbUser) {
+       return res.status(404).json({ error: 'Akun tidak ditemukan.' });
+    }
+
+    // Generate OTP
+    const otp = await otpService.generateOtp(dbUser.id, 'reset_password');
+
+    // Kirim Pararel ke Email dan WhatsApp!
+    sendOtpNotification(dbUser.whatsapp, otp).catch(() => {});
+    sendResetOtpEmail(dbUser.email, dbUser.username, otp).catch(() => {});
+
+    return res.json({ message: 'Kode OTP untuk reset password telah dikirim ke WhatsApp dan Email Anda.' });
+  } catch (err: any) {
+    console.error('[Forgot Password Error]', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/auth/reset-password
+router.post('/reset-password', async (req: Request, res: Response) => {
+  try {
+    const { emailOrPhone, otpCode, newPassword } = req.body;
+    if (!emailOrPhone || !otpCode || !newPassword) {
+       return res.status(400).json({ error: 'Semua field (Kontak, Kode OTP, Password Baru) wajib diisi' });
+    }
+    if (newPassword.length < 8) {
+       return res.status(400).json({ error: 'Password minimal 8 karakter' });
+    }
+
+    const dbUser = await db.select().from(users).where(eq(users.email, emailOrPhone)).limit(1).then(r => r[0]) 
+                || await db.select().from(users).where(eq(users.whatsapp, emailOrPhone)).limit(1).then(r => r[0]);
+
+    if (!dbUser) return res.status(404).json({ error: 'Akun tidak ditemukan' });
+
+    // Verifikasi OTP
+    const isValid = await otpService.verifyOtp(dbUser.id, otpCode, 'reset_password', true);
+    if (!isValid) return res.status(400).json({ error: 'Kode OTP tidak valid atau telah kedaluwarsa.' });
+
+    // Hash Password Baru & Update di DB
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await db.update(users).set({ password: hashedPassword, updatedAt: new Date() }).where(eq(users.id, dbUser.id));
+
+    return res.json({ message: 'Password Anda berhasil diubah! Silakan login dengan password baru.' });
+  } catch (err: any) {
+    console.error('[Reset Password Error]', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 
 // POST /api/auth/logout
 router.post('/logout', requireAuth, async (req: Request, res: Response) => {
