@@ -13,10 +13,20 @@ function getTransporter() {
     return null;
   }
 
+  // Auto-detect SMTP Host based on provided username
+  let smtpHost = 'smtp.gmail.com';
+  let smtpPort = 465;
+  if (SMTP_USER === 'resend') {
+    smtpHost = 'smtp.resend.com';
+  } else if (SMTP_USER.includes('brevo') || SMTP_USER.includes('sendinblue')) {
+    smtpHost = 'smtp-relay.brevo.com';
+    smtpPort = 587;
+  }
+
   transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpPort === 465, // true for 465, false for 587
     auth: {
       user: SMTP_USER,
       pass: SMTP_PASS,
