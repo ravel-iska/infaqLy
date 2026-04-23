@@ -153,6 +153,13 @@ export async function createCampaign(data: {
   title: string; category?: string; target: number; status?: string;
   imageUrl?: string; description?: string; endDate?: string;
 }) {
+  if (data.target <= 0) {
+    throw new Error('Target kampanye harus lebih besar dari 0');
+  }
+  if (data.target > 2000000000) {
+    throw new Error('Target kampanye melebihi batas maksimal');
+  }
+
   const [campaign] = await db.insert(campaigns).values({
     title: data.title,
     slug: slugify(data.title),

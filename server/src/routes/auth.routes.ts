@@ -7,6 +7,15 @@ import { db } from '../config/database.js';
 import { settings, users } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
+import rateLimit from 'express-rate-limit';
+
+const otpLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 5 requests per window
+  standardHeaders: true, 
+  legacyHeaders: false,
+  message: { error: 'Celah Keamanan: Terlalu banyak percobaan OTP salah. Silakan coba lagi nanti.' },
+});
 
 const router = Router();
 
@@ -42,7 +51,7 @@ router.post('/register', async (req: Request, res: Response) => {
 });
 
 // POST /api/auth/verify-registration
-router.post('/verify-registration', requireAuth, async (req: Request, res: Response) => {
+router.post('/verify-registration', requireAuth, otpLimiter, async (req: Request, res: Response) => {
   try {
     const { code } = req.body;
     if (!code) return res.status(400).json({ error: 'Kode OTP wajib diisi' });

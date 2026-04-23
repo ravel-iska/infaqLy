@@ -6,12 +6,20 @@ import crypto from 'crypto';
 
 // ═══ Per-Order Mutex Lock — prevents race condition on concurrent webhook + poll ═══
 const orderLocks = new Map<string, Promise<any>>();
-function withOrderLock<T>(orderId: string, fn: () => Promise<T>): Promise<T> {
+function withOrderLock<T>(orderId: string, fn: () => Promise<T>, timeoutMs = 30000): Promise<T> {
   const prev = orderLocks.get(orderId) || Promise.resolve();
-  const next = prev.then(fn, fn); // always run fn even if prev rejects
+  const timeoutPromise = new Promise<T>((_, reject) => 
+    setTimeout(() => reject(new Error(`[Lock Timeout] Lock stalled for ${orderId}`)), timeoutMs)
+  );
+  
+  // Race between the next execution and the dead-lock timeout
+  const next = Promise.race([prev.then(fn, fn), timeoutPromise]);
   orderLocks.set(orderId, next);
+  
   // Cleanup after completion to avoid memory leak
-  next.finally(() => { if (orderLocks.get(orderId) === next) orderLocks.delete(orderId); });
+  next.finally(() => { 
+    if (orderLocks.get(orderId) === next) orderLocks.delete(orderId); 
+  });
   return next;
 }
 
@@ -87,6 +95,14 @@ export function generateOrderId(): string {
 export async function createSnapToken(data: {
   orderId: string; amount: number; donorName: string; donorEmail: string; donorPhone: string; programName: string;
 }) {
+  // Input Validation (Bug #7 fix)
+  if (!data.amount || data.amount < 1000) {
+    throw new Error('Jumlah donasi minimum adalah Rp 1.000');
+  }
+  if (data.amount > 2000000000) {
+    throw new Error('Jumlah donasi melebihi batas maksimal');
+  }
+  
   const config = await getMidtransConfig();
 
   if (!config.serverKey) {
@@ -178,43 +194,53 @@ async function _handleNotificationUnsafe(body: any) {
     status = 'expired';
   }
 
-  // Get current status before updating (to prevent double-counting and sandbox overrides)
-  const [existing] = await db.select()
-    .from(donations).where(eq(donations.orderId, orderId)).limit(1);
-  const wasAlreadySuccess = existing?.paymentStatus === 'success';
+  // Ensure Distributed Atomicity (Bug #1) using db.transaction
+  return db.transaction(async (tx) => {
+    // Acquire a row-level lock FOR UPDATE inside the database
+    const [existing] = await tx.select().from(donations).where(eq(donations.orderId, orderId)).limit(1).for('update');
+    if (!existing) {
+      throw new Error(`Donasi dengan orderId ${orderId} tidak ditemukan.`);
+    }
 
-  // SECURITY: Jika status lokal sudah success (baik asli maupun simulasi Sandbox), 
-  // ABAIKAN webhook Midtrans yang mencoba menurunkannya kembali jadi pending/gagal!
-  if (wasAlreadySuccess && status !== 'success') {
-    return { orderId, status: 'success', donation: existing, isNewSuccess: false };
-  }
+    const wasAlreadySuccess = existing.paymentStatus === 'success';
 
-  // Update donation record
-  const [donation] = await db.update(donations)
-    .set({
-      paymentStatus: status,
-      paymentMethod: body.payment_type || null,
-      midtransResponse: body,
-      paidAt: status === 'success' ? new Date() : null,
-      updatedAt: new Date(),
-    })
-    .where(eq(donations.orderId, orderId))
-    .returning();
+    // Amount Validation Check (Bug #3) - Guard against signature bypass attacks
+    if (body.gross_amount && existing.amount.toString() !== parseFloat(body.gross_amount).toString()) {
+      throw new Error(`SECURITY_ERROR: Manipulasi nominal terdeteksi! Database Rp ${existing.amount} != Webhook Rp ${body.gross_amount}`);
+    }
 
-  // If transitioning TO success (and wasn't already success), update campaign
-  let isNewSuccess = false;
-  if (status === 'success' && donation && !wasAlreadySuccess) {
-    isNewSuccess = true;
-    await db.execute(
-      sql`UPDATE campaigns SET collected = collected + ${donation.amount}, donors = donors + 1, updated_at = NOW() WHERE id = ${donation.campaignId}`
-    );
-    // Auto-complete campaign if target is reached
-    await db.execute(
-      sql`UPDATE campaigns SET status = 'completed', updated_at = NOW() WHERE id = ${donation.campaignId} AND target > 0 AND collected >= target AND status = 'active'`
-    );
-  }
+    // SECURITY: Jika status lokal sudah success, ABAIKAN webhook Midtrans yang mencoba menurunkannya kembali jadi pending/gagal!
+    if (wasAlreadySuccess && status !== 'success') {
+      return { orderId, status: 'success', donation: existing, isNewSuccess: false };
+    }
 
-  return { orderId, status, donation, isNewSuccess };
+    // Update donation record
+    const [donation] = await tx.update(donations)
+      .set({
+        paymentStatus: status,
+        paymentMethod: body.payment_type || null,
+        midtransResponse: body,
+        paidAt: status === 'success' ? new Date() : null,
+        updatedAt: new Date(),
+      })
+      .where(eq(donations.orderId, orderId))
+      .returning();
+
+    // If transitioning TO success (and wasn't already success), update campaign atomically inside the same transaction
+    let isNewSuccess = false;
+    if (status === 'success' && donation && !wasAlreadySuccess) {
+      isNewSuccess = true;
+      await tx.execute(
+        sql`UPDATE campaigns SET collected = collected + ${donation.amount}, donors = donors + 1, updated_at = NOW() WHERE id = ${donation.campaignId}`
+      );
+      // Auto-complete campaign if target is reached
+      await tx.execute(
+        sql`UPDATE campaigns SET status = 'completed', updated_at = NOW() WHERE id = ${donation.campaignId} AND target > 0 AND collected >= target AND status = 'active'`
+      );
+    }
+
+    return { orderId, status, donation, isNewSuccess };
+  });
 }
 
 /**
