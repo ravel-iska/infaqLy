@@ -3,6 +3,9 @@ import * as withdrawalService from '../services/withdrawal.service.js';
 import { sendWithdrawalNotification } from '../services/whatsapp.service.js';
 import { requireAdmin } from '../middleware/auth.middleware.js';
 import { upload } from '../middleware/upload.middleware.js';
+import { db } from '../config/database.js';
+import { campaigns } from '../db/schema.js';
+import { eq } from 'drizzle-orm';
 
 const router = Router();
 
@@ -42,6 +45,23 @@ router.post('/', requireAdmin, upload.single('evidence'), async (req: Request, r
     const { amount, bankInfo, note, campaignId } = req.body;
     if (!amount || !bankInfo) return res.status(400).json({ error: 'Nominal dan info rekening wajib diisi' });
     if (!campaignId) return res.status(400).json({ error: 'Pilih kampanye yang ingin ditarik dananya' });
+
+    // SECURITY: Verify user owns this campaign or is admin
+    const [campaign] = await db.select()
+      .from(campaigns)
+      .where(eq(campaigns.id, Number(campaignId)))
+      .limit(1);
+
+    if (!campaign) {
+      return res.status(404).json({ error: 'Kampanye tidak ditemukan' });
+    }
+
+    // Check if user is campaign creator or system admin
+    if (campaign.createdBy !== req.user!.id && req.user!.role !== 'admin') {
+      return res.status(403).json({
+        error: 'Anda tidak memiliki izin untuk penarikan kampanye ini. Hanya pemilik kampanye atau admin yang dapat melakukan penarikan.'
+      });
+    }
 
     let evidenceUrl: string | undefined = undefined;
     if (req.file) {

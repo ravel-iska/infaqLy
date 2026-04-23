@@ -3,6 +3,7 @@ import { db } from '../config/database.js';
 import { donations, campaigns, settings } from '../db/schema.js';
 import { eq, sql } from 'drizzle-orm';
 import crypto from 'crypto';
+import validator from 'validator';
 
 // ═══ Per-Order Mutex Lock — prevents race condition on concurrent webhook + poll ═══
 const orderLocks = new Map<string, Promise<any>>();
@@ -95,12 +96,60 @@ export function generateOrderId(): string {
 export async function createSnapToken(data: {
   orderId: string; amount: number; donorName: string; donorEmail: string; donorPhone: string; programName: string;
 }) {
-  // Input Validation (Bug #7 fix)
-  if (!data.amount || data.amount < 1000) {
+  // Input Validation (Bug #7 fix) - Comprehensive validation before Midtrans API call
+  
+  // Validate amount
+  if (!data.amount || typeof data.amount !== 'number') {
+    throw new Error('Jumlah donasi harus berupa angka');
+  }
+  
+  if (data.amount < 1000) {
     throw new Error('Jumlah donasi minimum adalah Rp 1.000');
   }
+  
   if (data.amount > 2000000000) {
-    throw new Error('Jumlah donasi melebihi batas maksimal');
+    throw new Error('Jumlah donasi melebihi batas maksimal (Rp 2 Miliar)');
+  }
+  
+  // Validate email format
+  if (!data.donorEmail) {
+    throw new Error('Email donatur wajib diisi');
+  }
+  
+  if (!validator.isEmail(data.donorEmail)) {
+    throw new Error('Format email tidak valid');
+  }
+  
+  // Validate donor name
+  if (!data.donorName) {
+    throw new Error('Nama donatur wajib diisi');
+  }
+  
+  const nameTrimmed = data.donorName.trim();
+  if (nameTrimmed.length < 2) {
+    throw new Error('Nama donatur minimal 2 karakter');
+  }
+  
+  if (nameTrimmed.length > 100) {
+    throw new Error('Nama donatur maksimal 100 karakter');
+  }
+  
+  // Validate phone if provided
+  if (data.donorPhone && data.donorPhone.trim().length > 0) {
+    const phoneTrimmed = data.donorPhone.trim();
+    // Basic phone validation - must be numeric and 10-15 digits
+    if (!/^\d{10,15}$/.test(phoneTrimmed.replace(/[\s\-\+]/g, ''))) {
+      throw new Error('Format nomor telepon tidak valid (harus 10-15 digit angka)');
+    }
+  }
+  
+  // Validate program name
+  if (!data.programName) {
+    throw new Error('Nama program wajib diisi');
+  }
+  
+  if (data.programName.trim().length < 3) {
+    throw new Error('Nama program minimal 3 karakter');
   }
   
   const config = await getMidtransConfig();
