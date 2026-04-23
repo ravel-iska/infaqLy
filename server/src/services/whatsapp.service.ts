@@ -2,6 +2,9 @@ import { env } from '../config/env.js';
 import { db } from '../config/database.js';
 import { settings } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
+import fs from 'fs';
+import path from 'path';
+import { generateCertificatePDF } from './pdf.service.js';
 
 function sanitizePhone(phone: string): string {
   let num = phone.replace(/[\s\-\+]/g, '');
@@ -13,7 +16,7 @@ function sanitizePhone(phone: string): string {
 /**
  * Send WhatsApp message — Powered by Fonnte 3rd Party API
  */
-export async function sendWhatsApp(target: string, message: string, fileUrl?: string, filename?: string) {
+export async function sendWhatsApp(target: string, message: string, localFilePath?: string) {
   const phone = sanitizePhone(target);
   
   let token = env.FONNTE_TOKEN;
@@ -30,24 +33,54 @@ export async function sendWhatsApp(target: string, message: string, fileUrl?: st
   }
 
   try {
-    const payload: Record<string, string> = {
-      target: phone,
-      message: message,
-    };
-    
-    if (fileUrl) {
-      payload.url = fileUrl;
-      payload.filename = filename || 'document.pdf';
-    }
+    let response;
 
-    const response = await fetch('https://api.fonnte.com/send', {
-      method: 'POST',
-      headers: {
-        'Authorization': token,
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: new URLSearchParams(payload)
-    });
+    // 1. Send via Raw Buffer Multipart/Form-Data if File exists
+    if (localFilePath && fs.existsSync(localFilePath)) {
+      const boundary = '----FonnteBoundary' + Date.now();
+      let formPayload = `--${boundary}\r\n`;
+      formPayload += `Content-Disposition: form-data; name="target"\r\n\r\n${phone}\r\n`;
+      formPayload += `--${boundary}\r\n`;
+      formPayload += `Content-Disposition: form-data; name="message"\r\n\r\n${message}\r\n`;
+
+      const fileBuffer = fs.readFileSync(localFilePath);
+      const filename = path.basename(localFilePath);
+      const fileHeader = `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="${filename}"\r\nContent-Type: application/pdf\r\n\r\n`;
+      const tail = `\r\n--${boundary}--\r\n`;
+
+      const bodyBuffer = Buffer.concat([
+        Buffer.from(formPayload),
+        Buffer.from(fileHeader),
+        fileBuffer,
+        Buffer.from(tail)
+      ]);
+
+      response = await fetch('https://api.fonnte.com/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': token,
+          'Content-Type': `multipart/form-data; boundary=${boundary}`
+        },
+        body: bodyBuffer
+      });
+
+      // Cleanup local temp file
+      fs.unlink(localFilePath, () => {});
+    } 
+    // 2. Standard Text Message if no file
+    else {
+      response = await fetch('https://api.fonnte.com/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          target: phone,
+          message: message,
+        })
+      });
+    }
 
     const result = await response.json();
     if (result.status) {
@@ -76,11 +109,17 @@ export async function sendDonationNotification(donorName: string, donorPhone: st
   const msg = `🕌 *infaqLy — Konfirmasi Donasi*\n\nAssalamu'alaikum ${donorName},\n\nTerima kasih atas donasi Anda! ❤️\n\n📋 *Detail:*\n• Program: ${program}\n• Nominal: Rp ${fmt}\n• Order ID: ${orderId}\n• Status: ✅ Berhasil\n\n_Sertifikat donasi PDF resmi dari InfaqLy telah kami lampirkan bersama pesan ini._\n\nSemoga Allah membalas kebaikan Anda. Aamiin. 🤲\n\n_Pesan otomatis dari infaqLy_`;
   console.log(`[WA] 📤 Sending donation receipt to ${donorName} (${donorPhone})...`);
   
-  // Public URL to serve the dynamic PDF
-  const publicPdfUrl = `${env.FRONTEND_URL}/api/donations/${orderId}/pdf`;
-  const pdfFilename = `Kuitansi_InfaqLy_${orderId}.pdf`;
+  // Parse local PDF for direct Fonnte upload bypasses URL routing bugs entirely
+  let localPdfPath: string | undefined = undefined;
+  try {
+    localPdfPath = await generateCertificatePDF({
+      orderId, donorName, amount, programName: program, date: new Date()
+    });
+  } catch (err) {
+    console.error('[WA Fonnte] Failed to generate PDF:', err);
+  }
   
-  return sendWhatsApp(donorPhone, msg, publicPdfUrl, pdfFilename);
+  return sendWhatsApp(donorPhone, msg, localPdfPath);
 }
 
 /** OTP notification for password reset */
