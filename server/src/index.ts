@@ -41,10 +41,8 @@ import withdrawalRoutes from './routes/withdrawal.routes.js';
 import whatsappRoutes from './routes/whatsapp.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import settingsRoutes from './routes/settings.routes.js';
-import wabotRoutes from './routes/wabot.routes.js';
 import bugsRoutes from './routes/bugs.routes.js';
 import visitorRoutes from './routes/visitor.routes.js';
-import { startBot } from './services/wabot.service.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -82,7 +80,6 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/bugs', bugsRoutes);
 app.use('/api/midtrans', paymentRoutes);
-app.use('/api/wabot', wabotRoutes);
 app.use('/api/visitors', visitorRoutes);
 
 // Health check
@@ -156,9 +153,8 @@ app.listen(env.PORT, async () => {
   setInterval(runExpiry, EXPIRE_INTERVAL_MS);
   console.log('   ⏰ Cron: Auto-expire donations setiap 15 menit');
 
-  // ═══ WhatsApp Bot: Auto-start ═══
-  startBot().catch((err) => console.error('[WABot] Auto-start error:', err));
-  console.log('   📱 WABot: Baileys self-hosted (untuk OTP)\n');
+  // ═══ WhatsApp Bot: Auto-start (REMOVED) ═══
+  console.log('   📱 WABot: Powered by Fonnte API (Serverless Ready)\n');
 });
 
 // ═══ Graceful Shutdown (Railway & PM2) ═══

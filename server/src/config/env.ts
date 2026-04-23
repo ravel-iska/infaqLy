@@ -27,6 +27,7 @@ export const env = {
 
   // Native WhatsApp Admin Fallback Phone
   ADMIN_PHONE: process.env.ADMIN_PHONE || process.env.FONNTE_ADMIN_PHONE || '',
+  FONNTE_TOKEN: process.env.FONNTE_TOKEN || '',
 
   // Server
   PORT: parseInt(process.env.PORT || '5000', 10),

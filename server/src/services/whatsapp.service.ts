@@ -2,9 +2,6 @@ import { env } from '../config/env.js';
 import { db } from '../config/database.js';
 import { settings } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
-import * as wabot from './wabot.service.js';
-import { generateCertificatePDF } from './pdf.service.js';
-import fs from 'fs';
 
 function sanitizePhone(phone: string): string {
   let num = phone.replace(/[\s\-\+]/g, '');
@@ -14,23 +11,42 @@ function sanitizePhone(phone: string): string {
 }
 
 /**
- * Send WhatsApp message — WABot (Baileys self-hosted)
+ * Send WhatsApp message — Powered by Fonnte 3rd Party API
  */
 export async function sendWhatsApp(target: string, message: string) {
-  const botStatus = wabot.getStatus();
   const phone = sanitizePhone(target);
-  if (botStatus.connected) {
-    const result = await wabot.sendMessage(target, message);
-    if (result.success) {
-      console.log(`[WA] ✅ Sent via WABot to ${phone}`);
-      return result;
-    }
-    console.warn(`[WA] ❌ WABot send failed for ${phone}`);
-    return result;
+  const token = env.FONNTE_TOKEN;
+  
+  if (!token) {
+    console.warn(`[WA Fonnte] ❌ FONNTE_TOKEN is not set. Cannot send to ${phone}`);
+    return { success: false, message: 'Fonnte Token tidak ditemukan' };
   }
 
-  console.warn(`[WA] ❌ WABot is disconnected. Cannot send to ${phone}`);
-  return { success: false, message: 'WhatsApp Bot terputus' };
+  try {
+    const response = await fetch('https://api.fonnte.com/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        target: phone,
+        message: message,
+      })
+    });
+
+    const result = await response.json();
+    if (result.status) {
+      console.log(`[WA Fonnte] ✅ Sent to ${phone}`);
+      return { success: true, message: 'Terkirim via Fonnte' };
+    } else {
+      console.warn(`[WA Fonnte] ❌ Failed for ${phone}:`, result.reason);
+      return { success: false, message: result.reason || 'Gagal API Fonnte' };
+    }
+  } catch (err: any) {
+    console.error(`[WA Fonnte] ❌ Crash API for ${phone}:`, err.message);
+    return { success: false, message: 'Kesalahan Jaringan Fonnte' };
+  }
 }
 
 /** Welcome notification for new users */
@@ -43,45 +59,10 @@ export async function sendWelcomeNotification(name: string, phone: string) {
 /** Donation success notification */
 export async function sendDonationNotification(donorName: string, donorPhone: string, program: string, amount: number, orderId: string) {
   const fmt = new Intl.NumberFormat('id-ID').format(amount);
-  const msg = `🕌 *infaqLy — Konfirmasi Donasi*\n\nAssalamu'alaikum ${donorName},\n\nTerima kasih atas donasi Anda! ❤️\n\n📋 *Detail:*\n• Program: ${program}\n• Nominal: Rp ${fmt}\n• Order ID: ${orderId}\n• Status: ✅ Berhasil\n\nSemoga Allah membalas kebaikan Anda. Aamiin. 🤲\n\n_Pesan otomatis dari infaqLy_`;
+  const msg = `🕌 *infaqLy — Konfirmasi Donasi*\n\nAssalamu'alaikum ${donorName},\n\nTerima kasih atas donasi Anda! ❤️\n\n📋 *Detail:*\n• Program: ${program}\n• Nominal: Rp ${fmt}\n• Order ID: ${orderId}\n• Status: ✅ Berhasil\n\n_Catatan: Kuitansi digital donasi berformat PDF dapat Anda unduh kapan saja melalui Dasbor Profil Akun Anda._\n\nSemoga Allah membalas kebaikan Anda. Aamiin. 🤲\n\n_Pesan otomatis dari infaqLy_`;
   console.log(`[WA] 📤 Sending donation receipt to ${donorName} (${donorPhone})...`);
   
-  // Kirim struk teks utama terlebih dahulu
-  const result = await sendWhatsApp(donorPhone, msg);
-
-  // Jika WA bot native (Baileys) tersambung, kita buat & kirim Certificate PDF
-  const botStatus = wabot.getStatus();
-  if (botStatus.connected) {
-    let pdfPath = '';
-    try {
-      console.log(`[WA] 📄 Generating PDF certificate for ${orderId}...`);
-      pdfPath = await generateCertificatePDF({
-        orderId,
-        donorName,
-        amount,
-        programName: program,
-        date: new Date(),
-      });
-
-      console.log(`[WA] 📤 Sending PDF certificate to ${donorPhone}...`);
-      await wabot.sendDocument(
-        donorPhone, 
-        pdfPath, 
-        `Kuitansi-Donasi-${orderId}.pdf`, 
-        `Berikut adalah kuitansi digital untuk donasi Anda.`
-      );
-    } catch (err: any) {
-      console.error(`[WA] ❌ Failed to generate/send PDF:`, err);
-    } finally {
-      // Hapus file sementara agar tidak menumpuk memenuhi memori/storage server
-      if (pdfPath && fs.existsSync(pdfPath)) {
-        fs.unlinkSync(pdfPath);
-        console.log(`[WA] 🗑️ Temporary PDF file deleted: ${pdfPath}`);
-      }
-    }
-  }
-
-  return result;
+  return sendWhatsApp(donorPhone, msg);
 }
 
 /** OTP notification for password reset */

@@ -2,7 +2,6 @@ import { Router, Request, Response } from 'express';
 import * as userService from '../services/user.service.js';
 import * as otpService from '../services/otp.service.js';
 import { sendOtpNotification } from '../services/whatsapp.service.js';
-import * as wabot from '../services/wabot.service.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { upload } from '../middleware/upload.middleware.js';
 
