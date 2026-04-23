@@ -6,6 +6,15 @@ export default defineConfig({
   out: './drizzle',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/infaqly',
+    url: (() => {
+      let url = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/infaqly';
+      try {
+        const u = new URL(url);
+        u.searchParams.delete('sslmode');
+        return u.toString();
+      } catch (e) {
+        return url;
+      }
+    })(),
   },
 });
