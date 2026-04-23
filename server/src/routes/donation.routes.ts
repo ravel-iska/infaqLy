@@ -119,7 +119,7 @@ router.get('/:orderId/pdf', async (req: Request, res: Response) => {
     }
 
     const campaign = await campaignService.getCampaignById(donation.campaignId);
-    const pdfPath = await generateCertificatePDF({
+    const pdfBuffer = await generateCertificatePDF({
       orderId: donation.orderId,
       donorName: donation.isAnonymous ? 'Hamba Allah' : donation.donorName,
       amount: donation.amount,
@@ -127,10 +127,9 @@ router.get('/:orderId/pdf', async (req: Request, res: Response) => {
       date: new Date(donation.paidAt || donation.createdAt)
     });
 
-    res.download(pdfPath, `Kuitansi-${orderId}.pdf`, (err) => {
-      // Cleanup file after download so it doesn't inflate the server
-      if (!err) fs.unlink(pdfPath, () => {});
-    });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="Kuitansi-${orderId}.pdf"`);
+    return res.send(pdfBuffer);
   } catch (err: any) {
     return res.status(500).send('Gagal membuat PDF: ' + err.message);
   }

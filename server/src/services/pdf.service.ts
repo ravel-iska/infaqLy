@@ -1,15 +1,4 @@
 import PDFDocument from 'pdfkit';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TMP_DIR = path.resolve(__dirname, '../../tmp');
-
-// Pastikan folder tmp ada
-if (!fs.existsSync(TMP_DIR)) {
-  fs.mkdirSync(TMP_DIR, { recursive: true });
-}
 
 interface CertificateData {
   orderId: string;
@@ -19,19 +8,18 @@ interface CertificateData {
   date: Date;
 }
 
-export async function generateCertificatePDF(data: CertificateData): Promise<string> {
+export async function generateCertificatePDF(data: CertificateData): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    const filename = `Kuitansi-Donasi-${data.orderId}.pdf`;
-    const filePath = path.join(TMP_DIR, filename);
-
     // Kertas kecil struk A5 (148 x 210 mm) (approx 420 x 595 pixels)
     const doc = new PDFDocument({
       size: 'A5',
       margin: 40,
     });
 
-    const stream = fs.createWriteStream(filePath);
-    doc.pipe(stream);
+    const chunks: Buffer[] = [];
+    doc.on('data', (chunk) => chunks.push(chunk));
+    doc.on('end', () => resolve(Buffer.concat(chunks)));
+    doc.on('error', reject);
 
     // -- Header Background (Hijau) --
     doc.rect(0, 0, doc.page.width, 100).fill('#059669');
@@ -108,9 +96,5 @@ export async function generateCertificatePDF(data: CertificateData): Promise<str
     doc.fillColor('#94a3b8').fontSize(8).text('Platform Donasi Digital - infaqLy.com', 40, doc.page.height - 30, { align: 'center' });
 
     doc.end();
-
-    stream.on('finish', () => resolve(filePath));
-    stream.on('error', reject);
-    doc.on('error', reject);
   });
 }
