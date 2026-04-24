@@ -3,6 +3,9 @@ import * as withdrawalService from '../services/withdrawal.service.js';
 import { sendWithdrawalNotification } from '../services/whatsapp.service.js';
 import { requireAdmin } from '../middleware/auth.middleware.js';
 import { upload } from '../middleware/upload.middleware.js';
+import { db } from '../config/database.js';
+import { campaigns } from '../db/schema.js';
+import { eq } from 'drizzle-orm';
 
 const router = Router();
 
@@ -43,6 +46,18 @@ router.post('/', requireAdmin, upload.single('evidence'), async (req: Request, r
     if (!amount || !bankInfo) return res.status(400).json({ error: 'Nominal dan info rekening wajib diisi' });
     if (!campaignId) return res.status(400).json({ error: 'Pilih kampanye yang ingin ditarik dananya' });
 
+    // SECURITY: Verify user owns this campaign or is admin
+    const [campaign] = await db.select()
+      .from(campaigns)
+      .where(eq(campaigns.id, Number(campaignId)))
+      .limit(1);
+
+    if (!campaign) {
+      return res.status(404).json({ error: 'Kampanye tidak ditemukan' });
+    }
+
+
+
     let evidenceUrl: string | undefined = undefined;
     if (req.file) {
       const b64 = req.file.buffer.toString('base64');
@@ -59,7 +74,7 @@ router.post('/', requireAdmin, upload.single('evidence'), async (req: Request, r
     });
 
     // Send WA notification to admin
-    sendWithdrawalNotification(Number(amount), bankInfo, note || '-').catch(() => {});
+    sendWithdrawalNotification(Number(amount), bankInfo, note || '-').catch(() => { });
 
     return res.status(201).json({ withdrawal });
   } catch (err: any) {
