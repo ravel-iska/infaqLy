@@ -8,7 +8,7 @@ export default function WithdrawalsPage() {
   const [history, setHistory] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
-  
+
   const [balancePending, setBalancePending] = useState(true);
   const [balance, setBalance] = useState({ settled: 0, withdrawn: 0, available: 0 });
   const [campaignBalances, setCampaignBalances] = useState([]);
@@ -111,7 +111,7 @@ export default function WithdrawalsPage() {
           <p className="text-3xl font-bold text-base-content font-headline mt-1 tracking-tight">{formatCurrency(balance.settled)}</p>
         </div>
         <div className="bg-gradient-to-br from-base-100 to-base-200/50 backdrop-blur-md shadow-2xl shadow-base-200/40 rounded-[1.5rem] p-6 relative overflow-hidden group hover:-translate-y-2 transition-all duration-500 border border-white/10 dark:border-base-content/5">
-           <div className="absolute right-0 top-0 w-24 h-24 bg-error/10 rounded-bl-[100px] -z-10 group-hover:bg-error/20 transition-colors"></div>
+          <div className="absolute right-0 top-0 w-24 h-24 bg-error/10 rounded-bl-[100px] -z-10 group-hover:bg-error/20 transition-colors"></div>
           <div className="flex items-center gap-3 mb-2">
             <span className="material-symbols-outlined text-error text-[20px]">publish</span>
             <p className="text-sm font-semibold text-base-content/60">Total Dana Keluar</p>
@@ -119,7 +119,7 @@ export default function WithdrawalsPage() {
           <p className="text-3xl font-bold text-error font-headline mt-1 tracking-tight">{formatCurrency(balance.withdrawn)}</p>
         </div>
         <div className="bg-gradient-to-br from-base-100 to-base-200/50 backdrop-blur-md shadow-2xl shadow-base-200/40 rounded-[1.5rem] p-6 relative overflow-hidden group hover:-translate-y-2 transition-all duration-500 border border-white/10 dark:border-base-content/5">
-           <div className="absolute right-0 top-0 w-24 h-24 bg-success/10 rounded-bl-[100px] -z-10 group-hover:bg-success/20 transition-colors"></div>
+          <div className="absolute right-0 top-0 w-24 h-24 bg-success/10 rounded-bl-[100px] -z-10 group-hover:bg-success/20 transition-colors"></div>
           <div className="flex items-center gap-3 mb-2">
             <span className="material-symbols-outlined text-success text-[20px]">credit_score</span>
             <p className="text-sm font-semibold text-base-content/60">Saldo Siap Dicairkan</p>
@@ -159,7 +159,7 @@ export default function WithdrawalsPage() {
                       )}
                     </div>
                     <div className="flex items-center gap-2 w-full max-w-sm mb-2">
-                       <progress className={`progress flex-1 ${c.reachedTarget ? 'progress-success' : 'progress-secondary'}`} value={progress} max="100"></progress>
+                      <progress className={`progress flex-1 ${c.reachedTarget ? 'progress-success' : 'progress-secondary'}`} value={progress} max="100"></progress>
                     </div>
                     <div className="flex gap-4 text-xs text-base-content/60 font-mono">
                       <span>Target: {formatCurrency(c.target)}</span>
@@ -186,7 +186,7 @@ export default function WithdrawalsPage() {
           <span className="material-symbols-outlined text-primary text-[20px]">history_edu</span>
           <h2 className="text-lg font-bold text-base-content">Riwayat Penarikan Dana</h2>
         </div>
-        
+
         {history.length === 0 ? (
           <div className="text-center py-16 text-base-content/50 flex flex-col items-center bg-base-200/30">
             <span className="material-symbols-outlined text-6xl opacity-30 mb-4">money_off</span>
@@ -197,40 +197,39 @@ export default function WithdrawalsPage() {
           <div className="overflow-x-auto">
             <table className="table table-zebra table-md w-full">
               <thead>
-                <tr>
-                  <th className="bg-base-200">Tanggal & Jam</th>
-                  <th className="bg-base-200">Kampanye</th>
-                  <th className="bg-base-200">Nominal</th>
-                  <th className="bg-base-200">Rekening Tujuan</th>
-                  <th className="bg-base-200">Detail Penyaluran</th>
-                  <th className="bg-base-200 text-center">Dokumen/Bukti</th>
+                <tr className="text-base-content/70 text-[11px]">
+                  <th className="bg-base-200 uppercase tracking-wider">Waktu</th>
+                  <th className="bg-base-200 uppercase tracking-wider hidden sm:table-cell">Kampanye</th>
+                  <th className="bg-base-200 uppercase tracking-wider">Jumlah</th>
+                  <th className="bg-base-200 uppercase tracking-wider hidden md:table-cell">Rekening</th>
+                  <th className="bg-base-200 uppercase tracking-wider hidden lg:table-cell">Keterangan</th>
+                  <th className="bg-base-200 text-center uppercase tracking-wider">Bukti</th>
                 </tr>
               </thead>
               <tbody>
                 {history.map((h) => (
-                  <tr key={h.id}>
-                    <td className="text-base-content/60 font-mono font-medium text-xs">{formatDateTime(h.createdAt)}</td>
-                    <td>
-                      <span className="text-base-content font-bold text-xs">{h.campaignTitle || 'Global (Legacy)'}</span>
+                  <tr key={h.id} className="text-[13px]">
+                    <td className="text-base-content/60 font-mono font-medium text-[10px] whitespace-nowrap">{formatDateTime(h.createdAt)}</td>
+                    <td className="hidden sm:table-cell max-w-[120px] truncate">
+                      <span className="text-base-content font-bold text-[11px]">{h.campaignTitle || 'Global'}</span>
                     </td>
-                    <td className="text-base-content font-mono font-bold tracking-tight">{formatCurrency(h.amount)}</td>
-                    <td>
-                      <div className="flex items-center gap-2 text-base-content font-medium">
-                        <span className="material-symbols-outlined text-base-content/50 text-[16px]">account_balance</span>
+                    <td className="text-base-content font-mono font-bold tracking-tighter text-[12px]">{formatCurrencyShort(h.amount)}</td>
+                    <td className="hidden md:table-cell">
+                      <div className="flex items-center gap-1.5 text-base-content font-medium text-[11px]">
                         {h.bankInfo}
                       </div>
                     </td>
-                    <td className="text-base-content/70 font-medium">{h.note}</td>
+                    <td className="text-base-content/70 font-medium hidden lg:table-cell max-w-[150px] truncate">{h.note}</td>
                     <td className="text-center">
                       {h.evidenceUrl ? (
                         <button
                           onClick={() => setPreviewImage(h.evidenceUrl)}
-                          className="btn btn-sm btn-outline text-primary"
+                          className="btn btn-xs btn-outline btn-primary font-bold px-3"
                         >
-                          <span className="material-symbols-outlined text-[16px]">visibility</span> Lihat
+                          Lihat
                         </button>
                       ) : (
-                        <span className="badge">Tidak dilampirkan</span>
+                        <span className="text-[10px] text-base-content/40 italic">Kosong</span>
                       )}
                     </td>
                   </tr>
@@ -367,9 +366,9 @@ function WithdrawalModal({ eligibleCampaigns, onClose, onSubmit }) {
       <div className="bg-gradient-to-br from-base-100 to-base-200 border border-white/20 backdrop-blur-xl rounded-[2rem] p-6 sm:p-8 w-full max-w-lg shadow-3xl animate-scale-in max-h-[90vh] overflow-y-auto relative" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-8 pb-4 border-b border-base-200">
           <div className="flex items-center gap-3">
-             <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                 <span className="material-symbols-outlined text-[24px]">account_balance</span>
-             </div>
+            <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+              <span className="material-symbols-outlined text-[24px]">account_balance</span>
+            </div>
             <h2 className="text-xl font-bold text-base-content tracking-tight">Formulir Penarikan Cair</h2>
           </div>
           <button onClick={onClose} className="btn btn-ghost btn-circle btn-sm text-base-content/50 hover:text-base-content transition-colors">
@@ -402,37 +401,37 @@ function WithdrawalModal({ eligibleCampaigns, onClose, onSubmit }) {
           </div>
 
           <div className="bg-success/5 border border-success/20 p-4 rounded-xl flex items-center justify-between">
-              <span className="text-sm font-semibold text-base-content/70">Plafon Maksimal</span>
-              <span className="text-lg font-bold text-success font-mono">{formatCurrency(maxAmount)}</span>
+            <span className="text-sm font-semibold text-base-content/70">Plafon Maksimal</span>
+            <span className="text-lg font-bold text-success font-mono">{formatCurrency(maxAmount)}</span>
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-base-content/70 mb-2">Nominal Diminta (Rp) <span className="text-error">*</span></label>
             <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-base-content/50">Rp</span>
-                <input
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Nominal angka murni"
-                    className="input input-bordered w-full pl-10 font-mono tracking-wider font-bold text-lg"
-                    min="0"
-                    max={maxAmount}
-                />
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-base-content/50">Rp</span>
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="Nominal angka murni"
+                className="input input-bordered w-full pl-10 font-mono tracking-wider font-bold text-lg"
+                min="0"
+                max={maxAmount}
+              />
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-base-content/70 mb-2">Data Rekening Korporat/Penerima <span className="text-error">*</span></label>
             <div className="relative">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40 text-[20px]">domain</span>
-                <input
-                    type="text"
-                    value={bank}
-                    onChange={(e) => setBank(e.target.value)}
-                    placeholder="Misal: MANDIRI - 1234xxx - Yayasan ABC"
-                    className="input input-bordered w-full pl-12 font-medium"
-                />
+              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40 text-[20px]">domain</span>
+              <input
+                type="text"
+                value={bank}
+                onChange={(e) => setBank(e.target.value)}
+                placeholder="Misal: MANDIRI - 1234xxx - Yayasan ABC"
+                className="input input-bordered w-full pl-12 font-medium"
+              />
             </div>
           </div>
 
@@ -449,16 +448,16 @@ function WithdrawalModal({ eligibleCampaigns, onClose, onSubmit }) {
 
           <div>
             <label className="block text-sm font-semibold text-base-content/70 mb-2 flex items-center justify-between">
-                <span>Dokumen Bukti/Kuitansi Fisik <span className="text-error">*</span></span>
-                <span className="text-[10px] text-base-content/50 font-normal bg-base-200 px-2 py-0.5 rounded">Maks 10MB</span>
+              <span>Dokumen Bukti/Kuitansi Fisik <span className="text-error">*</span></span>
+              <span className="text-[10px] text-base-content/50 font-normal bg-base-200 px-2 py-0.5 rounded">Maks 10MB</span>
             </label>
-            
+
             {evidencePreview ? (
               <div className="relative group rounded-xl overflow-hidden border border-base-200 bg-base-200/50">
                 {isPdf ? (
                   <div className="flex items-center gap-3 p-5">
                     <div className="w-12 h-12 rounded bg-error/10 text-error flex items-center justify-center">
-                        <span className="material-symbols-outlined text-[24px]">picture_as_pdf</span>
+                      <span className="material-symbols-outlined text-[24px]">picture_as_pdf</span>
                     </div>
                     <div className="flex-1 overflow-hidden">
                       <p className="text-sm text-base-content font-bold truncate">{evidencePreview.replace('pdf:', '')}</p>
@@ -491,7 +490,7 @@ function WithdrawalModal({ eligibleCampaigns, onClose, onSubmit }) {
                 className="border-2 border-dashed border-base-300 hover:border-primary hover:bg-primary/5 rounded-xl p-8 flex flex-col items-center justify-center transition-all cursor-pointer bg-base-100"
               >
                 <div className="w-14 h-14 rounded-full bg-base-200 border border-base-300 text-base-content/40 flex items-center justify-center mb-3">
-                    <span className="material-symbols-outlined text-[28px]">upload_file</span>
+                  <span className="material-symbols-outlined text-[28px]">upload_file</span>
                 </div>
                 <p className="text-sm font-bold text-base-content">Klik area ini untuk memuat berkas pendukung</p>
                 <p className="text-xs text-base-content/50 font-medium mt-1">Mendukung format gambar rilis dan PDF.</p>

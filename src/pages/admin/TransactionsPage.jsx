@@ -84,8 +84,8 @@ export default function TransactionsPage() {
 
   // Pagination Logic
   const startIndex = (currentPage - 1) * (itemsPerPage === 'all' ? filtered.length : Number(itemsPerPage));
-  const paginatedTransactions = itemsPerPage === 'all' 
-    ? filtered 
+  const paginatedTransactions = itemsPerPage === 'all'
+    ? filtered
     : filtered.slice(startIndex, startIndex + Number(itemsPerPage));
   const totalPages = itemsPerPage === 'all' ? 1 : Math.ceil(filtered.length / Number(itemsPerPage));
 
@@ -160,9 +160,9 @@ export default function TransactionsPage() {
         </div>
         <div className="relative">
           <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-base-content/50 text-[20px]">filter_list</span>
-          <select 
-            value={statusFilter} 
-            onChange={(e) => setStatusFilter(e.target.value)} 
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
             className="select select-bordered pl-12 sm:w-56 font-medium"
           >
             <option value="all">Semua Status (All)</option>
@@ -180,24 +180,24 @@ export default function TransactionsPage() {
           <div className="overflow-x-auto">
             <table className="table table-zebra table-md w-full">
               <thead>
-                <tr>
-                  <th className="bg-base-200">Order ID</th>
-                  <th className="bg-base-200">Donatur</th>
-                  <th className="bg-base-200">Nominal</th>
-                  <th className="bg-base-200">Metode</th>
-                  <th className="bg-base-200 text-center">Status</th>
-                  <th className="bg-base-200 text-left">Tanggal Waktu</th>
+                <tr className="text-base-content/70 text-[11px]">
+                  <th className="bg-base-200 uppercase tracking-wider">Order ID</th>
+                  <th className="bg-base-200 uppercase tracking-wider">Donatur</th>
+                  <th className="bg-base-200 uppercase tracking-wider">Jumlah</th>
+                  <th className="bg-base-200 uppercase tracking-wider hidden md:table-cell">Metode</th>
+                  <th className="bg-base-200 text-center uppercase tracking-wider">Status</th>
+                  <th className="bg-base-200 text-left uppercase tracking-wider hidden lg:table-cell">Waktu</th>
                 </tr>
               </thead>
               <tbody>
                 {[...Array(5)].map((_, i) => (
                   <tr key={`skel-${i}`} className="animate-pulse">
+                    <td><div className="h-4 w-16 bg-base-200 rounded"></div></td>
                     <td><div className="h-4 w-24 bg-base-200 rounded"></div></td>
-                    <td><div className="h-4 w-32 bg-base-200 rounded"></div></td>
-                    <td><div className="h-4 w-20 bg-base-200 rounded"></div></td>
-                    <td><div className="h-6 w-24 bg-base-200 rounded"></div></td>
-                    <td><div className="h-6 w-24 bg-base-200 rounded mx-auto"></div></td>
-                    <td><div className="h-4 w-32 bg-base-200 rounded"></div></td>
+                    <td><div className="h-4 w-12 bg-base-200 rounded"></div></td>
+                    <td className="hidden md:table-cell"><div className="h-6 w-16 bg-base-200 rounded"></div></td>
+                    <td><div className="h-6 w-16 bg-base-200 rounded mx-auto"></div></td>
+                    <td className="hidden lg:table-cell"><div className="h-4 w-24 bg-base-200 rounded"></div></td>
                   </tr>
                 ))}
               </tbody>
@@ -213,13 +213,13 @@ export default function TransactionsPage() {
           <div className="overflow-x-auto">
             <table className="table table-zebra table-md w-full">
               <thead>
-                <tr>
-                  <th className="bg-base-200">Order ID</th>
-                  <th className="bg-base-200">Donatur</th>
-                  <th className="bg-base-200">Nominal</th>
-                  <th className="bg-base-200">Metode</th>
-                  <th className="bg-base-200 text-center">Status</th>
-                  <th className="bg-base-200 text-left">Tanggal Waktu</th>
+                <tr className="text-base-content/70 text-[11px]">
+                  <th className="bg-base-200 uppercase tracking-wider">Order ID</th>
+                  <th className="bg-base-200 uppercase tracking-wider">Donatur</th>
+                  <th className="bg-base-200 uppercase tracking-wider">Jumlah</th>
+                  <th className="bg-base-200 uppercase tracking-wider hidden md:table-cell">Metode</th>
+                  <th className="bg-base-200 text-center uppercase tracking-wider">Status</th>
+                  <th className="bg-base-200 text-left uppercase tracking-wider hidden lg:table-cell">Waktu</th>
                 </tr>
               </thead>
               <tbody>
@@ -233,35 +233,25 @@ export default function TransactionsPage() {
                   const isOverdue = remainMs <= 0;
 
                   return (
-                    <tr key={tx.id || tx.orderId}>
-                      <td className="text-primary font-mono text-[11px] font-black tracking-tight bg-primary/5 px-2 py-0.5 rounded border border-primary/10">{tx.orderId}</td>
-                      <td className="font-bold">{tx.donorName}</td>
-                      <td className="font-mono font-bold tracking-tight">{formatCurrency(tx.amount)}</td>
-                      <td>
-                        <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-base-200 rounded text-xs border border-base-300 font-medium">
-                          <span className="material-symbols-outlined text-[14px]">account_balance_wallet</span>
+                    <tr key={tx.id || tx.orderId} className="text-[13px]">
+                      <td className="text-primary font-mono text-[10px] font-black tracking-tighter bg-primary/5 px-2 py-0.5 rounded border border-primary/10 max-w-[80px] break-all">{tx.orderId}</td>
+                      <td className="font-bold whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px] sm:max-w-none">{tx.donorName}</td>
+                      <td className="font-mono font-bold tracking-tighter text-[12px]">{formatCurrencyShort(tx.amount)}</td>
+                      <td className="hidden md:table-cell">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-base-200 rounded text-[10px] border border-base-300 font-medium">
                           {tx.paymentMethod || '-'}
                         </span>
                       </td>
                       <td className="text-center">
-                        <div className="flex flex-col items-center gap-1.5">
-                          <span className={`badge badge-sm badge-outline gap-1 p-3 ${
-                            tx.paymentStatus === 'success' ? 'badge-success' :
+                        <div className="flex flex-col items-center gap-1">
+                          <span className={`badge badge-xs gap-1 p-2.5 font-bold uppercase tracking-tight ${tx.paymentStatus === 'success' ? 'badge-success' :
                             tx.paymentStatus === 'pending' ? 'badge-warning' : 'badge-error'
-                          }`}>
-                            {tx.paymentStatus === 'success' ? <span className="material-symbols-outlined text-[12px]">check_circle</span> :
-                             tx.paymentStatus === 'pending' ? <span className="material-symbols-outlined text-[12px]">schedule</span> :
-                             <span className="material-symbols-outlined text-[12px]">cancel</span>}
+                            }`}>
                             {statusLabel(tx.paymentStatus)}
                           </span>
-                          {tx.paymentStatus === 'pending' && (
-                            <span className={`text-[10px] font-medium px-2 py-0.5 rounded ${isOverdue ? 'bg-error/10 text-error' : 'bg-base-200 text-base-content/60 border border-base-300'}`}>
-                              {isOverdue ? '! Menunggu Webhook API' : `Auto-expire: ${remainHours}j ${remainMins}m`}
-                            </span>
-                          )}
                         </div>
                       </td>
-                      <td className="text-base-content/60 font-mono text-xs">{formatDateTime(tx.createdAt)}</td>
+                      <td className="text-base-content/60 font-mono text-[10px] hidden lg:table-cell">{formatDateTime(tx.createdAt)}</td>
                     </tr>
                   );
                 })}
@@ -275,8 +265,8 @@ export default function TransactionsPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-base-200 bg-base-100 gap-4">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-base-content/70">Tampilkan:</span>
-              <select 
-                value={itemsPerPage} 
+              <select
+                value={itemsPerPage}
                 onChange={(e) => setItemsPerPage(e.target.value)}
                 className="select select-bordered select-sm w-24 font-mono text-sm shadow-sm"
               >
@@ -287,19 +277,19 @@ export default function TransactionsPage() {
                 <option value="all">Semua</option>
               </select>
             </div>
-            
+
             {itemsPerPage !== 'all' && totalPages > 1 && (
               <div className="join shadow-sm">
-                <button 
-                  className="join-item btn btn-sm btn-outline hover:bg-base-200 hover:text-base-content" 
+                <button
+                  className="join-item btn btn-sm btn-outline hover:bg-base-200 hover:text-base-content"
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
                 >
                   <span className="material-symbols-outlined text-[18px]">chevron_left</span> Prev
                 </button>
                 <span className="join-item btn btn-sm btn-disabled bg-base-200/50 text-base-content font-medium">Halaman {currentPage} dari {totalPages}</span>
-                <button 
-                  className="join-item btn btn-sm btn-outline hover:bg-base-200 hover:text-base-content" 
+                <button
+                  className="join-item btn btn-sm btn-outline hover:bg-base-200 hover:text-base-content"
                   onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
                 >

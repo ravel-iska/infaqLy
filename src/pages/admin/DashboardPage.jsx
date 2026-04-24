@@ -85,12 +85,12 @@ export default function DashboardPage() {
   const misiSelesai = campaigns.filter(c => c.target > 0 && c.collected >= c.target).length;
 
   const STATS = [
-    { icon: 'visibility', label: 'Visitor Harian', value: todayVisitor, trend: 'Trafik hari ini', up: true, color: 'text-primary', bg: 'bg-primary/10' },
-    { icon: 'volunteer_activism', label: 'Pahlawan Kebaikan', value: totalPahlawan, trend: 'Aksi hamba Allah', up: true, color: 'text-secondary', bg: 'bg-secondary/10' },
-    { icon: 'rocket_launch', label: 'Ruang Berbagi Aktif', value: ruangAktif, trend: 'Sedang menggalang dana', up: true, color: 'text-info', bg: 'bg-info/10' },
-    { icon: 'task_alt', label: 'Target Terselesaikan', value: misiSelesai, trend: 'Misi sukses 100%', up: true, color: 'text-success', bg: 'bg-success/10' },
-    { icon: 'payments', label: 'Total Infaq Terkumpul', value: formatCurrencyShort(campaigns.reduce((s, c) => s + c.collected, 0)), trend: 'Dana terhimpun', up: true, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-    { icon: 'analytics', label: 'Rata-rata Infaq', value: totalPahlawan > 0 ? formatCurrencyShort(campaigns.reduce((s, c) => s + c.collected, 0) / totalPahlawan) : '0', trend: 'Per transaksi', up: true, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+    { icon: 'visibility', label: 'Visitor Harian', value: todayVisitor, trend: 'Trafik', up: true, color: 'text-primary', bg: 'bg-primary/10' },
+    { icon: 'volunteer_activism', label: 'Donatur', value: totalPahlawan, trend: 'Aktif', up: true, color: 'text-secondary', bg: 'bg-secondary/10' },
+    { icon: 'rocket_launch', label: 'Program Aktif', value: ruangAktif, trend: 'Live', up: true, color: 'text-info', bg: 'bg-info/10' },
+    { icon: 'task_alt', label: 'Goal Tercapai', value: misiSelesai, trend: 'Target', up: true, color: 'text-success', bg: 'bg-success/10' },
+    { icon: 'payments', label: 'Terhimpun', value: formatCurrencyShort(campaigns.reduce((s, c) => s + c.collected, 0)), trend: 'Total', up: true, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+    { icon: 'analytics', label: 'Rata-rata', value: totalPahlawan > 0 ? formatCurrencyShort(campaigns.reduce((s, c) => s + c.collected, 0) / totalPahlawan) : '0', trend: 'Rerata', up: true, color: 'text-purple-500', bg: 'bg-purple-500/10' },
   ];
 
   // DATA KATEGORI UNTUK PIE CHART
@@ -138,23 +138,23 @@ export default function DashboardPage() {
             </div>
           ))
           : STATS.map((stat) => (
-            <div key={stat.label} className="bg-base-100 backdrop-blur-xl shadow-lg shadow-base-200/30 rounded-[1.5rem] p-6 border border-base-200 hover:shadow-2xl hover:shadow-emerald-500/15 hover:-translate-y-2 hover:border-emerald-500/30 transition-all duration-500 overflow-hidden relative group">
+            <div key={stat.label} className="bg-base-100 backdrop-blur-xl shadow-lg shadow-base-200/30 rounded-[1.5rem] p-5 border border-base-200 hover:shadow-2xl hover:shadow-emerald-500/15 hover:-translate-y-2 hover:border-emerald-500/30 transition-all duration-500 overflow-hidden relative group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 rounded-full blur-2xl -mr-10 -mt-10 transition-transform duration-500 group-hover:scale-150"></div>
 
-              <div className="flex items-center justify-between mb-4 relative z-10">
-                <div className={`p-3 rounded-2xl ${stat.bg} shadow-inner`}>
-                  <span className={`material-symbols-outlined ${stat.color} text-[26px]`}>{stat.icon}</span>
+              <div className="flex items-center justify-between mb-3 relative z-10">
+                <div className={`p-2.5 rounded-xl ${stat.bg} shadow-inner`}>
+                  <span className={`material-symbols-outlined ${stat.color} text-[22px]`}>{stat.icon}</span>
                 </div>
-                <span className={`text-xs font-bold flex items-center gap-1.5 px-3 py-1.5 rounded-lg border ${stat.up ? 'bg-success/10 text-success border-success/20' : 'bg-error/10 text-error border-error/20'} shadow-sm`}>
-                  <span className="material-symbols-outlined text-[14px]">
+                <span className={`text-[10px] font-bold flex items-center gap-1 px-2 py-1 rounded-lg border ${stat.up ? 'bg-success/10 text-success border-success/20' : 'bg-error/10 text-error border-error/20'} shadow-sm`}>
+                  <span className="material-symbols-outlined text-[12px]">
                     {stat.up ? 'trending_up' : 'trending_down'}
                   </span>
                   {stat.trend}
                 </span>
               </div>
               <div className="relative z-10">
-                <p className="text-sm font-semibold text-base-content/60">{stat.label}</p>
-                <p className="text-3xl font-black text-base-content mt-1 font-headline tracking-tight leading-none pt-1">
+                <p className="text-[11px] font-bold text-base-content/50 uppercase tracking-wider">{stat.label}</p>
+                <p className="text-2xl font-black text-base-content mt-0.5 font-headline tracking-tight leading-none pt-1">
                   {typeof stat.value === 'string' ? stat.value : (typeof stat.value === 'number' && stat.value > 9999 ? formatCurrencyShort(stat.value) : (stat.value || 0).toLocaleString('id-ID'))}
                 </p>
               </div>

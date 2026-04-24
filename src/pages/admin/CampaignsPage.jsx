@@ -103,14 +103,14 @@ export default function CampaignsPage() {
             <div className="overflow-x-auto">
               <table className="table table-zebra table-md w-full">
                 <thead>
-                  <tr className="bg-base-200/80 text-base-content/70">
-                    <th className="font-bold uppercase tracking-wider">#ID</th>
-                    <th className="font-bold uppercase tracking-wider">Info Program</th>
-                    <th className="font-bold uppercase tracking-wider">Kategori</th>
-                    <th className="font-bold uppercase tracking-wider">Penghimpunan</th>
-                    <th className="font-bold uppercase tracking-wider">Progress</th>
-                    <th className="text-center font-bold uppercase tracking-wider">Status Akhir</th>
-                    <th className="text-center font-bold uppercase tracking-wider">Kelola</th>
+                  <tr className="bg-base-200/80 text-base-content/70 text-[11px]">
+                    <th className="font-bold uppercase tracking-wider hidden sm:table-cell">#ID</th>
+                    <th className="font-bold uppercase tracking-wider">Program</th>
+                    <th className="font-bold uppercase tracking-wider hidden lg:table-cell">Kategori</th>
+                    <th className="font-bold uppercase tracking-wider">Himpun</th>
+                    <th className="font-bold uppercase tracking-wider hidden md:table-cell">Progress</th>
+                    <th className="text-center font-bold uppercase tracking-wider">Status</th>
+                    <th className="text-center font-bold uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -141,10 +141,10 @@ export default function CampaignsPage() {
                     const progress = c.target > 0 ? Math.round((c.collected / c.target) * 100) : 0;
                     return (
                       <tr key={c.id}>
-                        <td className="text-base-content/60 font-mono font-medium text-xs">#{c.id}</td>
-                        <td>
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-base-300 border border-base-200">
+                        <td className="text-base-content/60 font-mono font-medium text-[10px] hidden sm:table-cell">#{c.id}</td>
+                        <td className="max-w-[150px] sm:max-w-none">
+                          <div className="flex items-center gap-2 sm:gap-4">
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg overflow-hidden flex-shrink-0 bg-base-300 border border-base-200 hidden xs:flex">
                               {(() => {
                                 const rawImageUrl = c.imageUrl || c.image;
                                 const hasValidImage = rawImageUrl && typeof rawImageUrl === 'string' && rawImageUrl.length > 5 && rawImageUrl !== 'null' && rawImageUrl !== 'undefined';
@@ -164,43 +164,38 @@ export default function CampaignsPage() {
                                 return null;
                               })()}
                               <div className="w-full h-full flex items-center justify-center text-base-content/40 bg-base-200" style={{ display: (c.imageUrl || c.image) ? 'none' : 'flex' }}>
-                                <span className="material-symbols-outlined text-[20px]">image</span>
+                                <span className="material-symbols-outlined text-[16px]">image</span>
                               </div>
                             </div>
-                            <div>
-                              <span className="text-base-content font-bold block mb-0.5 line-clamp-1 max-w-[200px]">{c.title}</span>
-                              <span className="text-[11px] text-base-content/60 font-medium">Batas: {c.endDate ? formatDateShort(c.endDate) : 'Tanpa batas'}</span>
+                            <div className="min-w-0">
+                              <span className="text-base-content font-bold block mb-0.5 line-clamp-1 text-[13px] sm:text-sm">{c.title}</span>
+                              <span className="text-[10px] text-base-content/60 font-medium whitespace-nowrap">Batas: {c.endDate ? formatDateShort(c.endDate) : '∞'}</span>
                             </div>
                           </div>
                         </td>
-                        <td>
-                          <span className={`px-2.5 py-1 text-[11px] font-bold rounded flex items-center w-max gap-1.5 uppercase tracking-wider ${c.category === 'infaq' ? 'bg-primary/10 text-primary border border-primary/20'
-                              : c.category === 'wakaf' ? 'bg-secondary/10 text-secondary border border-secondary/20'
-                                : 'bg-accent/10 text-accent border border-accent/20'
+                        <td className="hidden lg:table-cell">
+                          <span className={`px-2 py-0.5 text-[10px] font-bold rounded flex items-center w-max gap-1 uppercase border ${c.category === 'infaq' ? 'bg-primary/10 text-primary border-primary/20'
+                            : c.category === 'wakaf' ? 'bg-secondary/10 text-secondary border-secondary/20'
+                              : 'bg-accent/10 text-accent border-accent/20'
                             }`}>
-                            <span className="material-symbols-outlined text-[14px]">
-                              {c.category === 'infaq' ? 'volunteer_activism'
-                                : c.category === 'wakaf' ? 'real_estate_agent'
-                                  : 'loyalty'}
-                            </span>
                             {c.category === 'infaq' ? 'Infaq' : c.category === 'wakaf' ? 'Wakaf' : c.category}
                           </span>
                         </td>
                         <td>
                           <div className="flex flex-col">
-                            <span className="text-primary font-mono font-bold">{formatCurrencyShort(c.collected)}</span>
-                            <span className="text-xs text-base-content/60 font-mono mt-0.5">/ {formatCurrencyShort(c.target)}</span>
+                            <span className="text-primary font-mono font-bold text-[12px]">{formatCurrencyShort(c.collected)}</span>
+                            <span className="text-[10px] text-base-content/60 font-mono">/ {formatCurrencyShort(c.target)}</span>
                           </div>
                         </td>
-                        <td>
-                          <div className="flex items-center gap-2 w-32">
-                            <progress className="progress progress-secondary w-full" value={progress} max="100"></progress>
-                            <span className="text-[11px] font-mono font-bold w-8 text-right">{progress}%</span>
+                        <td className="hidden md:table-cell">
+                          <div className="flex items-center gap-2 w-24">
+                            <progress className="progress progress-secondary w-full h-1.5" value={progress} max="100"></progress>
+                            <span className="text-[10px] font-mono font-bold w-7 text-right">{progress}%</span>
                           </div>
                         </td>
                         <td className="text-center">
                           <span className={`px-2.5 py-1 rounded inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider border ${c.status === 'active' ? 'bg-success/10 text-success border-success/20' :
-                              c.status === 'draft' ? 'bg-warning/10 text-warning border-warning/20' : 'bg-base-200 text-base-content/50 border-base-300'
+                            c.status === 'draft' ? 'bg-warning/10 text-warning border-warning/20' : 'bg-base-200 text-base-content/50 border-base-300'
                             }`}>
                             {c.status === 'active' ? 'Aktif' : c.status === 'draft' ? 'Draft' : 'Selesai'}
                           </span>
