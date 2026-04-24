@@ -106,6 +106,8 @@ export default {
         'user': '0 4px 6px -1px rgba(0, 0, 0, 0.07)',
         'user-lg': '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
         'admin': '0 1px 3px rgba(0, 0, 0, 0.3)',
+        'admin-card': '0 15px 35px -5px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+        'admin-card-hover': '0 0 30px rgba(99, 102, 241, 0.15), 0 20px 40px -10px rgba(0, 0, 0, 0.5)',
         'glow-indigo': '0 0 20px rgba(99, 102, 241, 0.15)',
         'glow-emerald': '0 0 20px rgba(16, 185, 129, 0.15)',
       },

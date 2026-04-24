@@ -108,11 +108,11 @@ h6 {
   }
 
   .admin-card {
-    @apply bg-white/80 dark:bg-[#1E293B]/65 backdrop-blur-[20px] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm dark:shadow-[0_15px_35px_-5px_rgba(0, 0, 0, 0.4)] transition-all duration-300;
+    @apply bg-white/80 dark:bg-[#1E293B]/65 backdrop-blur-[20px] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm dark:shadow-admin-card transition-all duration-300;
   }
 
   .admin-card:hover {
-    @apply border-indigo-300 dark:border-indigo-500/40 bg-white dark:bg-[#1E293B]/80 shadow-md dark:shadow-[0_0_30px_rgba(99, 102, 241, 0.15), 0_20px_40px_-10px_rgba(0, 0, 0, 0.5)] -translate-y-[2px];
+    @apply border-indigo-300 dark:border-indigo-500/40 bg-white dark:bg-[#1E293B]/80 shadow-md dark:shadow-admin-card-hover -translate-y-[2px];
   }
 
   /* ── Button Variants ──────────────────────────── */
