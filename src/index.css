@@ -104,15 +104,15 @@ h6 {
 /* ── Admin Theme Utilities ────────────────────── */
 @layer components {
   .admin-bg {
-    @apply bg-slate-50 text-slate-800 dark:bg-[#0B1120] dark:text-[#F8FAFC] transition-colors duration-300;
+    @apply bg-slate-50 text-slate-800 dark:bg-admin-bg dark:text-admin-text transition-colors duration-300;
   }
 
   .admin-card {
-    @apply bg-white/80 dark:bg-[#1E293B]/65 backdrop-blur-[20px] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm dark:shadow-admin-card transition-all duration-300;
+    @apply bg-white/80 dark:bg-admin-bg-card/65 backdrop-blur-[20px] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm dark:shadow-admin-card transition-all duration-300;
   }
 
   .admin-card:hover {
-    @apply border-indigo-300 dark:border-indigo-500/40 bg-white dark:bg-[#1E293B]/80 shadow-md dark:shadow-admin-card-hover -translate-y-[2px];
+    @apply border-indigo-300 dark:border-indigo-500/40 bg-white dark:bg-admin-bg-card/80 shadow-md dark:shadow-admin-card-hover -translate-y-[2px];
   }
 
   /* ── Button Variants ──────────────────────────── */
@@ -168,7 +168,7 @@ h6 {
   }
 
   .input-admin {
-    @apply w-full px-4 py-3 rounded-admin border border-slate-300 dark:border-admin-border bg-white dark:bg-admin-bg text-slate-800 dark:text-admin-text placeholder-slate-400 dark:placeholder-admin-text-muted font-mono text-sm focus:outline-none focus:ring-2 focus:ring-admin-accent/30 focus:border-admin-accent transition-[border-color, box-shadow] duration-200;
+    @apply w-full px-4 py-3 rounded-admin border border-slate-300 dark:border-admin-border bg-white dark:bg-admin-bg text-slate-800 dark:text-admin-text placeholder-slate-400 dark:placeholder-admin-text-muted font-mono text-sm focus:outline-none focus:ring-2 focus:ring-admin-accent focus:ring-opacity-30 focus:border-admin-accent transition-all duration-200;
   }
 }
 
