@@ -9,6 +9,36 @@
    Dual Theme: User (Light) + Admin (Dark)
    ═══════════════════════════════════════════════════ */
 
+@layer base {
+  :root {
+    --admin-bg: #F8FAFC;
+    --admin-bg-card: #FFFFFF;
+    --admin-bg-sidebar: #F1F5F9;
+    --admin-bg-hover: #E2E8F0;
+    --admin-accent: #6366F1;
+    --admin-accent-hover: #4F46E5;
+    --admin-accent-secondary: #059669;
+    --admin-text: #0F172A;
+    --admin-text-secondary: #475569;
+    --admin-text-muted: #64748B;
+    --admin-border: #E2E8F0;
+  }
+
+  .dark {
+    --admin-bg: #0F172A;
+    --admin-bg-card: #1E293B;
+    --admin-bg-sidebar: #0B1120;
+    --admin-bg-hover: #334155;
+    --admin-accent: #6366F1;
+    --admin-accent-hover: #818CF8;
+    --admin-accent-secondary: #10B981;
+    --admin-text: #F1F5F9;
+    --admin-text-secondary: #94A3B8;
+    --admin-text-muted: #64748B;
+    --admin-border: #334155;
+  }
+}
+
 /* ── Base Reset ────────────────────────────────── */
 * {
   margin: 0;
@@ -29,7 +59,12 @@ body {
   background-color: #F8FAF5;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: 'Outfit', sans-serif;
   font-weight: 700;
   line-height: 1.2;
@@ -67,112 +102,73 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ── Admin Theme Utilities ────────────────────── */
-.admin-bg {
-  background-color: #0B1120;
-  color: #F8FAFC;
-}
-
-.admin-card {
-  background-color: rgba(30, 41, 59, 0.65);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 16px;
-  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.admin-card:hover {
-  border-color: rgba(99, 102, 241, 0.4);
-  background-color: rgba(30, 41, 59, 0.8);
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.15), 0 20px 40px -10px rgba(0, 0, 0, 0.5);
-  transform: translateY(-2px);
-}
-
-/* ── Button Variants ──────────────────────────── */
 @layer components {
+  .admin-bg {
+    @apply bg-slate-50 text-slate-800 dark:bg-[#0B1120] dark:text-[#F8FAFC] transition-colors duration-300;
+  }
+
+  .admin-card {
+    @apply bg-white/80 dark:bg-[#1E293B]/65 backdrop-blur-[20px] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm dark:shadow-[0_15px_35px_-5px_rgba(0, 0, 0, 0.4)] transition-all duration-300;
+  }
+
+  .admin-card:hover {
+    @apply border-indigo-300 dark:border-indigo-500/40 bg-white dark:bg-[#1E293B]/80 shadow-md dark:shadow-[0_0_30px_rgba(99, 102, 241, 0.15), 0_20px_40px_-10px_rgba(0, 0, 0, 0.5)] -translate-y-[2px];
+  }
+
+  /* ── Button Variants ──────────────────────────── */
   /* User Primary Button */
   .btn-user-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 
-           bg-user-accent text-white font-semibold rounded-lg
-           hover:bg-user-accent-hover active:scale-[0.97]
-           transition-all duration-200 cursor-pointer
-           disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-user-accent text-white font-semibold rounded-lg hover:bg-user-accent-hover active:scale-[0.97] transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   /* User Ghost Button */
   .btn-user-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 
-           bg-transparent text-user-accent font-semibold rounded-lg
-           border-2 border-user-accent
-           hover:bg-user-accent hover:text-white active:scale-[0.97]
-           transition-all duration-200 cursor-pointer;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-transparent text-user-accent font-semibold rounded-lg border-2 border-user-accent hover:bg-user-accent hover:text-white active:scale-[0.97] transition-all duration-200 cursor-pointer;
   }
 
   /* Admin Primary Button */
   .btn-admin-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 
-           bg-admin-accent text-white font-semibold rounded-admin
-           hover:bg-admin-accent-hover active:scale-[0.97]
-           transition-all duration-200 cursor-pointer
-           disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 dark:bg-admin-accent text-white font-semibold rounded-admin hover:bg-indigo-700 dark:hover:bg-admin-accent-hover active:scale-[0.97] transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   /* Admin Ghost Button */
   .btn-admin-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 
-           bg-transparent text-admin-text-secondary font-medium rounded-admin
-           border border-admin-border
-           hover:bg-admin-bg-hover hover:text-admin-text active:scale-[0.97]
-           transition-all duration-200 cursor-pointer;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-transparent text-slate-600 dark:text-admin-text-secondary font-medium rounded-admin border border-slate-300 dark:border-admin-border hover:bg-slate-100 dark:hover:bg-admin-bg-hover hover:text-slate-900 dark:hover:text-admin-text active:scale-[0.97] transition-all duration-200 cursor-pointer;
   }
 
   /* Status Badges */
   .badge-success {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold
-           rounded-full bg-emerald-100 text-emerald-700;
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400;
   }
 
   .badge-warning {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold
-           rounded-full bg-amber-100 text-amber-700;
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400;
   }
 
   .badge-danger {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold
-           rounded-full bg-red-100 text-red-700;
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400;
   }
 
   /* Admin Status Badges */
   .badge-admin-success {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold
-           rounded-full bg-emerald-500/20 text-emerald-400;
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400;
   }
 
   .badge-admin-warning {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold
-           rounded-full bg-amber-500/20 text-amber-400;
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400;
   }
 
   .badge-admin-danger {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold
-           rounded-full bg-red-500/20 text-red-400;
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400;
   }
 
   /* Input Styles */
   .input-user {
-    @apply w-full px-4 py-3 rounded-lg border border-user-border
-           bg-white text-user-text placeholder-user-text-muted
-           focus:outline-none focus:ring-2 focus:ring-user-accent/30 focus:border-user-accent
-           transition-all duration-200;
+    @apply w-full px-4 py-3 rounded-lg border border-user-border bg-white text-user-text placeholder-user-text-muted focus:outline-none focus:ring-2 focus:ring-user-accent/30 focus:border-user-accent transition-all duration-200;
   }
 
   .input-admin {
-    @apply w-full px-4 py-3 rounded-admin border border-admin-border
-           bg-admin-bg text-admin-text placeholder-admin-text-muted font-mono text-sm
-           focus:outline-none focus:ring-2 focus:ring-admin-accent/30 focus:border-admin-accent
-           transition-[border-color,box-shadow] duration-200;
+    @apply w-full px-4 py-3 rounded-admin border border-slate-300 dark:border-admin-border bg-white dark:bg-admin-bg text-slate-800 dark:text-admin-text placeholder-slate-400 dark:placeholder-admin-text-muted font-mono text-sm focus:outline-none focus:ring-2 focus:ring-admin-accent/30 focus:border-admin-accent transition-[border-color, box-shadow] duration-200;
   }
 }
 
@@ -195,7 +191,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── Admin Grid Pattern Background ────────────── */
 .admin-grid-bg {
-  background-image: 
+  background-image:
     linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
   background-size: 40px 40px;
@@ -247,30 +243,31 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── Skeleton loading shimmer ─────────────────── */
 .skeleton-shimmer {
-  background: linear-gradient(
-    90deg,
-    #E2E8F0 25%,
-    #F1F5F9 50%,
-    #E2E8F0 75%
-  );
+  background: linear-gradient(90deg,
+      #E2E8F0 25%,
+      #F1F5F9 50%,
+      #E2E8F0 75%);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
 
 .skeleton-shimmer-dark {
-  background: linear-gradient(
-    90deg,
-    #1E293B 25%,
-    #334155 50%,
-    #1E293B 75%
-  );
+  background: linear-gradient(90deg,
+      #1E293B 25%,
+      #334155 50%,
+      #1E293B 75%);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 /* ── Scrollbar Hide ──────────────────────────── */
@@ -278,7 +275,7 @@ h1, h2, h3, h4, h5, h6 {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
-

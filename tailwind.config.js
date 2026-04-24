@@ -23,23 +23,23 @@ export default {
         },
         // Admin Theme
         'admin': {
-          'bg': '#0F172A',
-          'bg-card': '#1E293B',
-          'bg-sidebar': '#0B1120',
-          'bg-hover': '#334155',
-          'accent': '#6366F1',
-          'accent-hover': '#818CF8',
-          'accent-secondary': '#10B981',
-          'text': '#F1F5F9',
-          'text-secondary': '#94A3B8',
-          'text-muted': '#64748B',
-          'border': '#334155',
+          'bg': 'var(--admin-bg)',
+          'bg-card': 'var(--admin-bg-card)',
+          'bg-sidebar': 'var(--admin-bg-sidebar)',
+          'bg-hover': 'var(--admin-bg-hover)',
+          'accent': 'var(--admin-accent)',
+          'accent-hover': 'var(--admin-accent-hover)',
+          'accent-secondary': 'var(--admin-accent-secondary)',
+          'text': 'var(--admin-text)',
+          'text-secondary': 'var(--admin-text-secondary)',
+          'text-muted': 'var(--admin-text-muted)',
+          'border': 'var(--admin-border)',
         },
         // Status colors
         'success': '#10B981',
         'warning': '#F59E0B',
         'danger': '#EF4444',
-        
+
         // Material 3 Colors
         "secondary-fixed-dim": "#68dba9",
         "tertiary-fixed-dim": "#b7c8e1",
