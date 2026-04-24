@@ -162,6 +162,136 @@ export default function DashboardPage() {
           ))}
       </div>
 
+      {/* Row: Distribution & Category Summary (Primary Focus) */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className="lg:col-span-2 bg-base-100 backdrop-blur-xl shadow-lg shadow-base-200/30 rounded-[1.5rem] p-6 border border-base-200 flex flex-col relative overflow-hidden group">
+          <div className="flex items-center gap-3 mb-6 relative z-10">
+            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500">
+              <span className="material-symbols-outlined text-[20px]">pie_chart</span>
+            </div>
+            <h2 className="text-lg font-bold text-base-content">Sebaran Program</h2>
+          </div>
+          <div className="h-64 relative z-10">
+            {isLoading ? (
+              <div className="h-full w-full bg-base-200/50 animate-pulse rounded-full"></div>
+            ) : categoryData.length === 0 ? (
+              <div className="h-full flex items-center justify-center text-base-content/40">No data available</div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={categoryData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                    animationDuration={1500}
+                  >
+                    {categoryData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <LineTooltip
+                    contentStyle={{
+                      backgroundColor: isAdminDark ? '#1E293B' : '#ffffff',
+                      borderColor: isAdminDark ? '#334155' : '#e2e8f0',
+                      borderRadius: '12px',
+                      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)'
+                    }}
+                    labelStyle={{ color: isAdminDark ? '#94A3B8' : '#64748B' }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+              <p className="text-2xl font-black text-base-content">{campaigns.length}</p>
+              <p className="text-[10px] font-bold text-base-content/40 uppercase tracking-widest">Total</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3 mt-4 relative z-10">
+            {categoryData.map((d, i) => (
+              <div key={d.name} className="flex items-center gap-2 p-2 rounded-lg bg-base-200/40 border border-base-200">
+                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }}></div>
+                <span className="text-xs font-bold text-base-content/70">{d.name}</span>
+                <span className="text-xs font-black text-base-content ml-auto">{d.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="lg:col-span-3 admin-card p-8 flex flex-col justify-between overflow-hidden relative group border-indigo-500/20">
+          <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none transition-transform group-hover:scale-150 duration-700"></div>
+
+          <div>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
+                <span className="material-symbols-outlined text-[24px]">account_balance_wallet</span>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-base-content">Laporan Keuangan Global</h2>
+                <p className="text-sm text-base-content/50 font-medium">Rekapitulasi target dan realisasi donasi</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
+              <div className="space-y-6">
+                <div>
+                  <div className="flex justify-between items-end mb-2">
+                    <span className="text-sm font-bold text-base-content/60">Terkumpul Terhadap Target</span>
+                    <span className="text-2xl font-black text-emerald-500 font-headline">
+                      {Math.round((campaigns.reduce((s, c) => s + c.collected, 0) / (campaigns.reduce((s, c) => s + Math.max(c.target, c.collected), 0) || 1)) * 100)}%
+                    </span>
+                  </div>
+                  <div className="h-3 w-full bg-base-200 rounded-full overflow-hidden border border-base-300 p-0.5">
+                    <div
+                      className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-1000 shadow-[0_0_15px_rgba(16,185,129,0.4)]"
+                      style={{ width: `${Math.min(100, (campaigns.reduce((s, c) => s + c.collected, 0) / (campaigns.reduce((s, c) => s + Math.max(c.target, c.collected), 0) || 1)) * 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="p-4 rounded-2xl bg-base-200/30 border border-base-200">
+                    <p className="text-[11px] font-bold text-base-content/40 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Total Realisasi
+                    </p>
+                    <p className="text-2xl font-black text-base-content font-headline tracking-tight">
+                      {formatCurrency(campaigns.reduce((s, c) => s + c.collected, 0))}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col justify-end space-y-4">
+                <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
+                  <p className="text-[11px] font-bold text-indigo-500 uppercase tracking-widest mb-1.5">Estimasi Kekurangan</p>
+                  <p className="text-2xl font-black text-base-content font-headline tracking-tight">
+                    {formatCurrency(Math.max(0, campaigns.reduce((s, c) => s + c.target, 0) - campaigns.reduce((s, c) => s + c.collected, 0)))}
+                  </p>
+                </div>
+                <div className="p-4 rounded-2xl bg-base-200/30 border border-base-200">
+                  <p className="text-[11px] font-bold text-base-content/40 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> Total Target Kolektif
+                  </p>
+                  <p className="text-xl font-bold text-base-content/80 font-headline">
+                    {formatCurrency(campaigns.reduce((s, c) => s + c.target, 0))}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-base-200 flex items-center justify-between">
+            <p className="text-xs text-base-content/40 font-medium">Berdasarkan data dari <span className="text-indigo-500 font-bold">{campaigns.length}</span> program yang berjalan saat ini.</p>
+            <Link to="/admin-panel/transactions" className="text-xs font-black text-indigo-500 hover:underline uppercase tracking-widest flex items-center gap-1">
+              Audit Keuangan <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+
       {/* Chart + Recent Transactions */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <div className="lg:col-span-3 bg-base-100 backdrop-blur-xl shadow-lg shadow-base-200/30 rounded-[1.5rem] p-6 border border-base-200 overflow-hidden relative group">
@@ -451,135 +581,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Row 4: Distribution & Category Summary */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-2 bg-base-100 backdrop-blur-xl shadow-lg shadow-base-200/30 rounded-[1.5rem] p-6 border border-base-200 flex flex-col relative overflow-hidden group">
-          <div className="flex items-center gap-3 mb-6 relative z-10">
-            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500">
-              <span className="material-symbols-outlined text-[20px]">pie_chart</span>
-            </div>
-            <h2 className="text-lg font-bold text-base-content">Sebaran Program</h2>
-          </div>
-          <div className="h-64 relative z-10">
-            {isLoading ? (
-              <div className="h-full w-full bg-base-200/50 animate-pulse rounded-full"></div>
-            ) : categoryData.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-base-content/40">No data available</div>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={categoryData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                    animationDuration={1500}
-                  >
-                    {categoryData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <LineTooltip
-                    contentStyle={{
-                      backgroundColor: isAdminDark ? '#1E293B' : '#ffffff',
-                      borderColor: isAdminDark ? '#334155' : '#e2e8f0',
-                      borderRadius: '12px',
-                      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)'
-                    }}
-                    labelStyle={{ color: isAdminDark ? '#94A3B8' : '#64748B' }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            )}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-              <p className="text-2xl font-black text-base-content">{campaigns.length}</p>
-              <p className="text-[10px] font-bold text-base-content/40 uppercase tracking-widest">Total</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3 mt-4 relative z-10">
-            {categoryData.map((d, i) => (
-              <div key={d.name} className="flex items-center gap-2 p-2 rounded-lg bg-base-200/40 border border-base-200">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }}></div>
-                <span className="text-xs font-bold text-base-content/70">{d.name}</span>
-                <span className="text-xs font-black text-base-content ml-auto">{d.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="lg:col-span-3 admin-card p-8 flex flex-col justify-between overflow-hidden relative group border-indigo-500/20">
-          <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none transition-transform group-hover:scale-150 duration-700"></div>
-
-          <div>
-            <div className="flex items-center gap-3 mb-8">
-              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
-                <span className="material-symbols-outlined text-[24px]">account_balance_wallet</span>
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-base-content">Laporan Keuangan Global</h2>
-                <p className="text-sm text-base-content/50 font-medium">Rekapitulasi target dan realisasi donasi</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
-              <div className="space-y-6">
-                <div>
-                  <div className="flex justify-between items-end mb-2">
-                    <span className="text-sm font-bold text-base-content/60">Terkumpul Terhadap Target</span>
-                    <span className="text-2xl font-black text-emerald-500 font-headline">
-                      {Math.round((campaigns.reduce((s, c) => s + c.collected, 0) / (campaigns.reduce((s, c) => s + Math.max(c.target, c.collected), 0) || 1)) * 100)}%
-                    </span>
-                  </div>
-                  <div className="h-3 w-full bg-base-200 rounded-full overflow-hidden border border-base-300 p-0.5">
-                    <div
-                      className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-1000 shadow-[0_0_15px_rgba(16,185,129,0.4)]"
-                      style={{ width: `${Math.min(100, (campaigns.reduce((s, c) => s + c.collected, 0) / (campaigns.reduce((s, c) => s + Math.max(c.target, c.collected), 0) || 1)) * 100)}%` }}
-                    ></div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="p-4 rounded-2xl bg-base-200/30 border border-base-200">
-                    <p className="text-[11px] font-bold text-base-content/40 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Total Realisasi
-                    </p>
-                    <p className="text-2xl font-black text-base-content font-headline tracking-tight">
-                      {formatCurrency(campaigns.reduce((s, c) => s + c.collected, 0))}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col justify-end space-y-4">
-                <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
-                  <p className="text-[11px] font-bold text-indigo-500 uppercase tracking-widest mb-1.5">Estimasi Kekurangan</p>
-                  <p className="text-2xl font-black text-base-content font-headline tracking-tight">
-                    {formatCurrency(Math.max(0, campaigns.reduce((s, c) => s + c.target, 0) - campaigns.reduce((s, c) => s + c.collected, 0)))}
-                  </p>
-                </div>
-                <div className="p-4 rounded-2xl bg-base-200/30 border border-base-200">
-                  <p className="text-[11px] font-bold text-base-content/40 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> Total Target Kolektif
-                  </p>
-                  <p className="text-xl font-bold text-base-content/80 font-headline">
-                    {formatCurrency(campaigns.reduce((s, c) => s + c.target, 0))}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 pt-4 border-t border-base-200 flex items-center justify-between">
-            <p className="text-xs text-base-content/40 font-medium">Berdasarkan data dari <span className="text-indigo-500 font-bold">{campaigns.length}</span> program yang berjalan saat ini.</p>
-            <Link to="/admin-panel/transactions" className="text-xs font-black text-indigo-500 hover:underline uppercase tracking-widest flex items-center gap-1">
-              Audit Keuangan <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
-            </Link>
-          </div>
-        </div>
-      </div>
 
       {isBugModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-base-300/40 backdrop-blur-sm animate-fade-in">
