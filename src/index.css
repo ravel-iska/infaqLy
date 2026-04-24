@@ -11,31 +11,31 @@
 
 @layer base {
   :root {
-    --admin-bg: #F8FAFC;
-    --admin-bg-card: #FFFFFF;
-    --admin-bg-sidebar: #F1F5F9;
-    --admin-bg-hover: #E2E8F0;
-    --admin-accent: #6366F1;
-    --admin-accent-hover: #4F46E5;
-    --admin-accent-secondary: #059669;
-    --admin-text: #0F172A;
-    --admin-text-secondary: #475569;
-    --admin-text-muted: #64748B;
-    --admin-border: #E2E8F0;
+    --admin-bg: 248 250 252;
+    --admin-bg-card: 255 255 255;
+    --admin-bg-sidebar: 241 245 249;
+    --admin-bg-hover: 226 232 240;
+    --admin-accent: 99 102 241;
+    --admin-accent-hover: 79 70 229;
+    --admin-accent-secondary: 5 150 105;
+    --admin-text: 15 23 42;
+    --admin-text-secondary: 71 85 105;
+    --admin-text-muted: 100 116 139;
+    --admin-border: 226 232 240;
   }
 
   .dark {
-    --admin-bg: #0F172A;
-    --admin-bg-card: #1E293B;
-    --admin-bg-sidebar: #0B1120;
-    --admin-bg-hover: #334155;
-    --admin-accent: #6366F1;
-    --admin-accent-hover: #818CF8;
-    --admin-accent-secondary: #10B981;
-    --admin-text: #F1F5F9;
-    --admin-text-secondary: #94A3B8;
-    --admin-text-muted: #64748B;
-    --admin-border: #334155;
+    --admin-bg: 15 23 42;
+    --admin-bg-card: 30 41 59;
+    --admin-bg-sidebar: 11 17 32;
+    --admin-bg-hover: 51 65 85;
+    --admin-accent: 99 102 241;
+    --admin-accent-hover: 129 140 248;
+    --admin-accent-secondary: 16 185 129;
+    --admin-text: 241 245 249;
+    --admin-text-secondary: 148 163 184;
+    --admin-text-muted: 100 116 139;
+    --admin-border: 51 65 85;
   }
 }
 
