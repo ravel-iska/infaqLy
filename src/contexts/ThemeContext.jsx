@@ -2,34 +2,55 @@ import { createContext, useContext, useEffect, useState } from 'react';
 
 const ThemeContext = createContext();
 
+const safeGetItem = (key) => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return window.localStorage.getItem(key);
+    }
+  } catch (e) {
+    return null;
+  }
+  return null;
+};
+
+const safeSetItem = (key, value) => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem(key, value);
+    }
+  } catch (e) {
+    // ignore
+  }
+};
+
 export function ThemeProvider({ children }) {
   const [isUserDark, setIsUserDark] = useState(() => {
-    const saved = localStorage.getItem('infaqly_user_theme');
+    const saved = safeGetItem('infaqly_user_theme');
     if (saved) return saved === 'dark';
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return true;
+    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return true;
     return false;
   });
 
   const [isAdminDark, setIsAdminDark] = useState(() => {
-    const saved = localStorage.getItem('infaqly_admin_theme');
+    const saved = safeGetItem('infaqly_admin_theme');
     if (saved) return saved === 'dark';
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return true;
+    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return true;
     return false;
   });
 
   useEffect(() => {
-    localStorage.setItem('infaqly_user_theme', isUserDark ? 'dark' : 'light');
+    safeSetItem('infaqly_user_theme', isUserDark ? 'dark' : 'light');
   }, [isUserDark]);
 
   useEffect(() => {
-    localStorage.setItem('infaqly_admin_theme', isAdminDark ? 'dark' : 'light');
+    safeSetItem('infaqly_admin_theme', isAdminDark ? 'dark' : 'light');
   }, [isAdminDark]);
 
   const toggleUserTheme = () => setIsUserDark(prev => !prev);
   const toggleAdminTheme = () => setIsAdminDark(prev => !prev);
 
   return (
-    <ThemeContext.Provider value={{ 
+    <ThemeContext.Provider value={{
       isUserDark, toggleUserTheme,
       isAdminDark, toggleAdminTheme
     }}>
