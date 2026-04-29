@@ -100,10 +100,10 @@ function LoadingScreen() {
       <div className="relative flex justify-center items-center mb-8 z-10">
         {/* Outer Static Track */}
         <div className="absolute inset-0 w-16 h-16 rounded-full border-[3px] border-outline-variant/30 dark:border-slate-700" />
-        
+
         {/* Fast Inner Ring */}
         <div className="absolute w-10 h-10 rounded-full border-[3px] border-transparent border-t-primary dark:border-t-emerald-400 animate-spin" style={{ animationDuration: '0.8s' }} />
-        
+
         {/* Slow Outer Ring */}
         <div className="w-16 h-16 rounded-full border-[3px] border-transparent border-b-primary dark:border-b-emerald-400 animate-[spin_1.5s_linear_infinite_reverse]" />
       </div>
@@ -154,17 +154,17 @@ function AppRoutes() {
 
   // Visitor Tracking (Anti-Spam Refresh)
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    const lastVisit = localStorage.getItem('infaqly_last_visit_date');
-    
-    // Jika hari ini belum tercatat kunjungannya di browser ini
-    if (lastVisit !== today) {
-      fetch('/api/visitors/track', { method: 'POST' })
-        .then(res => {
-          if (res.ok) localStorage.setItem('infaqly_last_visit_date', today);
-        })
-        .catch(() => {}); // Silent fail
-    }
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const lastVisit = localStorage.getItem('infaqly_last_visit_date');
+      if (lastVisit !== today) {
+        fetch('/api/visitors/track', { method: 'POST' })
+          .then(res => {
+            if (res.ok) { try { localStorage.setItem('infaqly_last_visit_date', today); } catch { } }
+          })
+          .catch(() => { }); // Silent fail
+      }
+    } catch { } // Guard if localStorage unavailable
   }, []);
 
   if (checkingMaintenance) return <LoadingScreen />;
@@ -178,43 +178,43 @@ function AppRoutes() {
   return (
     <ErrorBoundary>
       <Suspense fallback={<LoadingScreen />}>
-      <Routes>
-        {/* ── User Public Routes ── */}
-        <Route element={<UserLayout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/explore" element={<ExplorePage />} />
-          <Route path="/explore/:campaignId" element={<CampaignDetailPage />} />
-          <Route path="/cara-donasi" element={<HowToDonatePage />} />
-          <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
-          <Route path="/payment-verification" element={<PaymentVerificationPage />} />
+        <Routes>
+          {/* ── User Public Routes ── */}
+          <Route element={<UserLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/explore" element={<ExplorePage />} />
+            <Route path="/explore/:campaignId" element={<CampaignDetailPage />} />
+            <Route path="/cara-donasi" element={<HowToDonatePage />} />
+            <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
+            <Route path="/payment-verification" element={<PaymentVerificationPage />} />
             <Route path="/receipt/:orderId" element={<ReceiptPage />} />
-        </Route>
+          </Route>
 
-        {/* ── Auth Routes (Minimal Layout) ── */}
-        <Route element={<MinimalLayout />}>
-          <Route path="/login" element={<GuestOnly><LoginPage /></GuestOnly>} />
-          <Route path="/register" element={<GuestOnly><RegisterPage /></GuestOnly>} />
-          <Route path="/forgot-password" element={<GuestOnly><ForgotPasswordPage /></GuestOnly>} />
-        </Route>
+          {/* ── Auth Routes (Minimal Layout) ── */}
+          <Route element={<MinimalLayout />}>
+            <Route path="/login" element={<GuestOnly><LoginPage /></GuestOnly>} />
+            <Route path="/register" element={<GuestOnly><RegisterPage /></GuestOnly>} />
+            <Route path="/forgot-password" element={<GuestOnly><ForgotPasswordPage /></GuestOnly>} />
+          </Route>
 
-        {/* ── Admin Login (No Layout) ── */}
-        <Route path="/admin-panel/login" element={<AdminGuestOnly><AdminLoginPage /></AdminGuestOnly>} />
+          {/* ── Admin Login (No Layout) ── */}
+          <Route path="/admin-panel/login" element={<AdminGuestOnly><AdminLoginPage /></AdminGuestOnly>} />
 
-        {/* ── Admin Protected Routes ── */}
-        <Route element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
-          <Route path="/admin-panel/dashboard" element={<DashboardPage />} />
-          <Route path="/admin-panel/campaigns" element={<CampaignsPage />} />
-          <Route path="/admin-panel/campaigns/new" element={<CampaignFormPage />} />
-          <Route path="/admin-panel/campaigns/:id" element={<CampaignFormPage />} />
-          <Route path="/admin-panel/transactions" element={<TransactionsPage />} />
-          <Route path="/admin-panel/withdrawals" element={<WithdrawalsPage />} />
-          <Route path="/admin-panel/settings" element={<SettingsPage />} />
-        </Route>
+          {/* ── Admin Protected Routes ── */}
+          <Route element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
+            <Route path="/admin-panel/dashboard" element={<DashboardPage />} />
+            <Route path="/admin-panel/campaigns" element={<CampaignsPage />} />
+            <Route path="/admin-panel/campaigns/new" element={<CampaignFormPage />} />
+            <Route path="/admin-panel/campaigns/:id" element={<CampaignFormPage />} />
+            <Route path="/admin-panel/transactions" element={<TransactionsPage />} />
+            <Route path="/admin-panel/withdrawals" element={<WithdrawalsPage />} />
+            <Route path="/admin-panel/settings" element={<SettingsPage />} />
+          </Route>
 
-        {/* 404 */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Suspense>
+          {/* 404 */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </ErrorBoundary>
   );
 }
@@ -225,7 +225,7 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter>
           <AppRoutes />
-          <Toaster 
+          <Toaster
             position="top-center"
             toastOptions={{
               duration: 3000,

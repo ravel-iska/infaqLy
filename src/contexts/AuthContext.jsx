@@ -1,6 +1,13 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import api from '@/services/api';
 
+// Safe localStorage wrapper — guards against null/restricted environments
+const safeStorage = {
+  getItem: (key) => { try { return localStorage.getItem(key); } catch { return null; } },
+  setItem: (key, val) => { try { localStorage.setItem(key, val); } catch { } },
+  removeItem: (key) => { try { localStorage.removeItem(key); } catch { } },
+};
+
 const AuthContext = createContext(null);
 
 const initialState = {
@@ -37,38 +44,38 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     async function restoreSession() {
       // --- User session ---
-      const token = localStorage.getItem('infaqly_token');
-      const userStr = localStorage.getItem('infaqly_user');
+      const token = safeStorage.getItem('infaqly_token');
+      const userStr = safeStorage.getItem('infaqly_user');
       if (token && userStr) {
         try {
           const data = await api.get('/auth/session', { _token: token });
           dispatch({ type: 'SET_USER', payload: { user: data.user, token } });
-          localStorage.setItem('infaqly_user', JSON.stringify(data.user));
+          safeStorage.setItem('infaqly_user', JSON.stringify(data.user));
         } catch {
           // Token invalid — clear
-          localStorage.removeItem('infaqly_token');
-          localStorage.removeItem('infaqly_user');
+          safeStorage.removeItem('infaqly_token');
+          safeStorage.removeItem('infaqly_user');
         }
       }
 
       // --- Admin session ---
-      const adminToken = localStorage.getItem('infaqly_admin_token');
-      const adminStr = localStorage.getItem('infaqly_admin');
+      const adminToken = safeStorage.getItem('infaqly_admin_token');
+      const adminStr = safeStorage.getItem('infaqly_admin');
       if (adminToken && adminStr) {
         try {
           // Use explicit admin token (not auto-detected)
           const data = await api.get('/auth/session', { _token: adminToken });
           if (data.user?.role === 'admin') {
             dispatch({ type: 'SET_ADMIN', payload: { admin: data.user, token: adminToken } });
-            localStorage.setItem('infaqly_admin', JSON.stringify(data.user));
+            safeStorage.setItem('infaqly_admin', JSON.stringify(data.user));
           } else {
             // Token is valid but user is not admin — clear
-            localStorage.removeItem('infaqly_admin_token');
-            localStorage.removeItem('infaqly_admin');
+            safeStorage.removeItem('infaqly_admin_token');
+            safeStorage.removeItem('infaqly_admin');
           }
         } catch {
-          localStorage.removeItem('infaqly_admin_token');
-          localStorage.removeItem('infaqly_admin');
+          safeStorage.removeItem('infaqly_admin_token');
+          safeStorage.removeItem('infaqly_admin');
         }
       }
 
@@ -78,48 +85,48 @@ export function AuthProvider({ children }) {
   }, []);
 
   const loginUser = (user, token) => {
-    localStorage.setItem('infaqly_token', token);
-    localStorage.setItem('infaqly_user', JSON.stringify(user));
+    safeStorage.setItem('infaqly_token', token);
+    safeStorage.setItem('infaqly_user', JSON.stringify(user));
     dispatch({ type: 'SET_USER', payload: { user, token } });
   };
 
   const loginAdmin = (admin, token) => {
-    localStorage.setItem('infaqly_admin_token', token);
-    localStorage.setItem('infaqly_admin', JSON.stringify(admin));
+    safeStorage.setItem('infaqly_admin_token', token);
+    safeStorage.setItem('infaqly_admin', JSON.stringify(admin));
     dispatch({ type: 'SET_ADMIN', payload: { admin, token } });
   };
 
   const logoutUser = async () => {
     try {
-      const userToken = localStorage.getItem('infaqly_token');
+      const userToken = safeStorage.getItem('infaqly_token');
       await api.post('/auth/logout', {}, { _token: userToken });
-    } catch {}
-    localStorage.removeItem('infaqly_token');
-    localStorage.removeItem('infaqly_user');
+    } catch { }
+    safeStorage.removeItem('infaqly_token');
+    safeStorage.removeItem('infaqly_user');
     dispatch({ type: 'LOGOUT_USER' });
   };
 
   const logoutAdmin = async () => {
     try {
-      const adminToken = localStorage.getItem('infaqly_admin_token');
+      const adminToken = safeStorage.getItem('infaqly_admin_token');
       await api.post('/auth/logout', {}, { _token: adminToken });
-    } catch {}
+    } catch { }
     // Preserve only username for PIN quick re-login, remove full admin profile
-    const adminStr = localStorage.getItem('infaqly_admin');
+    const adminStr = safeStorage.getItem('infaqly_admin');
     if (adminStr) {
       try {
         const admin = JSON.parse(adminStr);
-        if (admin?.username) localStorage.setItem('infaqly_admin_pin_user', admin.username);
-      } catch {}
+        if (admin?.username) safeStorage.setItem('infaqly_admin_pin_user', admin.username);
+      } catch { }
     }
-    localStorage.removeItem('infaqly_admin_token');
-    localStorage.removeItem('infaqly_admin');
+    safeStorage.removeItem('infaqly_admin_token');
+    safeStorage.removeItem('infaqly_admin');
     dispatch({ type: 'LOGOUT_ADMIN' });
   };
 
   const updateUser = (updatedFields) => {
     const newUser = { ...state.user, ...updatedFields };
-    localStorage.setItem('infaqly_user', JSON.stringify(newUser));
+    safeStorage.setItem('infaqly_user', JSON.stringify(newUser));
     dispatch({ type: 'UPDATE_USER', payload: updatedFields });
   };
 
