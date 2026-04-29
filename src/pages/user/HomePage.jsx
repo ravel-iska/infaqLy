@@ -101,30 +101,30 @@ export default function HomePage() {
           HERO SECTION — Immersive Premium
          ═══════════════════════════════════════════════ */}
       <section className="relative overflow-hidden min-h-[90vh] flex items-center">
-        {/* Animated gradient backdrop — matches CTA style */}
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-700 via-teal-700 to-emerald-800 dark:from-slate-950 dark:via-emerald-950 dark:to-slate-900 transition-colors duration-500">
+        {/* Animated gradient backdrop — light: soft mint, dark: deep green */}
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-white to-teal-50 dark:from-slate-950 dark:via-emerald-950 dark:to-slate-900 transition-colors duration-500">
           {/* Floating orbs */}
-          <div className="absolute top-[10%] left-[5%] w-96 h-96 bg-white/10 dark:bg-emerald-500/20 rounded-full blur-[120px] animate-pulse transition-colors duration-500"></div>
-          <div className="absolute bottom-[10%] right-[5%] w-80 h-80 bg-white/10 dark:bg-teal-400/15 rounded-full blur-[100px] animate-pulse transition-colors duration-500" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute top-[50%] left-[40%] w-64 h-64 bg-white/5 dark:bg-emerald-300/10 rounded-full blur-[80px] animate-pulse transition-colors duration-500" style={{ animationDelay: '4s' }}></div>
+          <div className="absolute top-[10%] left-[5%] w-96 h-96 bg-emerald-200/40 dark:bg-emerald-500/20 rounded-full blur-[120px] animate-pulse transition-colors duration-500"></div>
+          <div className="absolute bottom-[10%] right-[5%] w-80 h-80 bg-teal-200/30 dark:bg-teal-400/15 rounded-full blur-[100px] animate-pulse transition-colors duration-500" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-[50%] left-[40%] w-64 h-64 bg-emerald-100/30 dark:bg-emerald-300/10 rounded-full blur-[80px] animate-pulse transition-colors duration-500" style={{ animationDelay: '4s' }}></div>
           {/* Grid pattern overlay */}
-          <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,.8) 1px, transparent 1px)', backgroundSize: '60px 60px' }}></div>
+          <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'linear-gradient(rgba(16,185,129,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(16,185,129,.5) 1px, transparent 1px)', backgroundSize: '60px 60px' }}></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 py-20 md:py-28 w-full">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <div className="animate-fade-in">
-              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-white text-xs font-bold tracking-widest uppercase mb-8 transition-colors duration-500">
-                <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-emerald-500/10 dark:bg-white/10 backdrop-blur-md border border-emerald-500/20 dark:border-white/20 text-emerald-700 dark:text-emerald-300 text-xs font-bold tracking-widest uppercase mb-8 transition-colors duration-500">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse"></span>
                 #BerbagiItuIndah
               </div>
-              <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.1] mb-8 tracking-tight transition-colors duration-500">
+              <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-slate-900 dark:text-white leading-[1.1] mb-8 tracking-tight transition-colors duration-500">
                 Berbagi Kebaikan
                 <br />
-                <span className="bg-gradient-to-r from-white/90 via-emerald-100 to-white/90 bg-clip-text text-transparent dark:from-emerald-400 dark:via-teal-300 dark:to-emerald-400">Lewat Digital</span>
+                <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-600 dark:from-emerald-400 dark:via-teal-300 dark:to-emerald-400 bg-clip-text text-transparent">Lewat Digital</span>
               </h1>
-              <p className="text-lg md:text-xl text-white/80 mb-10 max-w-lg leading-relaxed transition-colors duration-500">
-                Platform amanah untuk menyalurkan infaq & wakaf Anda. Ubah masa depan mereka dengan kontribusi nyata yang transparan dan terukur.
+              <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 mb-10 max-w-lg leading-relaxed transition-colors duration-500">
+                Platform amanah untuk menyalurkan infaq &amp; wakaf Anda. Ubah masa depan mereka dengan kontribusi nyata yang transparan dan terukur.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/explore" className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-lg rounded-2xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 transition-all hover:-translate-y-0.5 overflow-hidden">
@@ -132,24 +132,24 @@ export default function HomePage() {
                   <span className="relative">Mulai Berdonasi</span>
                   <span className="material-symbols-outlined text-[20px] relative group-hover:translate-x-1 transition-transform">arrow_forward</span>
                 </Link>
-                <button onClick={() => setIsImpactOpen(true)} className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white/15 backdrop-blur-md border border-white/25 text-white font-bold text-lg rounded-2xl hover:bg-white/25 transition-all duration-300">
-                  <span className="material-symbols-outlined text-[22px] text-white">play_circle</span>
+                <button onClick={() => setIsImpactOpen(true)} className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-emerald-300 dark:bg-white/10 backdrop-blur-md dark:border-white/20 dark:text-white font-bold text-lg rounded-2xl dark:hover:bg-white/20 transition-all duration-300">
+                  <span className="material-symbols-outlined text-[22px] text-emerald-500 dark:text-emerald-400">play_circle</span>
                   Lihat Dampak
                 </button>
               </div>
 
               {/* Trust Row */}
-              <div className="flex items-center gap-6 mt-12 pt-8 border-t border-white/20">
+              <div className="flex items-center gap-6 mt-12 pt-8 border-t border-slate-200 dark:border-white/10">
                 <div className="flex -space-x-3">
                   {[...Array(4)].map((_, i) => (
-                    <div key={i} className={`w-10 h-10 rounded-full border-2 border-white/40 ${['bg-white/30', 'bg-white/25', 'bg-white/20', 'bg-white/15'][i]} flex items-center justify-center`}>
+                    <div key={i} className={`w-10 h-10 rounded-full border-2 border-white ${['bg-emerald-400', 'bg-teal-400', 'bg-cyan-400', 'bg-emerald-300'][i]} flex items-center justify-center`}>
                       <span className="text-[10px] font-bold text-white">{'😊🤲💚✨'[i]}</span>
                     </div>
                   ))}
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-white transition-colors duration-500">15,000+ Donatur</p>
-                  <p className="text-xs text-white/70 transition-colors duration-500">Sudah menyalurkan kebaikan</p>
+                  <p className="text-sm font-bold text-slate-800 dark:text-white transition-colors duration-500">15,000+ Donatur</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 transition-colors duration-500">Sudah menyalurkan kebaikan</p>
                 </div>
               </div>
             </div>
@@ -308,7 +308,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl shadow-emerald-500/25 dark:shadow-emerald-900/40">
             {/* Bg gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-700 via-teal-700 to-emerald-800 dark:from-emerald-700 dark:via-teal-700 dark:to-emerald-800"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-700"></div>
             {/* Decorative elements */}
             <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full -mr-40 -mt-40 blur-3xl"></div>
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-400/20 rounded-full -ml-48 -mb-48 blur-3xl"></div>
