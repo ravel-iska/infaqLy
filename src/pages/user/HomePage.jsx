@@ -304,7 +304,7 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════
           CTA SECTION — Premium Gradient
          ═══════════════════════════════════════════════ */}
-      <section className="max-w-7xl mx-auto px-6 sm:px-8 mb-12 pb-10">
+      <section className="max-w-7xl mx-auto px-6 sm:px-8 mb-24 pb-10">
         <div className="relative rounded-[2.5rem] overflow-hidden">
           {/* Bg gradient */}
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-700"></div>
