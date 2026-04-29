@@ -102,7 +102,7 @@ export default function HomePage() {
          ═══════════════════════════════════════════════ */}
       <section className="relative overflow-hidden min-h-[90vh] flex items-center">
         {/* Animated gradient backdrop — matches CTA style */}
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-teal-500 to-emerald-600 dark:from-slate-950 dark:via-emerald-950 dark:to-slate-900 transition-colors duration-500">
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-600 dark:from-slate-950 dark:via-emerald-950 dark:to-slate-900 transition-colors duration-500">
           {/* Floating orbs */}
           <div className="absolute top-[10%] left-[5%] w-96 h-96 bg-white/10 dark:bg-emerald-500/20 rounded-full blur-[120px] animate-pulse transition-colors duration-500"></div>
           <div className="absolute bottom-[10%] right-[5%] w-80 h-80 bg-white/10 dark:bg-teal-400/15 rounded-full blur-[100px] animate-pulse transition-colors duration-500" style={{ animationDelay: '2s' }}></div>
@@ -308,7 +308,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl shadow-emerald-500/25 dark:shadow-emerald-900/40">
             {/* Bg gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-teal-500 to-emerald-600 dark:from-emerald-600 dark:via-teal-600 dark:to-emerald-700"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-600 dark:from-emerald-600 dark:via-teal-600 dark:to-emerald-700"></div>
             {/* Decorative elements */}
             <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full -mr-40 -mt-40 blur-3xl"></div>
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-400/20 rounded-full -ml-48 -mb-48 blur-3xl"></div>
