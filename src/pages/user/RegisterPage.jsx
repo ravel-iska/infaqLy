@@ -10,12 +10,12 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [duplicateError, setDuplicateError] = useState('');
-  
+
   // OTP Modal State
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otp, setOtp] = useState('');
   const [verifying, setVerifying] = useState(false);
-  
+
   const { loginUser, user, updateUser } = useAuth();
   const navigate = useNavigate();
 
@@ -125,10 +125,10 @@ export default function RegisterPage() {
             </div>
             <h2 className="text-2xl font-bold font-headline text-on-surface dark:text-white mb-2">Verifikasi WhatsApp</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-              Kami telah mengirimkan 6 digit kode OTP ke nomor WhatsApp <br/>
+              Kami telah mengirimkan 6 digit kode OTP ke nomor WhatsApp <br />
               <span className="font-bold text-slate-800 dark:text-slate-200">{form.whatsapp}</span>
             </p>
-            
+
             <form onSubmit={handleVerifyOtp} className="space-y-4">
               <input
                 type="text"
@@ -159,10 +159,10 @@ export default function RegisterPage() {
         </div>
       )}
 
-      <div className="bg-white/10 dark:bg-slate-900/40 backdrop-blur-2xl p-8 md:p-10 rounded-3xl shadow-2xl border border-white/20 dark:border-slate-700/50 mt-12 mb-12">
+      <div className="bg-white/70 dark:bg-slate-900/40 backdrop-blur-2xl p-8 md:p-10 rounded-3xl shadow-2xl border border-white dark:border-slate-700/50 mt-12 mb-12">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold font-headline text-white">Daftar Akun InfaqLy</h1>
-          <p className="mt-3 text-sm text-emerald-100/70 font-medium">Bergabung untuk mulai berbagi kebaikan hari ini</p>
+          <h1 className="text-3xl font-bold font-headline text-slate-900 dark:text-white">Daftar Akun InfaqLy</h1>
+          <p className="mt-3 text-sm text-slate-600 dark:text-emerald-100/70 font-medium">Bergabung untuk mulai berbagi kebaikan hari ini</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -180,23 +180,23 @@ export default function RegisterPage() {
             </div>
           )}
           <div>
-            <label className="block text-sm font-bold text-slate-200 mb-2">Username *</label>
-            <input type="text" value={form.username} onChange={(e) => update('username', e.target.value)} placeholder="Contoh: ahmadrahmani" className="w-full bg-slate-950/50 border border-slate-700/50 text-white placeholder:text-slate-500 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all font-medium backdrop-blur-md" autoFocus />
+            <label className="block text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">Username *</label>
+            <input type="text" value={form.username} onChange={(e) => update('username', e.target.value)} placeholder="Contoh: ahmadrahmani" className="w-full bg-white/50 dark:bg-slate-950/50 border border-slate-300 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all font-medium backdrop-blur-md" autoFocus />
           </div>
           <div>
-            <label className="block text-sm font-bold text-slate-200 mb-2">Email *</label>
-            <input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} placeholder="Contoh: ahmad@email.com" className="w-full bg-slate-950/50 border border-slate-700/50 text-white placeholder:text-slate-500 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all font-medium backdrop-blur-md" />
+            <label className="block text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">Email *</label>
+            <input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} placeholder="Contoh: ahmad@email.com" className="w-full bg-white/50 dark:bg-slate-950/50 border border-slate-300 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all font-medium backdrop-blur-md" />
           </div>
           <div>
-            <label className="block text-sm font-bold text-slate-200 mb-2">Nomor WhatsApp *</label>
-            <input type="text" value={form.whatsapp} onChange={(e) => update('whatsapp', e.target.value)} placeholder="Contoh: 081234567890" className="w-full bg-slate-950/50 border border-slate-700/50 text-white placeholder:text-slate-500 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all font-medium backdrop-blur-md" />
-            <p className="mt-2 text-xs text-slate-400 font-medium flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">info</span> Digunakan untuk menerima OTP & kuitansi donasi</p>
+            <label className="block text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">Nomor WhatsApp *</label>
+            <input type="text" value={form.whatsapp} onChange={(e) => update('whatsapp', e.target.value)} placeholder="Contoh: 081234567890" className="w-full bg-white/50 dark:bg-slate-950/50 border border-slate-300 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all font-medium backdrop-blur-md" />
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">info</span> Digunakan untuk menerima OTP & kuitansi donasi</p>
           </div>
           <div>
-            <label className="block text-sm font-bold text-slate-200 mb-2">Password *</label>
+            <label className="block text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">Password *</label>
             <div className="relative">
-              <input type={showPassword ? 'text' : 'password'} value={form.password} onChange={(e) => update('password', e.target.value)} placeholder="••••••••" className="w-full bg-slate-950/50 border border-slate-700/50 text-white placeholder:text-slate-500 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all font-medium pr-12 backdrop-blur-md" />
-              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-400 transition-colors">
+              <input type={showPassword ? 'text' : 'password'} value={form.password} onChange={(e) => update('password', e.target.value)} placeholder="••••••••" className="w-full bg-white/50 dark:bg-slate-950/50 border border-slate-300 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all font-medium pr-12 backdrop-blur-md" />
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">
                 <span className="material-symbols-outlined text-[20px]">
                   {showPassword ? 'visibility_off' : 'visibility'}
                 </span>
@@ -205,16 +205,16 @@ export default function RegisterPage() {
             {/* Strength meter */}
             {form.password && (
               <div className="mt-3">
-                <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                <div className="h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
                   <div className={`h-full rounded-full ${strength.color} transition-all duration-300`} style={{ width: strength.width }}></div>
                 </div>
-                <p className="text-xs text-slate-400 font-medium mt-1.5 flex items-center gap-1">Kekuatan Sandi: <span className="font-bold text-white">{strength.label}</span></p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1.5 flex items-center gap-1">Kekuatan Sandi: <span className="font-bold text-slate-900 dark:text-white">{strength.label}</span></p>
               </div>
             )}
           </div>
           <div>
-            <label className="block text-sm font-bold text-slate-200 mb-2">Konfirmasi Password *</label>
-            <input type="password" value={form.confirmPassword} onChange={(e) => update('confirmPassword', e.target.value)} placeholder="••••••••" className="w-full bg-slate-950/50 border border-slate-700/50 text-white placeholder:text-slate-500 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all font-medium backdrop-blur-md" />
+            <label className="block text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">Konfirmasi Password *</label>
+            <input type="password" value={form.confirmPassword} onChange={(e) => update('confirmPassword', e.target.value)} placeholder="••••••••" className="w-full bg-white/50 dark:bg-slate-950/50 border border-slate-300 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all font-medium backdrop-blur-md" />
           </div>
 
           <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-bold py-4 rounded-xl shadow-lg border border-emerald-400/20 hover:shadow-emerald-500/25 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 mt-6">
@@ -225,10 +225,10 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <div className="mt-8 text-center bg-black/20 p-4 rounded-2xl border border-white/5">
-          <p className="text-sm text-slate-300 font-medium">
+        <div className="mt-8 text-center bg-slate-50 dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5">
+          <p className="text-sm text-slate-600 dark:text-slate-300 font-medium">
             Sudah terdaftar?{' '}
-            <Link to="/login" className="text-emerald-400 font-bold hover:text-emerald-300 transition-colors hover:underline">
+            <Link to="/login" className="text-emerald-600 dark:text-emerald-400 font-bold hover:text-emerald-500 dark:hover:text-emerald-300 transition-colors hover:underline">
               Silakan Masuk
             </Link>
           </p>
