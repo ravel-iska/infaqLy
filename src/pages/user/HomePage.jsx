@@ -304,38 +304,47 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════
           CTA SECTION — Premium Gradient
          ═══════════════════════════════════════════════ */}
-      <section className="w-full bg-gradient-to-b from-white via-emerald-50/60 to-emerald-100/40 dark:from-transparent dark:via-transparent dark:to-transparent pt-10 pb-16 transition-colors duration-500">
+      <section className="w-full py-10 pb-16 transition-colors duration-500">
         <div className="max-w-7xl mx-auto px-6 sm:px-8">
-          <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl shadow-emerald-500/25 dark:shadow-emerald-900/40">
-            {/* Bg gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-700"></div>
-            {/* Decorative elements */}
-            <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full -mr-40 -mt-40 blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-400/20 rounded-full -ml-48 -mb-48 blur-3xl"></div>
-            <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,.8) 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+          {/* Light mode: white card with green border. Dark mode: solid green gradient */}
+          <div className="relative rounded-[2.5rem] overflow-hidden
+            bg-white border border-emerald-100 shadow-xl shadow-emerald-500/10
+            dark:bg-transparent dark:border-0 dark:shadow-2xl dark:shadow-emerald-900/40">
+
+            {/* Dark mode only: solid green bg */}
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-700 opacity-0 dark:opacity-100 transition-opacity duration-500"></div>
+
+            {/* Light mode: subtle green blobs */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-100/60 dark:bg-white/10 rounded-full -mr-40 -mt-40 blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-100/40 dark:bg-emerald-400/20 rounded-full -ml-48 -mb-48 blur-3xl"></div>
 
             <div className="relative z-10 p-12 md:p-16 lg:p-20 text-center">
-              <h2 className="font-headline text-3xl md:text-5xl font-bold mb-6 max-w-3xl mx-auto text-white leading-tight">Wujudkan Dampak Nyata Hari Ini</h2>
-              <p className="text-lg text-white/80 mb-10 max-w-xl mx-auto leading-relaxed">Bergabunglah dengan ribuan donatur lainnya dalam menebar kebaikan yang terukur dan transparan.</p>
+              {/* Light: green accent label */}
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 dark:bg-white/10 border border-emerald-500/20 dark:border-white/20 text-emerald-700 dark:text-emerald-200 text-xs font-bold tracking-widest uppercase mb-6">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-white animate-pulse"></span>
+                Mulai Sekarang
+              </span>
+              <h2 className="font-headline text-3xl md:text-5xl font-bold mb-6 max-w-3xl mx-auto text-slate-900 dark:text-white leading-tight transition-colors duration-500">
+                Wujudkan Dampak Nyata <span className="bg-gradient-to-r from-emerald-600 to-teal-500 dark:from-emerald-300 dark:to-teal-200 bg-clip-text text-transparent">Hari Ini</span>
+              </h2>
+              <p className="text-lg text-slate-600 dark:text-white/80 mb-10 max-w-xl mx-auto leading-relaxed transition-colors duration-500">Bergabunglah dengan ribuan donatur lainnya dalam menebar kebaikan yang terukur dan transparan.</p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 {!isAuthenticated ? (
-                  <Link to="/register" className="group bg-white text-emerald-700 px-10 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-black/10 hover:shadow-2xl hover:-translate-y-0.5 transition-all inline-flex items-center justify-center gap-2">
+                  <Link to="/register" className="group bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all inline-flex items-center justify-center gap-2">
                     Daftar Sekarang <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
                   </Link>
                 ) : (
-                  <Link to="/profile" className="group bg-white text-emerald-700 px-10 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-black/10 hover:shadow-2xl hover:-translate-y-0.5 transition-all inline-flex items-center justify-center gap-2">
+                  <Link to="/profile" className="group bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all inline-flex items-center justify-center gap-2">
                     Dashboard Anda <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
                   </Link>
                 )}
-                <Link to="/explore" className="bg-white/15 backdrop-blur-md border border-white/25 text-white px-10 py-4 rounded-2xl font-bold text-lg hover:bg-white/25 transition-all inline-flex items-center justify-center gap-2">
-                  <span className="material-symbols-outlined text-[20px]">explore</span> Jelajahi Program
+                <Link to="/explore" className="bg-slate-50 dark:bg-white/15 backdrop-blur-md border border-slate-200 dark:border-white/25 text-slate-700 dark:text-white px-10 py-4 rounded-2xl font-bold text-lg hover:bg-emerald-50 dark:hover:bg-white/25 hover:border-emerald-300 transition-all inline-flex items-center justify-center gap-2">
+                  <span className="material-symbols-outlined text-[20px] text-emerald-500 dark:text-white">explore</span> Jelajahi Program
                 </Link>
               </div>
             </div>
           </div>
         </div>
-        {/* Soft bottom blend — gradient fades into white */}
-        <div className="h-12 bg-gradient-to-b from-emerald-100/40 to-white dark:from-transparent dark:to-transparent mt-0 transition-colors duration-500"></div>
       </section>
 
       {/* Impact Modal */}
