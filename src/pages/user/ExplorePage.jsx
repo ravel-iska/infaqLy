@@ -57,18 +57,18 @@ export default function ExplorePage() {
     <div className="animate-fade-in bg-surface dark:bg-slate-900 font-body text-on-surface dark:text-slate-100 min-h-screen transition-colors duration-300">
 
       {/* Premium Header */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-emerald-950 via-slate-900 to-teal-900 pt-28 pb-16 px-4 md:px-8">
+      <div className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-100 dark:from-emerald-950 dark:via-slate-900 dark:to-teal-900 pt-28 pb-16 px-4 md:px-8 transition-colors duration-500">
         <div className="absolute inset-0">
-          <div className="absolute top-[-20%] right-[-10%] w-96 h-96 bg-emerald-500/15 rounded-full blur-[120px]"></div>
-          <div className="absolute bottom-[-20%] left-[-10%] w-80 h-80 bg-teal-400/10 rounded-full blur-[100px]"></div>
-          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)', backgroundSize: '60px 60px' }}></div>
+          <div className="absolute top-[-20%] right-[-10%] w-96 h-96 bg-emerald-300/30 dark:bg-emerald-500/15 rounded-full blur-[120px] transition-colors duration-500"></div>
+          <div className="absolute bottom-[-20%] left-[-10%] w-80 h-80 bg-teal-300/20 dark:bg-teal-400/10 rounded-full blur-[100px] transition-colors duration-500"></div>
+          <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(0,0,0,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,.5) 1px, transparent 1px)', backgroundSize: '60px 60px' }}></div>
         </div>
         <div className="max-w-7xl mx-auto relative z-10">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-emerald-300 text-xs font-bold tracking-widest uppercase mb-6">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 dark:bg-white/10 backdrop-blur-md border border-emerald-500/20 dark:border-white/20 text-emerald-700 dark:text-emerald-300 text-xs font-bold tracking-widest uppercase mb-6 transition-colors duration-500">
             <span className="material-symbols-outlined text-[16px]">explore</span> Jelajahi
           </span>
-          <h1 className="font-headline text-4xl md:text-5xl font-bold mb-4 text-white">Jelajahi Program</h1>
-          <p className="text-slate-300 text-lg max-w-xl">Temukan program donasi yang sesuai dengan hati dan kepedulian Anda.</p>
+          <h1 className="font-headline text-4xl md:text-5xl font-bold mb-4 text-slate-900 dark:text-white transition-colors duration-500">Jelajahi Program</h1>
+          <p className="text-slate-600 dark:text-slate-300 text-lg max-w-xl transition-colors duration-500">Temukan program donasi yang sesuai dengan hati dan kepedulian Anda.</p>
         </div>
       </div>
 
