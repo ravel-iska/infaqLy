@@ -141,7 +141,7 @@ export default function ExplorePage() {
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-32 bg-surface-container-lowest dark:bg-slate-800 rounded-[3rem] border border-white/20 dark:border-slate-700 ambient-shadow">
+          <div className="text-center py-32 bg-surface-container-lowest dark:bg-slate-800 rounded-[3rem] border border-white/20 dark:border-slate-700 ambient-shadow mb-20">
             <div className="w-24 h-24 mx-auto bg-surface-container dark:bg-slate-700 rounded-full flex items-center justify-center mb-6">
               <span className="material-symbols-outlined text-5xl text-on-surface-variant dark:text-slate-500">
                 search_off
@@ -151,7 +151,7 @@ export default function ExplorePage() {
             <p className="text-on-surface-variant dark:text-slate-400">Coba ubah kata kunci atau filter kategori pencarian Anda.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20">
             {filtered.map((campaign, idx) => (
               <CampaignListCard key={campaign.id} campaign={campaign} idx={idx} />
             ))}
